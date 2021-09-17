@@ -16,7 +16,7 @@ GENOME="path/to/IndexedGenomeFile"
 BIN="25"
 
 #smoothlength setting, for smoothing the enrichment curve
-$SMOOTH="50"
+SMOOTH="50"
 
 #if you want to use the MNase parameter, uncomment the following lines
 MNase="--MNase"
