@@ -14,6 +14,7 @@ OUTDIR="path/to/OutputDirectory"
 
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank
 
+#GENOME="/home/zlewis/Genomes/Mouse/GCF_000001635.27_GRCm39_genomic.fna.gz" #Mouse
 #GENOME="/home/zlewis/Genomes/Cryptococcus/CryptococcusNeoformans_XL280" #Cryptococcus XL280
 #GENOME="/home/zlewis/Genomes/Cryptococcus/JEC21/GCF_000091045.1_ASM9104v1_genomic.fna" #Cryptococcus neoformans JEC21
 #GENOME="/home/zlewis/Genomes/HumanGenome/Hg19.fa" Human Genome
