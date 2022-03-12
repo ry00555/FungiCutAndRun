@@ -64,6 +64,6 @@ samtools index "$bam"
 
 ml deepTools/3.3.1-intel-2019b-Python-3.7.4
 # #use these parameters for ChIP data
-bamCoverage -p $THREADS $MNase -bs $BIN --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}${MN}.bw"
+bamCoverage -p $THREADS $MNase -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}${MN}.bw"
 
 done
