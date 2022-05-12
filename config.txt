@@ -5,6 +5,8 @@ THREADS=12
 
 FASTQ="path/to/fastqfiles"
 
+#Edit Code to add Q score option
+
 #OUTDIR should be the path a folder for writing output
 OUTDIR="path/to/OutputDirectory"
 
