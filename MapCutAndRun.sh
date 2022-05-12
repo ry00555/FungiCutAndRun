@@ -50,14 +50,17 @@ do
  	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 	#variable name for bigwig output
 	bigwig="${OUTDIR}/BigWigs/${name}"
+	QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
 
 ml SAMtools/1.9-GCC-8.3.0
 ml BWA/0.7.17-GCC-8.3.0
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-
 samtools index "$bam"
+
+samtools view -b -q 30 $bam > "$QualityBam"
+samtools index "$QualityBam"
 
 ############################
 # # #deeptools
