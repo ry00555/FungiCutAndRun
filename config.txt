@@ -38,7 +38,7 @@ GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBar
 BIN="25"
 
 #smoothlength setting, for smoothing the enrichment curve
-SMOOTH="50"
+SMOOTH="75"
 
 #if you want to use the MNase parameter, uncomment the following lines
 MNase="--MNase"
