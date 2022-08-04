@@ -40,7 +40,4 @@ BIN="25"
 #smoothlength setting, for smoothing the enrichment curve
 SMOOTH="75"
 
-#if you want to use the MNase parameter, uncomment the following lines
-MNase="--MNase"
-MN="MNase"
-
+##removed options for MNase analysis. Now, bulk reads will be plotted using deeptools using the bin and smooth parameters above ('_Bulk.bw'. A seperate MNase file will be generated to plot mononcleosome centers ('_MNase.bw') using a binsize of 1 and a smooth length of 25. 
