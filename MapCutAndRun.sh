@@ -66,7 +66,10 @@ samtools index "$bam"
 # # #deeptools
 
 ml deepTools/3.3.1-intel-2019b-Python-3.7.4
-# #use these parameters for ChIP data
-bamCoverage -p $THREADS $MNase -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}${MN}.bw"
+#Plot all reads
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+
+#plot mononucleosomes
+bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 done
