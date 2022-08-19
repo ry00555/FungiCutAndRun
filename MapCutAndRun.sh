@@ -17,6 +17,8 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 OUTDIR=../${OutputFolderName}
+mkdir=${OUTDIR}
+
 
 # #process reads using trimGalore
 #
