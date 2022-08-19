@@ -16,6 +16,8 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
+OUTDIR=../${OutputFolderName}
+
 # #process reads using trimGalore
 #
  ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
