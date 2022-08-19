@@ -7,8 +7,10 @@ FASTQ="path/to/fastqfiles"
 
 #Edit Code to add Q score option
 
-#OUTDIR should be the path a folder for writing output
-OUTDIR="path/to/OutputDirectory"
+#Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.   
+
+OutputFolderName="name of output folder"
+
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
