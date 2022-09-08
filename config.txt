@@ -3,7 +3,7 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-FASTQ="path/to/fastqfiles"
+FASTQ="/scratch/ry00555/MapCutandRun/"
 
 #Edit Code to add Q score option
 
@@ -31,7 +31,6 @@ GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeqGCA_000182925.2_NC12_genomic"
 #GENOME="/home/zlewis/Genomes/RhizophusDelemar/FungiDB/FungiDB-56_RdelemarRA99-880_Genome.fasta" #Rhizopus delemar
 #GENOME="/home/zlewis/Genomes/YeastGenome/Ensemble_Saccharomyces_cerevisiae.R64-1-1"    #YEAST R64 ENSEMBLE
 #GENOME="/home/zlewis/Genomes/Salmonella_enterica/GCF_000006945.2_ASM694v2_genomic.fna.gz".  #Salmonella enterica
-
 
 
 
