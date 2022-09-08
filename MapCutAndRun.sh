@@ -2,7 +2,7 @@
 #SBATCH --job-name=zl_mapChIPseq
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=zlewis@uga.edu
+#SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
@@ -41,7 +41,7 @@ do
 # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 		#${string//substring/replacement}
 # 		#dir=${f%/*}
-		
+
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
