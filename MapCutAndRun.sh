@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=zl_mapChIPseq
+#SBATCH --job-name=RY_mapChIPseq_Run109
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
