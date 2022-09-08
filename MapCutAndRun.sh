@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source config.txt
+source /Users/ry00555/Desktop/RochelleLabDesktop/FungiCutAndRun/config.txt
 
 OUTDIR=../${OutputFolderName}
 mkdir ${OUTDIR}
