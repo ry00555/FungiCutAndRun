@@ -7,9 +7,9 @@ FASTQ="/scratch/ry00555/MapCutandRun/"
 
 #Edit Code to add Q score option
 
-#Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.   
+#Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OutputFolderName="OutputFolder"
+OutputFolderName="/scratch/ry00555/OutputRun109"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
@@ -42,4 +42,4 @@ BIN="25"
 #smoothlength setting, for smoothing the enrichment curve
 SMOOTH="75"
 
-##removed options for MNase analysis. Now, bulk reads will be plotted using deeptools using the bin and smooth parameters above ('_Bulk.bw'. A seperate MNase file will be generated to plot mononcleosome centers ('_MNase.bw') using a binsize of 1 and a smooth length of 25. 
+##removed options for MNase analysis. Now, bulk reads will be plotted using deeptools using the bin and smooth parameters above ('_Bulk.bw'. A seperate MNase file will be generated to plot mononcleosome centers ('_MNase.bw') using a binsize of 1 and a smooth length of 25.
