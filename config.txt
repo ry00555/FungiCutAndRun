@@ -5,7 +5,7 @@ THREADS=12
 
 #lets see if this works please
 
-FASTQ="/scratch/ry00555/MapCutandRun/"
+FASTQ="/scratch/ry00555/MapCutandRun"
 
 #Edit Code to add Q score option
 
