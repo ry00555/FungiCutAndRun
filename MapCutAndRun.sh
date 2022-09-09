@@ -14,11 +14,14 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source /Users/ry00555/Desktop/RochelleLabDesktop/FungiCutAndRun/config.txt
+source config.txt
 
-OUTDIR=../${OutputFolderName}
-mkdir ${OUTDIR}
-
+##make output directory
+OUTDIR= "/scratch/ry00555/OutputRun109"
+if [ ! -d $OUTDIR ]
+then
+mkdir -p $OUTDIR
+fi
 
 # #process reads using trimGalore
 #
