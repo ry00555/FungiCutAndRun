@@ -3,7 +3,7 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-#lets see if this works please 
+#lets see if this works please
 
 FASTQ="/scratch/ry00555/MapCutandRun/"
 
@@ -11,7 +11,7 @@ FASTQ="/scratch/ry00555/MapCutandRun/"
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OutputFolderName="/scratch/ry00555/OutputRun109"
+OUTDIR="/scratch/ry00555/OutputRun109"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
