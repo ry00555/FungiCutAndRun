@@ -47,7 +47,7 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
@@ -63,8 +63,8 @@ do
 ml SAMtools/1.9-GCC-8.3.0
 ml BWA/0.7.17-GCC-8.3.0
 #
-#bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-#samtools index "$bam"
+bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
 
 #samtools view -b -q 30 $bam > "$QualityBam"
 #samtools index "$QualityBam"
