@@ -5,13 +5,13 @@ THREADS=12
 
 #lets see if this works please
 
-FASTQ="/scratch/ry00555/MapCutandRun"
+FASTQ="/scratch/ry00555/Bioinformatics/Run104"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OUTDIR="/scratch/ry00555/OutputRun109"
+OUTDIR="/scratch/ry00555/OutputRun104"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
