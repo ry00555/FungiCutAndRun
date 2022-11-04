@@ -18,6 +18,7 @@ OutputFolderName="OutputFolder"
 
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeqGCA_000182925.2_NC12_genomic"
 
+#GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 #GENOME="/home/zlewis/Genomes/Mouse/GCF_000001635.27_GRCm39_genomic.fna.gz" #Mouse
