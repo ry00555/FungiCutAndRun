@@ -5,7 +5,7 @@ THREADS=12
 
 #lets see if this works please
 
-FASTQ="/scratch/ry00555/Bioinformatics/Run104"
+FASTQ="/Users/ry00555/Desktop/RochelleLabDesktopData/IGV /mus-30xmei-3 anaylsis IGV/mus30Samples"
 
 #Edit Code to add Q score option
 
