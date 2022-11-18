@@ -18,10 +18,10 @@ source config.txt
 
 ##make output directory
 OUTDIR= "/scratch/ry00555/OutputRun109"
-if [ ! -d $OUTDIR ]
-then
-mkdir -p $OUTDIR
-fi
+#if [ ! -d $OUTDIR ]
+#then
+#mkdir -p $OUTDIR
+#fi
 
 # #process reads using trimGalore
 #
@@ -30,9 +30,9 @@ fi
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz.tdf" #Don't forget the *
 #
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
+ #mkdir "${OUTDIR}/SortedBamFiles"
+ #mkdir "${OUTDIR}/BigWigs"
+ #mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
 #
