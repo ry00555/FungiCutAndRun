@@ -5,13 +5,13 @@ THREADS=12
 
 #lets see if this works please
 
-FASTQ="/Users/ry00555/Desktop/RochelleLabDesktopData/IGV /mus-30xmei-3 anaylsis IGV/mus30Samples"
+FASTQ="/Users/ry00555/Desktop/RochelleLabDesktopData/IGV/mus30xmei3/mus30Samples"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OUTDIR="/scratch/ry00555/OutputRun104"
+OUTDIR="/scratch/ry00555/OutputRun109"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome

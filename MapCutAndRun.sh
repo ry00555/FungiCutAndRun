@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 ##make output directory
-OUTDIR= "/scratch/ry00555/OutputRun104"
+OUTDIR= "/scratch/ry00555/OutputRun109"
 if [ ! -d $OUTDIR ]
 then
 mkdir -p $OUTDIR
