@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 ##make output directory
-OUTDIR= "/scratch/ry00555/OutputRun109"
+OUTDIR= "/scratch/ry00555/OutputRun109/"
 #if [ ! -d $OUTDIR ]
 #then
 #mkdir -p $OUTDIR
@@ -28,7 +28,7 @@ OUTDIR= "/scratch/ry00555/OutputRun109"
  ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
  #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz.tdf" #Don't forget the *
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
  #mkdir "${OUTDIR}/SortedBamFiles"
  #mkdir "${OUTDIR}/BigWigs"
@@ -49,10 +49,12 @@ do
 	#remove ending from file name to create shorter names for bam files and other downstream output
 	name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
+done
+
 #
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
-	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+	#read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 	#variable for naming bam file
  	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 	#variable name for bigwig output
