@@ -62,8 +62,8 @@ do
 
 ml SAMtools/1.9-GCC-8.3.0
 ml BWA/0.7.17-GCC-8.3.0
-#
-bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+#sampe -r STR adds a read group to each sample. 
+bwa mem -M -v 3 -t sampe -r STR $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 
 #samtools view -b -q 30 $bam > "$QualityBam"
