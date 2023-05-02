@@ -4,20 +4,20 @@ THREADS=12
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
 
-FASTQ="/scratch/ry00555/MapCutandRun"
+FASTQ="/scratch/zlewis/2023_Run131/2023_Run131_FastQ/FASTQs"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OUTDIR="/scratch/ry00555/OutputRun109/V2"
+OUTDIR="/scratch/ry00555/OutputRun131"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 ml BWA/0.7.17-GCC-8.3.0
 #bwa index GCF_000182925.2.fasta
 #GENOME="path/to/IndexedGenomeFile"
-GENOME="/home/ry00555/Bioinformatics/CrassaGenome/GCF_000182925.2.fasta"
+GENOME="/Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/IGV/NeurosporaGenome/GCA_000182925.2_NC12_genomic.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
