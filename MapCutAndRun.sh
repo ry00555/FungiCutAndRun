@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=RY_mapChIPseq_Run127
+#SBATCH --job-name=RY_mapChIPseq_Run133
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 ##make output directory
-OUTDIR= "/scratch/ry00555/OutputRun131"
+OUTDIR= "/scratch/ry00555/OutputRun133"
 if [ ! -d $OUTDIR ]
 then
 mkdir -p $OUTDIR

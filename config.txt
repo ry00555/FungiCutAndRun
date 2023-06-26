@@ -2,15 +2,17 @@
 THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
+#to download all files to local machine  scp -r ry00555@xfer.gacrc.uga.edu:/scratch/zlewis/Run133/2023_Run133_FASTQ/ /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133
+#then seperate my files into a new folder for Run133 on my local machine it is /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133/RYSamples/ZippedFastQ
+#transfer to the scratch folder scp -r *fasta.gz ry00555@xfer@gacrc.uga.edu:scratch/ry00555/OutputRun133/FastQ
 
-
-FASTQ="/scratch/zlewis/2023_Run131/2023_Run131_FastQ/FASTQs"
+FASTQ="/Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133/RYSamples/ZippedFastQ"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OUTDIR="/scratch/ry00555/OutputRun131"
+OUTDIR="/scratch/ry00555/OutputRun133"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
