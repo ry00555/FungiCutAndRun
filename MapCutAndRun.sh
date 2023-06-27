@@ -18,10 +18,10 @@ source config.txt
 
 ##make output directory
 OUTDIR= "/scratch/ry00555/OutputRun133"
-if [ ! -d $OUTDIR ]
-then
-mkdir -p $OUTDIR
-fi
+#if [ ! -d $OUTDIR ]
+#then
+#mkdir -p $OUTDIR
+#fi
 
 # #process reads using trimGalore
 #
@@ -30,9 +30,9 @@ fi
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
-mkdir "${OUTDIR}/SortedBamFiles"
-mkdir "${OUTDIR}/BigWigs"
-mkdir "${OUTDIR}/Peaks"
+#mkdir "${OUTDIR}/SortedBamFiles"
+#mkdir "${OUTDIR}/BigWigs"
+#mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
 #
@@ -54,7 +54,7 @@ do
 # 	#use sed to get the name of the second read matching the input file
 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 	#variable for naming bam file
- 	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+ 	#bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 	#variable name for bigwig output
 	bigwig="${OUTDIR}/BigWigs/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
