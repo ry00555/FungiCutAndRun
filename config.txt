@@ -20,8 +20,8 @@ OUTDIR="/scratch/ry00555/OutputRun133"
 ml BWA/0.7.17-GCC-8.3.0
 #bwa index GCF_000182925.2.fasta
 #GENOME="path/to/IndexedGenomeFile"
-GENOME="/Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/IGV/NeurosporaGenome/GCA_000182925.2_NC12_genomic.fasta"
-#GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
+#GENOME="/Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/IGV/NeurosporaGenome/GCA_000182925.2_NC12_genomic.fasta"
+GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank
