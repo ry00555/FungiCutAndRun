@@ -25,7 +25,7 @@ OUTDIR= "/scratch/ry00555/OutputRun133"
 
 # #process reads using trimGalore
 #
- ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+ ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4 BWA/0.7.17-GCC-8.3.0
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
@@ -47,14 +47,14 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 	#variable for naming bam file
- 	#bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+ 	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 	#variable name for bigwig output
 	bigwig="${OUTDIR}/BigWigs/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
@@ -63,7 +63,7 @@ do
 ml SAMtools/1.9-GCC-8.3.0
 ml BWA/0.7.17-GCC-8.3.0
 #sampe -r STR adds a read group to each sample.
-bwa mem -M -v 3 -t sampe -r STR $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 
 #samtools view -b -q 30 $bam > "$QualityBam"
