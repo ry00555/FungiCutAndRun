@@ -6,22 +6,25 @@ THREADS=12
 #then seperate my files into a new folder for Run133 on my local machine it is /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133/RYSamples/ZippedFastQ
 #transfer to the scratch folder scp -r *fastq.gz ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/OutputRun133/FastQ
 
+#number of CPUs
+THREADS=12
 
-#FASTQ="/scratch/ry00555/OutputRun133/FastQ"
+#FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
+
+FASTQ="/scratch/ry00555/OutputRun133/FastQ"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OUTDIR="/scratch/ry00555/OutputRun133"
+OutputFolderName="/scratch/ry00555/OutputRun133"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
-ml BWA/0.7.17-GCC-8.3.0
-#bwa index GCF_000182925.2.fasta
+
 #GENOME="path/to/IndexedGenomeFile"
-#GENOME="/Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/IGV/NeurosporaGenome/GCA_000182925.2_NC12_genomic.fasta"
-GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
+
+GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank
@@ -37,6 +40,7 @@ GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 #GENOME="/home/zlewis/Genomes/RhizophusDelemar/FungiDB/FungiDB-56_RdelemarRA99-880_Genome.fasta" #Rhizopus delemar
 #GENOME="/home/zlewis/Genomes/YeastGenome/Ensemble_Saccharomyces_cerevisiae.R64-1-1"    #YEAST R64 ENSEMBLE
 #GENOME="/home/zlewis/Genomes/Salmonella_enterica/GCF_000006945.2_ASM694v2_genomic.fna.gz".  #Salmonella enterica
+
 
 
 
