@@ -30,7 +30,7 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
-mkdir "${OUTDIR}/NormalizedBigWigs"
+#mkdir "${OUTDIR}/NormalizedBigWigs"
 
 # Iterate over the files
 #do
@@ -54,42 +54,26 @@ mkdir "${OUTDIR}/NormalizedBigWigs"
 #  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 #done
 
-ml Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
-
 # Set common variables
 PEAKDIR="${OUTDIR}/Peaks"
-TAGDIR="$OUTDIR/HomerTagDirectories"
+TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
-# Generate list of sample IDs based on a naming pattern
-#common_id="132"
-#start_num=17
-#end_num=95
-#samples=()
-#for ((num=start_num; num<=end_num; num++)); do
-  #sample_id="${common_id}-${num}"
-#  samples+=("$sample_id")
-#done
+# Load necessary modules
+ml Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
 
-# Iterate over the sample IDs
-#for sample in "${samples[@]}"; do
-  # Construct file paths
-  #bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
-  #input_bam="${BAMDIR}/${sample}_input_S${sample}*_R1_001_val_1.fq.gz.bam"
-  input_bam="${BAMDIR}/*.bam"
-
-  # Iterate over each BAM file in the directory
-  for bam_file in "${BAMDIR}"/*.bam; do
-    # Get the sample ID from the BAM file name
-    sample_id=$(basename "${bam_file}" .bam)
-
+# Iterate over each BAM file in the directory
+for bam_file in "${BAMDIR}"/*.bam; do
+  # Get the sample ID from the BAM file name
+  sample_id=$(basename "${bam_file}" .bam)
 
   # Make tag directory
-  makeTagDirectory "${TAGDIR}/${sample_id}" "${BAMDIR}/$sample_id"
+  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "$input_bam"
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${bam_file}"
 done
+
 
 
 
