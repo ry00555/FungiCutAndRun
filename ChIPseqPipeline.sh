@@ -21,21 +21,21 @@ OUTDIR=/scratch/ry00555/OutputRun132
 
 # Process reads using trimGalore
 ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
-mkdir "${OUTDIR}/SortedBamFiles"
-mkdir "${OUTDIR}/BigWigs"
-mkdir "${OUTDIR}/Peaks"
-mkdir "$OUTDIR/HomerTagDirectories"
-mkdir "$OUTDIR/TdfFiles"
+#mkdir "${OUTDIR}/SortedBamFiles"
+#mkdir "${OUTDIR}/BigWigs"
+#mkdir "${OUTDIR}/Peaks"
+#mkdir "$OUTDIR/HomerTagDirectories"
+#mkdir "$OUTDIR/TdfFiles"
 
 # Iterate over the files
 for f in $FILES
 do
   file=${f##*/}
-  name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+  name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
 
   read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
   bam="${OUTDIR}/SortedBamFiles/${name}.bam"
@@ -48,6 +48,7 @@ do
   samtools index "$bam"
 
   ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+  conda install -c bioconda deeptools
 
   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
   bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
