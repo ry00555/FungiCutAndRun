@@ -30,29 +30,29 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #mkdir "${OUTDIR}/Peaks"
 #mkdir "$OUTDIR/HomerTagDirectories"
 #mkdir "$OUTDIR/TdfFiles"
+mkdir "${OUTDIR}/NormalizedBigWigs"
 
 # Iterate over the files
-for f in $FILES
-do
-  file=${f##*/}
+#do
+ file=${f##*/}
   name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
 
-  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-  bigwig="${OUTDIR}/BigWigs/${name}"
+#  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+#  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+#  bigwig="${OUTDIR}/BigWigs/${name}"
 
   ml SAMtools/1.9-GCC-8.3.0
   ml BWA/0.7.17-GCC-8.3.0
 
-  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-  samtools index "$bam"
+  #bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  #samtools index "$bam"
 
-  ml deepTools/3.3.1-intel-2019b-Python-3.7.4
-  conda install -c bioconda deeptools
+#  ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+#  conda install -c bioconda deeptools
 
-  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-done
+#  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+#done
 
 ml Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
 
@@ -74,7 +74,7 @@ done
 # Iterate over the sample IDs
 for sample in "${samples[@]}"; do
   # Construct file paths
-  #bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
+  bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
   #input_bam="${BAMDIR}/${sample}_input_S${sample}*_R1_001_val_1.fq.gz.bam"
   input_bam="${BAMDIR}/${name}.bam"
 
@@ -105,3 +105,26 @@ done
   # Plot heatmap
 #  plotHeatmap -m "matrix_${sample_id}.gz" -out "cacheatmap_H3K4me2_${sample_id}_hclust.png" --samplesLabel "${samples[*]}" --hclust 1 --colorMap Reds
 #done
+
+
+# Normalize to mitochondrial DNA which has no nucleosomes
+ml SAMtools/1.9-GCC-8.3.0
+ml deepTools/3.5.1-intel-2020b-Python-3.8.6
+
+
+
+# Iterate over each BAM file in the directory
+for bam_file in "${BAMDIR}"/*.bam; do
+  # Get the sample ID from the BAM file name
+  bam_id=$(basename "${bam_file}" .bam)
+
+  # Calculate read counts using samtools idxstats
+  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+
+  # Calculate scaling factor
+  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+
+  # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
+  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${bam_id}_normalized.bw"
+done
