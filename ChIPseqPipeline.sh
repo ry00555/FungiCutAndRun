@@ -59,7 +59,7 @@ ml Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
 # Set common variables
 OUTDIR="${OUTDIR}/Peaks"
 TAGDIR="$OUTDIR/HomerTagDirectories"
-BAMDIR="/${OUTDIR}/SortedBamFiles"
+BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Generate list of sample IDs based on a naming pattern
 common_id="132"
@@ -74,8 +74,9 @@ done
 # Iterate over the sample IDs
 for sample in "${samples[@]}"; do
   # Construct file paths
-  bam="${BAMDIR}/${sample}_S${sample}_L001_R1_001_val_1.fq.gz.bam"
-  input_bam="${BAMDIR}/${sample}_input_S${sample}_L001_R1_001_val_1.fq.gz.bam"
+  #bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
+  #input_bam="${BAMDIR}/${sample}_input_S${sample}*_R1_001_val_1.fq.gz.bam"
+  input_bam="${BAMDIR}/${name}.bam"
 
   # Make tag directory
   makeTagDirectory "${TAGDIR}/${sample}" "$bam"
