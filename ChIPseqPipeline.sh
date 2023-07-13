@@ -57,7 +57,7 @@ done
 ml Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
 
 # Set common variables
-OUTDIR="${OUTDIR}/Peaks"
+PEAKDIR="${OUTDIR}/Peaks"
 TAGDIR="$OUTDIR/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
@@ -82,7 +82,7 @@ for sample in "${samples[@]}"; do
   makeTagDirectory "${TAGDIR}/${sample}" "$bam"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample}" -style histone -region -size 150 -minDist 530 -o "${OUTDIR}/${sample}_peaks.txt" -i "$input_bam"
+  findPeaks "${TAGDIR}/${sample}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample}_peaks.txt" -i "$input_bam"
 done
 
 # Rest of the script...
