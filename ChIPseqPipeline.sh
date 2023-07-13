@@ -62,28 +62,38 @@ TAGDIR="$OUTDIR/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Generate list of sample IDs based on a naming pattern
-common_id="132"
-start_num=17
-end_num=95
-samples=()
-for ((num=start_num; num<=end_num; num++)); do
-  sample_id="${common_id}-${num}"
-  samples+=("$sample_id")
-done
+#common_id="132"
+#start_num=17
+#end_num=95
+#samples=()
+#for ((num=start_num; num<=end_num; num++)); do
+  #sample_id="${common_id}-${num}"
+#  samples+=("$sample_id")
+#done
 
 # Iterate over the sample IDs
-for sample in "${samples[@]}"; do
+#for sample in "${samples[@]}"; do
   # Construct file paths
-  bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
+  #bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
   #input_bam="${BAMDIR}/${sample}_input_S${sample}*_R1_001_val_1.fq.gz.bam"
-  input_bam="${BAMDIR}/${name}.bam"
+  #input_bam="${BAMDIR}/${name}.bam"
+
+  # Iterate over each BAM file in the directory
+  for bam_file in "${BAMDIR}"/*.bam; do
+    # Get the sample ID from the BAM file name
+    sample_id=$(basename "${bam_file}" .bam)
+
 
   # Make tag directory
-  makeTagDirectory "${TAGDIR}/${sample}" "$bam"
+  makeTagDirectory "${TAGDIR}/${sample_id}" "$sample_id"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample}_peaks.txt" -i "$input_bam"
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "$input_bam"
 done
+
+
+
+
 
 # Rest of the script...
 #ml deepTools/3.5.1-intel-2020b-Python-3.8.6
