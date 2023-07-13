@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Run133ChIP
+#SBATCH --job-name=Run132ChIP
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../MapCutAndRun133.%j.out
-#SBATCH --error=../MapCutAndRun133.%j.err
+#SBATCH --output=../MapCutAndRun132.%j.out
+#SBATCH --error=../MapCutAndRun132.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR=/scratch/ry00555/OutputRun133
+OUTDIR=/scratch/ry00555/OutputRun132
 
 
 
