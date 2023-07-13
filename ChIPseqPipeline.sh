@@ -76,7 +76,7 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
   # Construct file paths
   #bam="${BAMDIR}/${sample}_S${sample}*_R1_001_val_1.fq.gz.bam"
   #input_bam="${BAMDIR}/${sample}_input_S${sample}*_R1_001_val_1.fq.gz.bam"
-  #input_bam="${BAMDIR}/${name}.bam"
+  input_bam="${BAMDIR}/*.bam"
 
   # Iterate over each BAM file in the directory
   for bam_file in "${BAMDIR}"/*.bam; do
@@ -85,7 +85,7 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 
 
   # Make tag directory
-  makeTagDirectory "${TAGDIR}/${sample_id}" "$sample_id"
+  makeTagDirectory "${TAGDIR}/${sample_id}" "${BAMDIR}/$sample_id"
 
   # Call peaks
   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "$input_bam"
@@ -118,23 +118,23 @@ done
 
 
 # Normalize to mitochondrial DNA which has no nucleosomes
-ml SAMtools/1.9-GCC-8.3.0
-ml deepTools/3.5.1-intel-2020b-Python-3.8.6
+#ml SAMtools/1.9-GCC-8.3.0
+#ml deepTools/3.5.1-intel-2020b-Python-3.8.6
 
 
 
 # Iterate over each BAM file in the directory
-for bam_file in "${BAMDIR}"/*.bam; do
+#for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
-  bam_id=$(basename "${bam_file}" .bam)
+  #bam_id=$(basename "${bam_file}" .bam)
 
   # Calculate read counts using samtools idxstats
-  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  #mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+#  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
   # Calculate scaling factor
-  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+#  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
   # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${bam_id}_normalized.bw"
-done
+#  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${bam_id}_normalized.bw"
+#done
