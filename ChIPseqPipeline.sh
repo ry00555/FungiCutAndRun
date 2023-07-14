@@ -21,7 +21,15 @@ OUTDIR=/scratch/ry00555/OutputRun132
 
 # Process reads using trimGalore
 ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-ml BWA/0.7.17-GCC-8.3.0 Homer/4.11-foss-2019b SAMtools/1.9-GCC-8.3.0 deepTools/3.5.1-intel-2020b-Python-3.8.6
+
+ml SAMtools/1.9-GCC-8.3.0
+
+ml BWA/0.7.17-GCC-8.3.0
+
+ml deepTools/3.3.1-intel-2019b-Python-3.7.4
+
+module load Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
+
 
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
@@ -99,7 +107,7 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   BW_id="${BW_name%.*}"
 
   # Compute matrix
-  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R heatmapPRC2genes.bed --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
   # Plot heatmap
   plotHeatmap -m "${OUTDIR}/Matrices/matrix_${BW_id}.gz" -out "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_id}" --hclust 1 --colorMap Reds
