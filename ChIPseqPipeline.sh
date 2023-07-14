@@ -70,7 +70,7 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Iterate over each BAM file in the directory
-for bam_file in "${BAMDIR}/*.bam"; do
+for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
@@ -91,7 +91,7 @@ for bam_file in "${BAMDIR}/*.bam"; do
    scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+   bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
  done
 
 
@@ -107,8 +107,9 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   BW_id="${BW_name%.*}"
 
   # Compute matrix
-  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
   # Plot heatmap
-  plotHeatmap -m "${OUTDIR}/Matrices/matrix_${BW_id}.gz" -out "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_id}" --hclust 1 --colorMap Reds
+plotHeatmap --matrixFile "matrix_${BW_id}.gz" --outFileName "${BW_id}_hclust.png" \
+            --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 done
