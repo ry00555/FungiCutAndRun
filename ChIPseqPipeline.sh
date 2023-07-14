@@ -84,15 +84,15 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+   #mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+   #reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
    # Calculate scaling factor
    #scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
    #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-   bamCoverage -of bigwig -b "${bam_file}"-o "${OUTDIR}/BigWigs/${sample_id}.bw"
+   bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
 
 
