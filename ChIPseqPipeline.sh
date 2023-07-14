@@ -80,18 +80,19 @@ for bam_file in "${BAMDIR}"/*.bam; do
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}"
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}/"
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  # mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+   #reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
    # Calculate scaling factor
-   scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+   #scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-   bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+   #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+   bamCoverage -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
 
 
