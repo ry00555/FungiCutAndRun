@@ -20,13 +20,12 @@ OUTDIR=/scratch/ry00555/OutputRun132
 
 
 # Process reads using trimGalore
-ml Trim_Galore/0.6.5-GCCcore-11.3.0-Java-11-Python-3.8.6
-ml BWA/0.7.17-GCC-8.3.0 Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0 deepTools/3.5.1-intel-2020b-Python-3.8.6
+ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+ml BWA/0.7.17-GCC-8.3.0 Homer/4.11-foss-2019b SAMtools/1.9-GCC-8.3.0 deepTools/3.5.1-intel-2020b-Python-3.8.6
 
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz"
 
 
 #mkdir "${OUTDIR}/SortedBamFiles"
@@ -39,7 +38,7 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz"
 # Iterate over the files
 #do
  file=${f##*/}
-  name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
+  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
 #  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
@@ -63,7 +62,7 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Iterate over each BAM file in the directory
-for bam_file in "${BAMDIR}"/*.bam; do
+for bam_file in "${BAMDIR}/*.bam"; do
   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
@@ -77,15 +76,16 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+   reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
-  # Calculate scaling factor
-  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+   # Calculate scaling factor
+   scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
-  # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-done
+   # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
+   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+ done
+
 
 
 
