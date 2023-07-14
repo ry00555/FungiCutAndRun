@@ -17,7 +17,7 @@ FASTQ="/scratch/ry00555/OutputRun132/FASTQ"
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OutputFolderName="/scratch/ry00555/OutputRun133"
+OutputFolderName="/scratch/ry00555/OutputRun132"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
