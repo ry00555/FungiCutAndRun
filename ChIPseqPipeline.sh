@@ -80,7 +80,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}/"
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}/${sample_id}_peaks.txt" -i "${BAMDIR}/${sample_id}.bam"
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
@@ -93,6 +93,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
    #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
    bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
+   bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
 
 
@@ -108,9 +109,9 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   BW_id="${BW_name%.*}"
 
   # Compute matrix
-  computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
   # Plot heatmap
-plotHeatmap --matrixFile "matrix_${BW_id}.gz" --outFileName "${BW_id}_hclust.png" \
+plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${BW_id}_hclust.png" \
             --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 done
