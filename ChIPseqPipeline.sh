@@ -92,7 +92,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
    #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-   bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
+   #bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
    bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
 
