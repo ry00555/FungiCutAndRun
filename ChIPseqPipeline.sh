@@ -20,15 +20,15 @@ OUTDIR=/scratch/ry00555/OutputRun132
 
 
 # Process reads using trimGalore
-ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+#ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 
-ml SAMtools/1.9-GCC-8.3.0
+#ml SAMtools/1.9-GCC-8.3.0
 
 ml BWA/0.7.17-GCC-8.3.0
 
-ml deepTools/3.3.1-intel-2019b-Python-3.7.4
-
 module load Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
+
+
 
 
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
@@ -97,8 +97,8 @@ for bam_file in "${BAMDIR}"/*.bam; do
  done
 
 
-
-
+module unload Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
+ml deepTools/3.3.1-intel-2019b-Python-3.7.4
 
 # Iterate over each file in the directory
 for file_path in "${OUTDIR}/BigWigs"/*.bw; do
