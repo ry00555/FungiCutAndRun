@@ -70,6 +70,7 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Iterate over each BAM file in the directory #hi
+# Iterate over each BAM file in the directory
 for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" .bam)
@@ -80,21 +81,17 @@ for bam_file in "${BAMDIR}"/*.bam; do
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt" -i "${BAMDIR}/${sample_id}.bam"
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}/${sample_id}_peaks.txt" -i "${bam_file}"
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   #mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   #reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
-   # Calculate scaling factor
-   #scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
-
-   # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-   #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-   #bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
-   bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
- done
+  # Calculate scaling factor
+  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+  bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "/scratch/ry00555/OutputRun132/NormalizedBigWigs/${sample_id}_normalized.bw"
+done
 
 
 module unload Homer/4.11-foss-2019b SAMtools/1.16.1-GCC-11.3.0
