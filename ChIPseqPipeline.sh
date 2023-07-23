@@ -69,7 +69,7 @@ PEAKDIR="${OUTDIR}/Peaks"
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
-# Iterate over each BAM file in the directory
+# Iterate over each BAM file in the directory #hi
 for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" .bam)
