@@ -54,13 +54,14 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 #  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-#done
+#done D 
 
 # Set common variables
 PEAKDIR="${OUTDIR}/Peaks"
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
+# Iterate over each BAM file in the directory #hi
 # Iterate over each BAM file in the directory
 for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
@@ -72,13 +73,19 @@ for bam_file in "${BAMDIR}"/*.bam; do
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
+<<<<<<< HEAD
 #  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt" -i "${BAMDIR}/${sample_id}.bam"
   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}/${sample_id}_peaks.txt" -i "${BAMDIR}/${bam_file}.bam"
+=======
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}/${sample_id}_peaks.txt" -i "${bam_file}"
+
+>>>>>>> 8c86216ba6c982cfdaca6000e1e84bd4e4888317
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   #mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   #reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
+<<<<<<< HEAD
    # Calculate scaling factor
    #scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
@@ -87,6 +94,12 @@ for bam_file in "${BAMDIR}"/*.bam; do
    #bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
    bamCoverage -b "${PEAKDIR}/${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
+=======
+  # Calculate scaling factor
+  scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+  bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "/scratch/ry00555/OutputRun132/NormalizedBigWigs/${sample_id}_normalized.bw"
+done
+>>>>>>> 8c86216ba6c982cfdaca6000e1e84bd4e4888317
 
 
 module unload Homer/4.11-foss-2019b
