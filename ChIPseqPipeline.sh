@@ -62,7 +62,7 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 #  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-#done
+#done D 
 
 # Set common variables
 PEAKDIR="${OUTDIR}/Peaks"
