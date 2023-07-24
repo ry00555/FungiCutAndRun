@@ -85,8 +85,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
    scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
- bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-
+   bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
 
    #This is for unnormalized to mtDNA
 #  bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
@@ -100,6 +99,11 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
 
   # Remove the file extension to create the sample ID
   BW_id="${BW_name%.*}"
+  # Replace special characters with underscores in the sample ID
+ BW_id=${BW_id//[^a-zA-Z0-9]/_}
+
+ # Limit the length of the sample ID to avoid long filenames
+ BW_id=${BW_id:0:50}
   # Compute matrix
     computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
