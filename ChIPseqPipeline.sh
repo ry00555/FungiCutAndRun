@@ -78,11 +78,17 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+  reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
-   # Calculate scaling factor
-   scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
+  # Calculate scaling factor
+  scaling_factor=$(awk "BEGIN {printf \"%.4f\", ${mt_read_count} / ${reference_read_count}}")
+
+  # Check if the scaling factor is a valid float value
+  if [[ ! "$scaling_factor" =~ ^[+-]?[0-9]*\.?[0-9]+$ ]]; then
+    echo "Error: Invalid scaling factor for ${bam_file}"
+    continue
+  fi
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
    bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
