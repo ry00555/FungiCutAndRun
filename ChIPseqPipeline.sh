@@ -63,43 +63,51 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 
 # Iterate over each BAM file in the directory
-for bam_file in "${BAMDIR}"/*.bam; do
+#for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
-  sample_id=$(basename "${bam_file}" .bam)
+#  sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
-  sample_id="${sample_id%%_Rep_1*}"
+#  sample_id="${sample_id%%_Rep_1*}"
 
   # Make tag directory
-  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+#  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+#  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
 
   # Normalize to mitochondrial DNA which has no nucleosomes
   # Calculate read counts using samtools idxstats
-   #mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
-   #reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
+  # mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
+  # reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
    # Calculate scaling factor
    #scaling_factor=$(bc <<< "scale=4; ${mt_read_count} / ${reference_read_count}")
 
    # Normalize the ChIP-seq signal using bamCoverage with the scaling factor
-   #bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
-   #bamCoverage -of bigwig -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
-   bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
- done
+#   bamCoverage --scaleFactor $scaling_factor -of bigwig -b "${bam_file}".bam -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+
+
+   #This is for unnormalized to mtDNA
+#   bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
+ #done
+
 
 
 # Iterate over each file in the directory
 for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   # Get the base name of the file
-  BW_name=$(basename "${file_path}")
+  BW_name=$(basename "${file_path}" .bw)
 
   # Remove the file extension to create the sample ID
   BW_id="${BW_name%.*}"
 
   # Compute matrix
-  computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -S "${file_path}".bw -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+
+#For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
+  #computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
+  #plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust.png" \
+  #            --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
   # Plot heatmap
 plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${BW_id}_hclust.png" \
