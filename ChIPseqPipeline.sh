@@ -26,7 +26,7 @@ ml deepTools/3.5.1-foss-2020b-Python-3.8.6
 #ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
+#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 
 #mkdir "${OUTDIR}/SortedBamFiles"
@@ -38,12 +38,12 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 # Iterate over the files
 #do
- file=${f##*/}
-  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+# file=${f##*/}
+#  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
 #  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-  bigwig="${OUTDIR}/BigWigs/${name}"
+#  bigwig="${OUTDIR}/BigWigs/${name}"
 
 
 
@@ -96,13 +96,13 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 # Iterate over each file in the directory
 for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   # Get the base name of the file
-  BW_name=$(basename "${file_path}" .bw)
+  BW_name=$(basename "${file_path}")
 
   # Remove the file extension to create the sample ID
   BW_id="${BW_name%.*}"
 
   # Compute matrix
-  computeMatrix reference-point --referencePoint TSS -S "${file_path}".bw -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${OUTDIR}/BigWigs/${file_path}"*.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
 #For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
   #computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
