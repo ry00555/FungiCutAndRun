@@ -110,9 +110,9 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
     # For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
      computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
      plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust.png" \
-                 --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+                 --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds --replaceNaN
 
     # Plot heatmap
     plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" \
-                --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+                --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds --replaceNaN
   done
