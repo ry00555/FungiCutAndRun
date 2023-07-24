@@ -90,7 +90,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
    #This is for unnormalized to mtDNA
 #  bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
- #done
+ done
 
 
 # Iterate over each file in the directory
