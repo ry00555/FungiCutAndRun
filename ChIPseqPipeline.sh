@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-#source config.txt
+source config.txt
 
 #Set output directory specific for each sequencing experiment
 OUTDIR=/scratch/ry00555/OutputRun132
@@ -24,39 +24,40 @@ ml SAMtools/1.16.1-GCC-10.2.0
 ml BWA/0.7.17-GCC-10.2.0
 ml Homer/4.11-foss-2020b
 ml deepTools/3.5.1-foss-2020b-Python-3.8.6
-#ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 
 #This can be changed but make sure that there are appropriate paths and output directories based on the analysis specifically when peak calling and normalizing
 
-#mkdir "${OUTDIR}/SortedBamFiles"
-#mkdir "${OUTDIR}/BigWigs"
-#mkdir "${OUTDIR}/Peaks"
-#mkdir "$OUTDIR/HomerTagDirectories"
-#mkdir "$OUTDIR/TdfFiles"
-#mkdir "${OUTDIR}/Heatmaps"
-#mkdir "${OUTDIR}/Matrices"
-#mkdir "${OUTDIR}/NormalizedBigWigs"
+#mkdir -p "${OUTDIR}/SortedBamFiles"
+#mkdir -p "${OUTDIR}/BigWigs"
+#mkdir -p "${OUTDIR}/Peaks"
+#mkdir -p "$OUTDIR/HomerTagDirectories"
+#mkdir -p "$OUTDIR/TdfFiles"
+#mkdir -p "${OUTDIR}/Heatmaps"
+#mkdir -p "${OUTDIR}/Matrices"
+#mkdir -p "${OUTDIR}/NormalizedBigWigs"
 
 # Process reads using trimGalore
 
-#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 # Iterate over the files
-#do
-# file=${f##*/}
-#  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+for f in $FILES
+do
+ file=${f##*/}
+  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
-#  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-#  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-#  bigwig="${OUTDIR}/BigWigs/${name}"
+  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+  bigwig="${OUTDIR}/BigWigs/${name}"
 
-  #bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-  #samtools index "$bam"
-#  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  samtools index "$bam"
+  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-#done
+done
 
 # Set common variables - NOTE this is my organization method, do what works best for you, but if you change these variables then you might need to change the paths and variables below
 PEAKDIR="${OUTDIR}/Peaks"
@@ -71,22 +72,27 @@ for bam_file in "${BAMDIR}"/*.bam; do
   sample_id="${sample_id%%_Rep_1*}"
 
   # Make tag directory
-#  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
-#  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+ findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
 
-  # Normalize to mitochondrial DNA which has no nucleosomes
-  # Calculate read counts using samtools idxstats
+ # Calculate read counts using samtools idxstats
   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
   reference_read_count=$(samtools idxstats "${bam_file}" | awk 'BEGIN{total=0}{if($1!="MT"){total+=$3}}END{print total}')
 
-  # Calculate scaling factor
-  scaling_factor=$(awk "BEGIN {printf \"%.4f\", ${mt_read_count} / ${reference_read_count}}")
+  # Check if the read counts are valid (non-empty and numeric)
+  if ! [[ "$mt_read_count" =~ ^[0-9]+$ && "$reference_read_count" =~ ^[0-9]+$ ]]; then
+    echo "Error: Invalid read counts for ${bam_file}"
+    continue
+  fi
 
-  # Check if the scaling factor is a valid float value
-  if [[ ! "$scaling_factor" =~ ^[+-]?[0-9]*\.?[0-9]+$ ]]; then
-    echo "Error: Invalid scaling factor for ${bam_file}"
+  # Check if the read counts are greater than 0 to avoid division by zero
+  if (( mt_read_count > 0 && reference_read_count > 0 )); then
+    # Calculate scaling factor
+    scaling_factor=$(awk "BEGIN {printf \"%.4f\", ${mt_read_count} / ${reference_read_count}}")
+  else
+    echo "Error: Invalid read counts for ${bam_file}"
     continue
   fi
 
@@ -94,7 +100,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
    bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
 
    #This is for unnormalized to mtDNA
-#  bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
+  bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs/${sample_id}.bw"
  done
 
 
@@ -112,13 +118,14 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
  BW_id=${BW_id:0:50}
   # Compute matrix
     computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+    # Preprocess the matrix file to replace nan values with zeros
+    #  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
+    # Plot heatmap
+    plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" \
+                --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
     # For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
      computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
      plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust.png" \
-                 --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds --replaceNaN
-
-    # Plot heatmap
-    plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" \
-                --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds --replaceNaN
+                 --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
   done
