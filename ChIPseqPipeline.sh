@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source config.txt
+#source config.txt
 
 #Set output directory specific for each sequencing experiment
 OUTDIR=/scratch/ry00555/OutputRun132
@@ -118,14 +118,25 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
  BW_id=${BW_id:0:50}
   # Compute matrix
     computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+    computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
+
     # Preprocess the matrix file to replace nan values with zeros
     #  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
     # Plot heatmap
     plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" \
                 --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
+                plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" \
+                            --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+
     # For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
      computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
      plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust.png" \
                  --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+
+                 computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_PRC2genes_${BW_id}.gz"
+                 plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_PRC2genes_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust_PRC2genes.png" \
+                             --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+
+
   done
