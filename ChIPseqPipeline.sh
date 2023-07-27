@@ -43,7 +43,6 @@ mkdir -p "${OUTDIR}/Beds"
 
 
 # Process reads using trimGalore
-#ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
@@ -100,7 +99,6 @@ for bam_file in "${BAMDIR}"/*.bam; do
   sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
   sample_id="${sample_id%%_Rep_1*}"
-  Input="${sample_id}_input"
   outputFile="${BEDDIR}/${sample_id}_normalized.bed"
   unnormalizedBigWig="${OUTDIR}/BigWigs/${sample_id}.bw"
   normalizedBigWig="${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
@@ -132,7 +130,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
     # Calculate read counts using samtools idxstats for the non-mitochondrial genome
     reference_read_count=$(samtools idxstats "${bam_file}" | awk '$1 !~ /KI/ { total += $3 } END { print total }')
-fi 
+fi
     # Check if the read counts are valid (non-empty and numeric)
     if ! [[ "$mt_read_count" =~ ^[0-9]+$ && "$reference_read_count" =~ ^[0-9]+$ ]]; then
       echo "Error: Invalid read counts for ${bam_file}"
