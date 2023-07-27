@@ -25,8 +25,8 @@ ml SAMtools/1.16.1-GCC-10.2.0
 ml BWA/0.7.17-GCC-10.2.0
 ml Homer/4.11-foss-2020b
 ml deepTools/3.5.1-foss-2020b-Python-3.8.6
-ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-ml perl/5.20.1
+# ml Perl/5.30.0-GCCcore-8.3.0
+#ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 module load BEDTools/2.29.2-GCC-8.3.0
 
 #This can be changed but make sure that there are appropriate paths and output directories based on the analysis specifically when peak calling and normalizing
@@ -89,7 +89,7 @@ Genome=$(basename $genomeFile)
 #cut -f1,2 ${Genome}.fna.fai > ${Genome}.sizes
 
 #create genomic file with desired window sizes
-windowSize=1000
+#windowSize=1000
 #bedtools makewindows -g ${Genome}.sizes -w ${windowSize} > ${Genome}_1kbWindows.bed
 #bedtools makewindows -g GCA_000182925.2_NC12_genomic.fna.sizes -w 1000 > GCA_000182925.2_NC12_genomic_1kbWindows.bed
 
@@ -132,7 +132,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
     # Calculate read counts using samtools idxstats for the non-mitochondrial genome
     reference_read_count=$(samtools idxstats "${bam_file}" | awk '$1 !~ /KI/ { total += $3 } END { print total }')
-
+fi 
     # Check if the read counts are valid (non-empty and numeric)
     if ! [[ "$mt_read_count" =~ ^[0-9]+$ && "$reference_read_count" =~ ^[0-9]+$ ]]; then
       echo "Error: Invalid read counts for ${bam_file}"
@@ -151,7 +151,6 @@ for bam_file in "${BAMDIR}"/*.bam; do
       echo "Error: Invalid read counts for ${bam_file}"
       continue
     fi
-  fi
 
   # Normalize the ChIP-seq signal using bamCoverage with the scaling factor and create normalized bigwig and bedgraph files
   bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
@@ -159,6 +158,8 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
   # Create unnormalized bigwig file for mtDNA
   bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs"
+
+done
 
 
 # Iterate over each file in the directory
@@ -173,27 +174,50 @@ for bam_file in "${BAMDIR}"/*.bam; do
 
  # Limit the length of the sample ID to avoid long filenames
  #BW_id=${BW_id:0:50}
-  # Compute matrix
-  #  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
-#    computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
+ # Compute matrix for the reference-point TSS
+#  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
-    # Preprocess the matrix file to replace nan values with zeros
-    #  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
-    # Plot heatmap
-  #  plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" \
-    #            --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+  # Compute matrix for the reference-point TSS with specific regions (e.g., PRC2 genes)
+#  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
 
-    #            plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" \
-    #                        --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+  # Preprocess the matrix files to replace nan values with zeros
+#  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
+#  zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
 
-    # For normalized to mtDNA note as of current there's only one variable for the bw file_path as we don't know if normalization will work yet
-    # computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz"
-    # plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust.png" \
-    #             --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+  # Plot heatmaps for the reference-point TSS
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
-    #             computeMatrix reference-point --referencePoint TSS -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" -a 1500 -b 1500 --skipZeros -o "${OUTDIR}/Matrices/matrix_normalized_PRC2genes_${BW_id}.gz"
-      #           plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_normalized_PRC2genes_${BW_id}.gz" --outFileName "${BW_id}_normalized_hclust_PRC2genes.png" \
-        #                     --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+  # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+#done
 
 
-#  done
+       # Iterate over each file in the directory normalized
+      # for file_path in "${OUTDIR}/NormalizedBigWigs"/*.bw; do
+         # Get the base name of the file
+        # BW_name=$(basename "${file_path}")
+
+         # Remove the file extension to create the sample ID
+      #   BW_id="${BW_name%.*}"
+         # Replace special characters with underscores in the sample ID
+         #BW_id=${BW_id//[^a-zA-Z0-9]/_}
+
+         # Limit the length of the sample ID to avoid long filenames
+        # BW_id=${BW_id:0:50}
+
+         # Compute matrix for the reference-point TSS
+         #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+
+         # Compute matrix for the reference-point TSS with specific regions (e.g., PRC2 genes)
+         #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
+
+         # Preprocess the matrix files to replace nan values with zeros
+      #   zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
+      #   zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
+
+         # Plot heatmaps for the reference-point TSS
+      #   plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+
+         # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
+      #   plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+      # done
