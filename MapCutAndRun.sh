@@ -27,11 +27,11 @@ OUTDIR=/scratch/ry00555/OutputRun132
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
- #mkdir "${OUTDIR}/SortedBamFiles"
- #mkdir "${OUTDIR}/BigWigs"
-# mkdir "${OUTDIR}/Peaks"
-#mkdir "$OUTDIR/HomerTagDirectories"
-#mkdir "$OUTDIR/TdfFiles"
+mkdir "${OUTDIR}/SortedBamFiles"
+mkdir "${OUTDIR}/BigWigs"
+mkdir "${OUTDIR}/Peaks"
+mkdir "$OUTDIR/HomerTagDirectories"
+mkdir "$OUTDIR/TdfFiles"
 #
 #Iterate over the files
 for f in $FILES
@@ -44,7 +44,7 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars

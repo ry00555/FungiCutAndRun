@@ -18,6 +18,7 @@ cd $SLURM_SUBMIT_DIR
 
 #Set output directory specific for each sequencing experiment
 OUTDIR=/scratch/ry00555/OutputRun132
+<<<<<<< Updated upstream
 
 #Load all the modules that are needed for the entire pipeline
 #ml SAMtools/1.16.1-GCC-10.2.0
@@ -39,6 +40,15 @@ ml deepTools/3.5.1-foss-2020b-Python-3.8.6
 
 # Process reads using trimGalore
 
+=======
+ml SAMtools/1.16.1-GCC-10.2.0
+ml BWA/0.7.17-GCC-10.2.0
+ml Homer/4.11-foss-2020b
+ml deepTools/3.5.1-foss-2020b-Python-3.8.6
+
+# Process reads using trimGalore
+#ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+>>>>>>> Stashed changes
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
@@ -75,7 +85,11 @@ for bam_file in "${BAMDIR}"/*.bam; do
  #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
+<<<<<<< Updated upstream
  #findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+=======
+  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+>>>>>>> Stashed changes
 
  # Calculate read counts using samtools idxstats
   mt_read_count=$(samtools idxstats "${bam_file}" | awk '$1=="MT"{print $3}')
