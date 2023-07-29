@@ -34,12 +34,12 @@ module load BEDTools/2.29.2-GCC-8.3.0
 #mkdir -p "${OUTDIR}/SortedBamFiles"
 #mkdir -p "${OUTDIR}/BigWigs"
 #mkdir -p "${OUTDIR}/Peaks"
-mkdir -p "$OUTDIR/HomerTagDirectories"
-mkdir -p "$OUTDIR/TdfFiles"
-mkdir -p "${OUTDIR}/Heatmaps"
-mkdir -p "${OUTDIR}/Matrices"
-mkdir -p "${OUTDIR}/NormalizedBigWigs"
-mkdir -p "${OUTDIR}/Beds"
+#mkdir -p "$OUTDIR/HomerTagDirectories"
+#mkdir -p "$OUTDIR/TdfFiles"
+#mkdir -p "${OUTDIR}/Heatmaps"
+#mkdir -p "${OUTDIR}/Matrices"
+#mkdir -p "${OUTDIR}/NormalizedBigWigs"
+#mkdir -p "${OUTDIR}/Beds"
 
 
 # Process reads using trimGalore
@@ -112,18 +112,18 @@ for bam_file in "${BAMDIR}"/*.bam; do
  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
 
  # Calculate coverage for 1kb windows
-  bedtools coverage -a ${Genome}_1kbWindows.bed -b "${bam_file}" > "${BEDDIR}/${sample_id}_coverage.bed"
+  bedtools coverage -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${bam_file}" > "${BEDDIR}/${sample_id}_coverage.bed"
 
   # Check if the sample is an Input sample (for mitochondrial normalization)
   if [[ "${sample_id}" == *"Input"* ]]; then
     # Calculate the median coverage for mitochondrial chromosome from input file against the mitochondrial genome
-    bedtools map -a ${MitochondriaGenome}_1kbWindows.bed -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
+    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
 
     # Copy the unnormalized bigwig file (Input samples remain unnormalized)
     cp "${bam_file}" "${unnormalizedBigWig}"
   else
     # Calculate the median coverage for mitochondrial chromosome from ChIP-seq sample against the mitochondrial genome
-    bedtools map -a ${MitochondriaGenome}_1kbWindows.bed -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
+    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
 
     # Calculate read counts using samtools idxstats for the mitochondrial genome
     mt_read_count=$(samtools idxstats "${bam_file}" | awk -v mito_chr="KI" '$1 ~ mito_chr { total += $3 } END { print total }')
