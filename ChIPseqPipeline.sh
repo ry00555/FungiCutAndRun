@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=50gb
+#SBATCH --mem=100gb
 #SBATCH --time=48:00:00
 #SBATCH --output=../ChIPSeqPipeline133.%j.out
 #SBATCH --error=../ChIPSeqPipeline133.%j.err
@@ -73,7 +73,7 @@ BEDDIR="${OUTDIR}/Beds"
 
 genomeFile="/scratch/ry00555/GCA_000182925.2_NC12_genomic.fna"
 samtools faidx $genomeFile
-Genome=$(basename $genomeFile)
+Genome=$(basename $genomeFile .fna)
 
 #create txt file with Chromosome Name and Length
 #cut -f1,2 GCA_000182925.2_NC12_genomic.fna.fai > GCA_000182925.2_NC12_genomic.fna.sizes
@@ -151,11 +151,11 @@ fi
     fi
 
   # Normalize the ChIP-seq signal using bamCoverage with the scaling factor and create normalized bigwig and bedgraph files
-  bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+  bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${normalizedBigWig}"
   bamCoverage --scaleFactor "${scaling_factor}" -of bedgraph -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bedgraph"
 
   # Create unnormalized bigwig file for mtDNA
-  bamCoverage -b "${bam_file}" -o "${OUTDIR}/BigWigs"
+  bamCoverage -of bigwig -b "${bam_file}" -o "${unnormalizedBigWig}"
 
 done
 
