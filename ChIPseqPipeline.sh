@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=100gb
+#SBATCH --mem=500gb
 #SBATCH --time=48:00:00
 #SBATCH --output=../ChIPSeqPipeline133.%j.out
 #SBATCH --error=../ChIPSeqPipeline133.%j.err
@@ -161,32 +161,32 @@ done
 
 
 # Iterate over each file in the directory
-#for file_path in "${OUTDIR}/BigWigs"/*.bw; do
+for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   # Get the base name of the file
-#  BW_name=$(basename "${file_path}")
+  BW_name=$(basename "${file_path}" .bw)
 
   # Remove the file extension to create the sample ID
-  #BW_id="${BW_name%.*}"
+  BW_id="${BW_name%.*}"
   # Replace special characters with underscores in the sample ID
- #BW_id=${BW_id//[^a-zA-Z0-9]/_}
+ BW_id=${BW_id//[^a-zA-Z0-9]/_}
 
  # Limit the length of the sample ID to avoid long filenames
- #BW_id=${BW_id:0:50}
+ BW_id=${BW_id:0:50}
  # Compute matrix for the reference-point TSS
-#  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+ computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
 
   # Compute matrix for the reference-point TSS with specific regions (e.g., PRC2 genes)
-#  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
+  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
 
   # Preprocess the matrix files to replace nan values with zeros
-#  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
-#  zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
+  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
+  zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
 
   # Plot heatmaps for the reference-point TSS
-#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+ plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
   # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
-#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+ plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 #done
 
 
