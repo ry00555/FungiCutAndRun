@@ -94,14 +94,14 @@ Genome=$(basename $genomeFile .fna)
 
 
 # Iterate over each BAM file in the directory
-for bam_file in "${BAMDIR}"/*.bam; do
+#for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
-  sample_id=$(basename "${bam_file}" .bam)
+  #sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
-  sample_id="${sample_id%%_Rep_1*}"
-  outputFile="${BEDDIR}/${sample_id}_normalized.bed"
-  unnormalizedBigWig="${OUTDIR}/BigWigs/${sample_id}.bw"
-  normalizedBigWig="${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+  #sample_id="${sample_id%%_Rep_1*}"
+  #outputFile="${BEDDIR}/${sample_id}_normalized.bed"
+  #unnormalizedBigWig="${OUTDIR}/BigWigs/${sample_id}.bw"
+  #normalizedBigWig="${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
 
 
   # Make tag directory
