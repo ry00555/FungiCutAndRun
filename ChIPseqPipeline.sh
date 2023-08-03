@@ -27,7 +27,7 @@ ml Homer/4.11-foss-2020b
 ml deepTools/3.5.1-foss-2020b-Python-3.8.6
 # ml Perl/5.30.0-GCCcore-8.3.0
 #ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-module load BEDTools/2.29.2-GCC-8.3.0
+ml BEDTools/2.30.0-GCC-10.2.0
 
 #This can be changed but make sure that there are appropriate paths and output directories based on the analysis specifically when peak calling and normalizing
 
