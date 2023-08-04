@@ -161,7 +161,7 @@ Genome=$(basename $genomeFile .fna)
 
 
 # Iterate over each file in the directory
-for file_path in "${OUTDIR}/BigWigs"/*.bw; do
+for file_path in "${OUTDIR}/NormalizedBigWigs"/*.bw; do
   # Get the base name of the file
   BW_name=$(basename "${file_path}" .bw)
 
@@ -183,10 +183,10 @@ for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
 
   # Plot heatmaps for the reference-point TSS
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+ plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 
   # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
+ plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Reds
 done
 
 
