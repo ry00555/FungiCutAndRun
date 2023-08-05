@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=500gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../ChIPSeqPipeline133.%j.out
-#SBATCH --error=../ChIPSeqPipeline133.%j.err
+#SBATCH --output=../ChIPSeqPipeline131.%j.out
+#SBATCH --error=../ChIPSeqPipeline131.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -17,7 +17,7 @@ cd $SLURM_SUBMIT_DIR
 #source config.txt
 
 #Set output directory specific for each sequencing experiment
-OUTDIR=/scratch/ry00555/OutputRun133
+OUTDIR=/scratch/ry00555/OutputRun131
 
 
 #Load all the modules that are needed for the entire pipeline
@@ -31,15 +31,15 @@ ml BEDTools/2.30.0-GCC-10.2.0
 
 #This can be changed but make sure that there are appropriate paths and output directories based on the analysis specifically when peak calling and normalizing
 
-#mkdir -p "${OUTDIR}/SortedBamFiles"
+mkdir -p "${OUTDIR}/SortedBamFiles"
 #mkdir -p "${OUTDIR}/BigWigs"
 #mkdir -p "${OUTDIR}/Peaks"
-#mkdir -p "$OUTDIR/HomerTagDirectories"
-#mkdir -p "$OUTDIR/TdfFiles"
-#mkdir -p "${OUTDIR}/Heatmaps"
-#mkdir -p "${OUTDIR}/Matrices"
-#mkdir -p "${OUTDIR}/NormalizedBigWigs"
-#mkdir -p "${OUTDIR}/Beds"
+mkdir -p "$OUTDIR/HomerTagDirectories"
+mkdir -p "$OUTDIR/TdfFiles"
+mkdir -p "${OUTDIR}/Heatmaps"
+mkdir -p "${OUTDIR}/Matrices"
+mkdir -p "${OUTDIR}/NormalizedBigWigs"
+mkdir -p "${OUTDIR}/Beds"
 
 
 # Process reads using trimGalore
@@ -72,7 +72,7 @@ BEDDIR="${OUTDIR}/Beds"
 #Create mitochondrial normalization source files
 
 genomeFile="/scratch/ry00555/GCA_000182925.2_NC12_genomic.fna"
-samtools faidx $genomeFile
+#samtools faidx $genomeFile
 Genome=$(basename $genomeFile .fna)
 
 #create txt file with Chromosome Name and Length
@@ -94,70 +94,67 @@ Genome=$(basename $genomeFile .fna)
 
 
 # Iterate over each BAM file in the directory
-#for bam_file in "${BAMDIR}"/*.bam; do
+for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
-  #sample_id=$(basename "${bam_file}" .bam)
+  sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
-  #sample_id="${sample_id%%_Rep_1*}"
-  #outputFile="${BEDDIR}/${sample_id}_normalized.bed"
-  #unnormalizedBigWig="${OUTDIR}/BigWigs/${sample_id}.bw"
-  #normalizedBigWig="${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
+  sample_id="${sample_id%%_Rep_1*}"
+  outputFile="${BEDDIR}/${sample_id}_normalized.bed"
+  unnormalizedBigWig="${OUTDIR}/BigWigs/${sample_id}.bw"
+  normalizedBigWig="${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bw"
 
 
   # Make tag directory
- #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   # Call peaks
 
-# findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+ findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
 
  # Calculate coverage for 1kb windows
-#  bedtools coverage -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${bam_file}" > "${BEDDIR}/${sample_id}_coverage.bed"
+  bedtools coverage -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${bam_file}" > "${BEDDIR}/${sample_id}_coverage.bed"
 
   # Check if the sample is an Input sample (for mitochondrial normalization)
-#  if [[ "${sample_id}" == *"Input"* ]]; then
+  if [[ "${sample_id}" == *"Input"* ]]; then
     # Calculate the median coverage for mitochondrial chromosome from input file against the mitochondrial genome
-#    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
+    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
 
     # Copy the unnormalized bigwig file (Input samples remain unnormalized)
-#    cp "${bam_file}" "${unnormalizedBigWig}"
-#  else
+    cp "${bam_file}" "${unnormalizedBigWig}"
+  else
     # Calculate the median coverage for mitochondrial chromosome from ChIP-seq sample against the mitochondrial genome
-#    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
+    bedtools map -a "/scratch/ry00555/${Genome}_1kbWindows.bed" -b "${BEDDIR}/${sample_id}_coverage.bed" -c 4 -o median > "${BEDDIR}/${sample_id}_coverage.medianChromosomes.out"
 
     # Calculate read counts using samtools idxstats for the mitochondrial genome
-#    mt_read_count=$(samtools idxstats "${bam_file}" | awk -v mito_chr="KI" '$1 ~ mito_chr { total += $3 } END { print total }')
+   mt_read_count=$(samtools idxstats "${bam_file}" | awk -v mito_chr="KI" '$1 ~ mito_chr { total += $3 } END { print total }')
 
     # Calculate read counts using samtools idxstats for the non-mitochondrial genome
-#    reference_read_count=$(samtools idxstats "${bam_file}" | awk '$1 !~ /KI/ { total += $3 } END { print total }')
-#fi
+    reference_read_count=$(samtools idxstats "${bam_file}" | awk '$1 !~ /KI/ { total += $3 } END { print total }')
+fi
     # Check if the read counts are valid (non-empty and numeric)
-#    if ! [[ "$mt_read_count" =~ ^[0-9]+$ && "$reference_read_count" =~ ^[0-9]+$ ]]; then
-  #    echo "Error: Invalid read counts for ${bam_file}"
-#      continue
-#    fi
+    if ! [[ "$mt_read_count" =~ ^[0-9]+$ && "$reference_read_count" =~ ^[0-9]+$ ]]; then
+      echo "Error: Invalid read counts for ${bam_file}"
+      continue
+    fi
 
     # Check if the read counts are greater than 0 to avoid division by zero
-  #  if (( mt_read_count > 0 && reference_read_count > 0 )); then
+    if (( mt_read_count > 0 && reference_read_count > 0 )); then
       # Calculate the scaling factor
-  #    scaling_factor=$(awk "BEGIN {printf \"%.4f\", ${mt_read_count} / ${reference_read_count}}")
+      scaling_factor=$(awk "BEGIN {printf \"%.4f\", ${mt_read_count} / ${reference_read_count}}")
 
       # Normalize the ChIP-seq signal using bamCoverage with the scaling factor and create normalized bigwig and bedgraph files
-  #    bamCoverage --scaleFactor "${scaling_factor}" -of bedgraph -b "${bam_file}" -o "${outputFile}"
-#      bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${normalizedBigWig}"
-#    else
-#      echo "Error: Invalid read counts for ${bam_file}"
-#      continue
-#    fi
+      bamCoverage --scaleFactor "${scaling_factor}" -of bedgraph -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bedgraph"
+      bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${normalizedBigWig}"
+    else
+      echo "Error: Invalid read counts for ${bam_file}"
+      continue
+    fi
 
-  # Normalize the ChIP-seq signal using bamCoverage with the scaling factor and create normalized bigwig and bedgraph files
-#  bamCoverage --scaleFactor "${scaling_factor}" -of bigwig -b "${bam_file}" -o "${normalizedBigWig}"
-#  bamCoverage --scaleFactor "${scaling_factor}" -of bedgraph -b "${bam_file}" -o "${OUTDIR}/NormalizedBigWigs/${sample_id}_normalized.bedgraph"
 
   # Create unnormalized bigwig file for mtDNA
-#  bamCoverage -of bigwig -b "${bam_file}" -o "${unnormalizedBigWig}"
+  bamCoverage -of bigwig -b "${bam_file}" -o "${unnormalizedBigWig}"
 
-#done
+done
 
 
 # Iterate over each file in the directory
