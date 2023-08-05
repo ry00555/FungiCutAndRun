@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-#source config.txt
+source config.txt
 
 #Set output directory specific for each sequencing experiment
 OUTDIR=/scratch/ry00555/OutputRun131
@@ -31,37 +31,37 @@ ml BEDTools/2.30.0-GCC-10.2.0
 
 #This can be changed but make sure that there are appropriate paths and output directories based on the analysis specifically when peak calling and normalizing
 
-mkdir -p "${OUTDIR}/SortedBamFiles"
+#mkdir -p "${OUTDIR}/SortedBamFiles"
 #mkdir -p "${OUTDIR}/BigWigs"
 #mkdir -p "${OUTDIR}/Peaks"
-mkdir -p "$OUTDIR/HomerTagDirectories"
-mkdir -p "$OUTDIR/TdfFiles"
-mkdir -p "${OUTDIR}/Heatmaps"
-mkdir -p "${OUTDIR}/Matrices"
-mkdir -p "${OUTDIR}/NormalizedBigWigs"
-mkdir -p "${OUTDIR}/Beds"
+#mkdir -p "$OUTDIR/HomerTagDirectories"
+#mkdir -p "$OUTDIR/TdfFiles"
+#mkdir -p "${OUTDIR}/Heatmaps"
+#mkdir -p "${OUTDIR}/Matrices"
+#mkdir -p "${OUTDIR}/NormalizedBigWigs"
+#mkdir -p "${OUTDIR}/Beds"
 
 
 # Process reads using trimGalore
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 # Iterate over the files
-#for f in $FILES
-#do
- #file=${f##*/}
-  #name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+for f in $FILES
+do
+ file=${f##*/}
+  name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
-  #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-  #bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
   #bigwig="${OUTDIR}/BigWigs/${name}"
 
-  #bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-  #samtools index "$bam"
+  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  samtools index "$bam"
   #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-#done
+done
 
 # Set common variables - NOTE this is my organization method, do what works best for you, but if you change these variables then you might need to change the paths and variables below
 PEAKDIR="${OUTDIR}/Peaks"
@@ -149,7 +149,6 @@ fi
       echo "Error: Invalid read counts for ${bam_file}"
       continue
     fi
-
 
   # Create unnormalized bigwig file for mtDNA
   bamCoverage -of bigwig -b "${bam_file}" -o "${unnormalizedBigWig}"
