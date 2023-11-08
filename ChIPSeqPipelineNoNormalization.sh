@@ -63,7 +63,7 @@ for bam_file in "${BAMDIR}"/*.bam; do
  #  # Limit the length of the sample ID to avoid long filenames
  #  BW_id=${BW_id:0:50}
   # Compute matrix for the reference-point TSS
-
+done
   computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 133-78_ChIP_NCU00423_H3K27me3_Rep1_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/NCU00423_H3K27me3.gz"
   plotHeatmap --matrixFile "${OUTDIR}/Matrices/NCU00423_H3K27me3.gz" --outFileName "${OUTDIR}/Heatmaps/NCU00423_H3K27me3_hclust.png" --samplesLabel WT NCU00423-KO --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
 
