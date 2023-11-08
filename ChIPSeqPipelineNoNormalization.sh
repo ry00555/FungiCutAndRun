@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=500gb
+#SBATCH --mem=50gb
 #SBATCH --time=48:00:00
 #SBATCH --output=../ChIPSeqPipelinePooled.%j.out
 #SBATCH --error=../ChIPSeqPipelinePooled.%j.err
@@ -27,11 +27,11 @@ ml BEDTools/2.30.0-GCC-10.2.0
 mkdir -p "${OUTDIR}/Peaks"
 mkdir -p "$OUTDIR/HomerTagDirectories"
 #mkdir -p "$OUTDIR/TdfFiles"
-mkdir -p "${OUTDIR}/Heatmaps"
-mkdir -p "${OUTDIR}/Matrices"
+#mkdir -p "${OUTDIR}/Heatmaps"
+#mkdir -p "${OUTDIR}/Matrices"
 #mkdir -p "${OUTDIR}/NormalizedBigWigs"
-mkdir -p "${OUTDIR}/Beds"
-mkdir -p "${OUTDIR}/Counts"
+#mkdir -p "${OUTDIR}/Beds"
+#mkdir -p "${OUTDIR}/Counts"
 
 
 PEAKDIR="${OUTDIR}/Peaks"
@@ -42,9 +42,9 @@ BEDDIR="${OUTDIR}/Beds"
 
 # Check if the sample_id contains "input" and set the -i argument accordingly
  if [[ "${sample_id}" == *input* ]]; then
-   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}"
+   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}"
  else
-   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt"
  fi
 
  # for file_path in "${OUTDIR}/BigWigs"/*.bw; do
