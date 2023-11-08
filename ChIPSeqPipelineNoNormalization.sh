@@ -39,7 +39,11 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 
-
+for bam_file in "${BAMDIR}"/*.bam; do
+  # Get the sample ID from the BAM file name
+  sample_id=$(basename "${bam_file}" .bam)
+  # Remove everything after "Rep_1" in the sample ID
+  sample_id="${sample_id%%_Rep_1*}"
 # Check if the sample_id contains "input" and set the -i argument accordingly
  if [[ "${sample_id}" == *input* ]]; then
    findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt" -i "${TAGDIR}/${sample_id}"
