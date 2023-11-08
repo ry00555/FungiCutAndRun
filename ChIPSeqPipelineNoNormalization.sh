@@ -10,12 +10,12 @@
 #SBATCH --output=../ChIPSeqPipelinePooled.%j.out
 #SBATCH --error=../ChIPSeqPipelinePooled.%j.err
 
-OUTDIR=/scratch/ry00555/PoolChipSeq
+OUTDIR=/scratch/ry00555/PoolChIPSeq
 
 #Load all the modules that are needed for the entire pipeline
-ml BWA/0.7.17-GCC-8.3.0
+ml BWA/0.7.17-GCC-10.2.0
 ml SAMtools/1.10-GCC-8.3.0
-ml Homer/4.11-foss-2020b 
+ml Homer/4.11-foss-2020b
 ml deepTools/3.5.1-intel-2020b-Python-3.8.6
 # ml Perl/5.30.0-GCCcore-8.3.0
 #ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
