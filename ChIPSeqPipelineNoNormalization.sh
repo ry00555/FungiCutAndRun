@@ -13,13 +13,13 @@
 OUTDIR=/scratch/ry00555/PoolChIPSeq
 
 #Load all the modules that are needed for the entire pipeline
-ml BWA/0.7.17-GCC-10.2.0
-ml SAMtools/1.10-GCC-8.3.0
-ml Homer/4.11-foss-2020b
-ml deepTools/3.5.1-intel-2020b-Python-3.8.6
-# ml Perl/5.30.0-GCCcore-8.3.0
+ml BWA/0.7.17-GCCcore-11.3.0
+ml SAMtools/1.16.1-GCC-11.3.0
+ml Homer/4.11-foss-2022a
+ml deepTools/3.5.2-foss-2022a
+# ml Perl/5.34.1-GCCcore-11.3.0
 #ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-ml BEDTools/2.30.0-GCC-10.2.0
+ml BEDTools/2.30.0-GCC-11.3.0
 
 
 #mkdir -p "${OUTDIR}/SortedBamFiles"
