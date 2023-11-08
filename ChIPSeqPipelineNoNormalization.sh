@@ -71,8 +71,3 @@ computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-91_ChI
 
 
   plotHeatmap --matrixFile "${OUTDIR}/Matrices/NCU00423_H3K36me3.gz" --outFileName "${OUTDIR}/Heatmaps/NCU00423_H3K36me3_hclust.png" --samplesLabel WT NCU00423-KO --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
-
-
-  # computeMatrix reference-point --referencePoint TSS -b 1000 -a 1000 -R H3K27me3_domains_5_boundary.bed -S 119_41_CUT_RUN_WT_H3K27me3_Rep1_R1_val_1.fq.gz.bin_25.smooth_75Bulk.bw 106_50_ChIP_hda1_H3K27me23_Rep1_R1_merged_trimmed.fq.gz.bin_25.smooth_75Bulk.bw 107_4_ChIP_hda1_H3K27me23_Rep2_R1_merged_val_1.fq.gz.bin_25.smooth_75Bulk.bw  129_20_ChIP_hda1_H3K27me3_Rep3_R1_val_1.fq.gz.bin_25.smooth_75Bulk.bw ChIP_dim5_H3K27me3_Rep1_R1_trimmed.fq.gz.bin_25.smooth_75Bulk.bw ChIP_dim5_H3K27me3_Rep2_R1_trimmed.fq.gz.bin_25.smooth_75Bulk.bw ChIP_dim5_H3K27me3_Rep3_R1_trimmed.fq.gz.bin_25.smooth_75Bulk.bw -o H3K27me3_domains_5matrix2.gz --outFileSortedRegions H3K27me3_domains_5-2.bed --skipZeros --verbose -p max/2  --missingDataAsZero
-  #
-  # plotHeatmap --matrixFile H3K27me3_domains_5matrix2.gz  -o H3K27me3_domains_5.png  --outFileSortedRegions sorted_clustered_H3K27me3_domains_5matrix2.gz --samplesLabel WT-Cu-1  hda1-Ch-1  hda-Cu-1 hda1-Ch-2 dim5-1 dim5-2 dim5-3 --colorMap Greens --sortRegions descend  --heatmapHeight 20  --missingDataColor white --sortUsingSamples 1 --kmeans 3 --zMax 15
