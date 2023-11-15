@@ -109,8 +109,9 @@ computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/
 
 #rtt109 by Run
 #H3K27me3
-#computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/131-64_ChIP_ncu00548_H3K27me3_Rep1_S52_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only.gz"
-  #plotHeatmap --matrixFile "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only.gz" --outFileName "${OUTDIR}/Heatmaps/rtt109_H3K27me3_Run131Only_hclust.png" --samplesLabel WT 132-52 131-64 --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/131-64_ChIP_ncu00548_H3K27me3_Rep1_S52_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2.gz"
+  plotHeatmap --matrixFile "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2.gz" --outFileName "${OUTDIR}/Heatmaps/rtt109_H3K27me3_Run131Only2.png" --samplesLabel WT 131-64 --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
+  
 
 computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/133-81_ChIP_rtt109_hph_H3K27me3_Rep1_S78_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run133Only.gz"
 plotHeatmap --matrixFile "${OUTDIR}/Matrices/rtt109_H3K27me3_Run133Only.gz" --outFileName "${OUTDIR}/Heatmaps/rtt109_H3K27me3_Run133Only_hclust2.png" --samplesLabel WT 133-90 133-81 --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
