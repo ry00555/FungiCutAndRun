@@ -102,15 +102,15 @@ ml BEDTools/2.30.0-GCC-11.3.0
 
 
 #NCU00423 NCU00423_H3K27ac
-#computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/131-53_ChIP_WT_H3K27ac_Rep1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/132-31_ChIP_ncu00423_H3K27ac_Rep_1_S28_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/132-36_ChIP_ncu00423_H3K27ac_Rep_1_S33_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/NCU00423_H3K27ac_Pool_1stsetPRC2target.gz"
-#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/NCU00423_H3K27ac_Pool_1stsetPRC2target.gz" --outFileName "${OUTDIR}/Heatmaps/NCU00423_H3K27ac_Pool_1stsetPRC2target2.png" --samplesLabel WT 132-31 132-36 --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/131-53_ChIP_WT_H3K27ac_Rep1_S41_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/132-31_ChIP_ncu00423_H3K27ac_Rep_1_S28_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/132-36_ChIP_ncu00423_H3K27ac_Rep_1_S33_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/NCU00423_H3K27ac_Pool.gz"
+  plotHeatmap --matrixFile "${OUTDIR}/Matrices/NCU00423_H3K27ac_Pool.gz" --outFileName "${OUTDIR}/Heatmaps/NCU00423_H3K27ac_Pool_1stsetPRC2target2.png" --samplesLabel WT 132-31 132-36 --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1
 
 
 
 #rtt109 by Run
 #H3K27me3
-computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/131-64_ChIP_ncu00548_H3K27me3_Rep1_S52_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.gz"
-  plotHeatmap --matrixFile "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.gz" --outFileName "${OUTDIR}/Heatmaps/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.png" --samplesLabel WT rtt109-KO --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1 --kmeans 2
+#computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/131-64_ChIP_ncu00548_H3K27me3_Rep1_S52_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.gz"
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.gz" --outFileName "${OUTDIR}/Heatmaps/rtt109_H3K27me3_Run131Only2_kmeans2_TRUE.png" --samplesLabel WT rtt109-KO --hclust 1 --colorMap Reds --sortRegions descend --missingDataColor white --sortUsingSamples 1 --kmeans 2
 
 
 #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/133-90_ChIP_WT_H3K27me3_Rep1_S87_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw ${OUTDIR}/BigWigs/133-81_ChIP_rtt109_hph_H3K27me3_Rep1_S78_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/rtt109_H3K27me3_Run133Only2_kmeans2.gz"
