@@ -40,11 +40,11 @@ fi
 #
 FILES="/scratch/ry00555/DahlstromRun135/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
-mkdir "${OUTDIR}/SortedBamFiles"
-mkdir "${OUTDIR}/BigWigs"
-mkdir "${OUTDIR}/Peaks"
-mkdir "$OUTDIR/HomerTagDirectories"
-mkdir "$OUTDIR/TdfFiles"
+#mkdir "${OUTDIR}/SortedBamFiles"
+#mkdir "${OUTDIR}/BigWigs"
+#mkdir "${OUTDIR}/Peaks"
+#mkdir "$OUTDIR/HomerTagDirectories"
+#mkdir "$OUTDIR/TdfFiles"
 #
 #Iterate over the files
 for f in $FILES
@@ -84,6 +84,6 @@ samtools index "$bam"
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
 #plot mononucleosomes
-bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+#bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 
 done
