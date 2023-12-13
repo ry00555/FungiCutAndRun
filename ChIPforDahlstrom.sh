@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 
 ml BWA/0.7.17-GCCcore-11.3.0
-ml SAMtools/1.16.1-GCC-11.3.0
+ml SAMtools/1.10-GCC-8.3.0
 #ml Homer/4.11-foss-2022a
 ml deepTools/3.5.2-foss-2022a
 # ml Perl/5.34.1-GCCcore-11.3.0
