@@ -34,9 +34,9 @@ fi
 
 # #process reads using trimGalore
 
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
-FILES="/scratch/ry00555/DahlstromRun135/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
 #mkdir "${OUTDIR}/SortedBamFiles"
 #mkdir "${OUTDIR}/BigWigs"
