@@ -13,17 +13,15 @@
 cd $SLURM_SUBMIT_DIR
 
 
-
-
-
 ml BWA/0.7.17-GCCcore-11.3.0
 ml SAMtools/1.16.1-GCC-11.3.0
 #ml Homer/4.11-foss-2022a
 ml deepTools/3.5.2-foss-2022a
 # ml Perl/5.34.1-GCCcore-11.3.0
-ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+ml Trim_Galore/0.6.7-GCCcore-11.2.0
 #ml BEDTools/2.30.0-GCC-11.3.0
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
+
 
 source ConfigforDahlstrom.txt
 
