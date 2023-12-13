@@ -11,6 +11,14 @@
 #SBATCH --error=../DahlstrohmChIP.%j.err
 
 cd $SLURM_SUBMIT_DIR
+ml SAMtools/1.16.1-GCC-10.2.0
+ml BWA/0.7.17-GCC-10.2.0
+#ml Homer/4.11-foss-2020b
+ml deepTools/3.5.1-foss-2020b-Python-3.8.6
+# ml Perl/5.30.0-GCCcore-8.3.0
+ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+#ml BEDTools/2.30.0-GCC-10.2.0
+
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
@@ -24,8 +32,7 @@ fi
 
 
 # #process reads using trimGalore
-#
- ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
+
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
 FILES="/scratch/ry00555/DahlstromRun135/*R1_001_val_1\.fq\.gz" #Don't forget the *
@@ -60,8 +67,6 @@ do
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
 
-ml SAMtools/1.9-GCC-8.3.0
-ml BWA/0.7.17-GCC-8.3.0
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
@@ -72,7 +77,6 @@ samtools index "$bam"
 ############################
 # # #deeptools
 
-ml deepTools/3.3.1-intel-2019b-Python-3.7.4
 #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
