@@ -19,7 +19,7 @@ ml deepTools/3.5.2-foss-2022a
 
 
 ml Homer/4.11-foss-2022a
-# ml Perl/5.34.1-GCCcore-11.3.0
+ml Perl/5.34.1-GCCcore-11.3.0
 #ml Trim_Galore/0.6.7-GCCcore-11.2.0
 #ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 #ml BEDTools/2.30.0-GCC-11.3.0
@@ -93,30 +93,32 @@ OUTDIR=/scratch/ry00555/DahlstromRun135/Output
 
 TAGDIR="$OUTDIR/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
-#PEAKSDIR="${OUTDIR}/Peaks"
+PEAKSDIR="${OUTDIR}/Peaks"
 
-
+#basic command
 #makeTagDirectory ${TAGDIR}/129-43_ChIP_WT_input ${BAMDIR}/129-43_ChIP_WT_input_S42_L001_R1_001_val_1.fq.gz.bam
 # List of sample names
-samples=(
-    "135-41_ChIP_WT_Anti6xHis_Rep1_S38"
-    "135-42_ChIP_delHcra_Anti6xHis_Rep1_S39"
-    "135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40"
-    "135-44_ChIP_WT_Input_Rep1_S41"
-    "135-45_ChIP_delHcra_Input_Rep1_S42"
-    "135-46_ChIP_hcra6xhis_Input_Rep1_S43"
-)
+#samples=(
+#    "135-41_ChIP_WT_Anti6xHis_Rep1_S38"
+    #"135-42_ChIP_delHcra_Anti6xHis_Rep1_S39"
+#    "135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40"
+#    "135-44_ChIP_WT_Input_Rep1_S41"
+    #"135-45_ChIP_delHcra_Input_Rep1_S42"
+#    "135-46_ChIP_hcra6xhis_Input_Rep1_S43"
+#)
 
 # Loop through each sample
-for sample in "${samples[@]}"; do
-    bam_file="${BAMDIR}/${sample}_L001_R1_001_val_1.fq.gz.bam"
-    tag_directory="${TAGDIR}/${sample}"
-    output_peak_file="${PEAKSDIR}/${sample}_peaks.txt"
-    input_bam="${BAMDIR}/${sample}_L001_R1_001_val_1.fq.gz.bam"
+#for sample in "${samples[@]}"; do
+#    bam_file="${BAMDIR}/${sample}_L001_R1_001_val_1.fq.gz.bam"
+#    tag_directory="${TAGDIR}/${sample}"
+#    output_peak_file="${PEAKSDIR}/${sample}_peaks.txt"
+#    input_bam="${BAMDIR}/${sample}_L001_R1_001_val_1.fq.gz.bam"
 
     # Run makeTagDirectory
-    makeTagDirectory "${tag_directory}" "${bam_file}"
+#    makeTagDirectory "${tag_directory}" "${bam_file}"
 
     # Run findPeaks
   #  findPeaks "${tag_directory}" -style factor -region -size 150 -minDist 530 -o "${output_peak_file}" -i "${input_bam}"
-done
+#done
+findPeaks "${TAGDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor -region -size 150 -o "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" -i "${TAGDIR}/135-44_ChIP_WT_Input_Rep1_S41"
+findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -region -size 150  -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" -i "${TAGDIR}/135-46_ChIP_hcra6xhis_Input_Rep1_S43"
