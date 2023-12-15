@@ -56,9 +56,9 @@ OUTDIR=/scratch/ry00555/DahlstromRun135/Output
 		#${string//substring/replacement}
 # 		#dir=${f%/*}
 
-	file=${f##*/}
+	#file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-100]*_R1_001_val_1.fq.gz/}
+	#name=${file/%_S[1-100]*_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
@@ -91,7 +91,7 @@ OUTDIR=/scratch/ry00555/DahlstromRun135/Output
 
 
 
-TAGDIR="$OUTDIR/HomerTagDirectories"
+TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 PEAKSDIR="${OUTDIR}/Peaks"
 
@@ -120,11 +120,25 @@ PEAKSDIR="${OUTDIR}/Peaks"
     # Run findPeaks
   #  findPeaks "${tag_directory}" -style factor -region -size 150 -minDist 530 -o "${output_peak_file}" -i "${input_bam}"
 #done
-findPeaks "${TAGDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor -o "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" -F 1 -p 0.01 -FLR 2
+#line by line commands that worked as the homer module has changed arguments.
+#note that the WT antibody without input normalization used a peak size of 10 and tgat gave 1024 peaks. However 43_hrcA6xhis without input normalization peaks were called with a size of 100 not 10 and that gave 740. Ultimately we need the input normalized.
+#findPeaks "135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor -L 0 -LP 0.01 -P 0.01 -F 0 -fdr 0.01 -poisson 0.01 -size 100 -o "../Peaks/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" -i "135-44_ChIP_WT_Input_Rep1_S41"
+#findPeaks "135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -L 0 -LP 0.01 -P 0.01 -F 0 -fdr 0.01 -poisson 0.01 -size 100 -o "../Peaks/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks_wINPUT.txt" -i "135-46_ChIP_hcra6xhis_Input_Rep1_S43"
+
+#annotatePeaks.pl "135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ../135-41_ChIP_WT.txt
+
+
+
+
+
+
+
+
+#findPeaks "${TAGDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor -o "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt"
 #-i "${TAGDIR}/135-44_ChIP_WT_Input_Rep1_S41"
-findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" -F 1 -p 0.01 -FLR 2
+#findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt"
 #-i "${TAGDIR}/135-46_ChIP_hcra6xhis_Input_Rep1_S43"
 
-#annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ${OUTDIR}/135-41_ChIP_WT.txt
+annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf -keepALL > ${OUTDIR}/135-41_ChIP_WT.txt
 
 #annotatePeaks.pl "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ${OUTDIR}/135-43_hrcA6xhis.txt
