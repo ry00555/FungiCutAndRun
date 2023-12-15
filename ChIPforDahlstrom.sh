@@ -120,8 +120,8 @@ PEAKSDIR="${OUTDIR}/Peaks"
     # Run findPeaks
   #  findPeaks "${tag_directory}" -style factor -region -size 150 -minDist 530 -o "${output_peak_file}" -i "${input_bam}"
 #done
-findPeaks "${TAGDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor  -o "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" -i "${TAGDIR}/135-44_ChIP_WT_Input_Rep1_S41" -F 1 -p 0.01 -FLR 2
-findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor  -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" -i "${TAGDIR}/135-46_ChIP_hcra6xhis_Input_Rep1_S43" -F 1 -p 0.01 -FLR 2 
+findPeaks "${TAGDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38" -style factor -F 1 -p 0.01 -FLR 2 -o "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" #-i "${TAGDIR}/135-44_ChIP_WT_Input_Rep1_S41"
+findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -F 1 -p 0.01 -FLR 2 -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" #-i "${TAGDIR}/135-46_ChIP_hcra6xhis_Input_Rep1_S43"
 
 annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ${OUTDIR}/135-41_ChIP_WT.txt
 
