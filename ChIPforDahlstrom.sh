@@ -139,6 +139,6 @@ PEAKSDIR="${OUTDIR}/Peaks"
 #findPeaks "${TAGDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40" -style factor -o "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt"
 #-i "${TAGDIR}/135-46_ChIP_hcra6xhis_Input_Rep1_S43"
 
-annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf -keepALL > ${OUTDIR}/135-41_ChIP_WT.txt
+annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ${OUTDIR}/135-41_ChIP_WT.txt
 
 #annotatePeaks.pl "${PEAKSDIR}/135-43_ChIP_hcra6xhis_Anti6xHis_Rep1_S40_peaks.txt" $GENOME -gtf /home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf > ${OUTDIR}/135-43_hrcA6xhis.txt
