@@ -90,6 +90,12 @@ done < "SRAforEaf3Ash1Set7WTRco1withMeta.txt"
 source config.txt
 
 #
+mkdir "${OUTDIR}/SortedBamFiles"
+mkdir "${OUTDIR}/BigWigs"
+mkdir "${OUTDIR}/Peaks"
+mkdir "${OUTDIR}/TrimmedReads"
+mkdir "$OUTDIR/Matrices"
+mkdir "$OUTDIR/Heatmaps"
 
 ml BWA
 ml SAMtools
@@ -98,11 +104,7 @@ ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
- mkdir "${OUTDIR}/SortedBamFiles"
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
-#mkdir "$OUTDIR/HomerTagDirectories"
-#mkdir "$OUTDIR/TdfFiles"
+
 #
 #Iterate over the files
 for f in $FILES
@@ -147,7 +149,7 @@ bamCoverage -p $THREADS $MNase -bs $BIN --normalizeUsing BPM --smoothLength $SMO
 
 done
 
-for file_path in "${OUTDIR}/NormalizedBigWigs"/*.bw; do
+for file_path in "${OUTDIR}/BigWigs"/*.bw; do
   # Get the base name of the file
   BW_name=$(basename "${file_path}" .bw)
 
