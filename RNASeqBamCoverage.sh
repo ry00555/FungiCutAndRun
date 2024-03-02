@@ -5,7 +5,8 @@
 #SBATCH --cpus-per-task=6		                            # Number of cores per task - match this to the num_threads used by BLAST
 #SBATCH --mem=24gb			                                # Total memory for job
 #SBATCH --time=72:00:00  		                            # Time limit hrs:min:sec
-#SBATCH --output=/home/ry00555/log.%j			    # Standard output and error log - # replace cbergman with your myid
+#SBATCH --output=../RNASeqBamCoverage.%j.out
+#SBATCH --error=../RNASeqBamCoverage.%j.err
 #SBATCH --mail-user=ry00555@uga.edu                    # Where to send mail - # replace cbergman with your myid
 #SBATCH --mail-type=END,FAIL                            # Mail events (BEGIN, END, FAIL, ALL)
 
@@ -23,7 +24,7 @@ then
 fi
 
 #loading modules
-module load SRA-Toolkit/2.11.1-centos_linux64 BWA/0.7.17-GCC-8.3.0 SAMtools/1.10-GCC-8.3.0 Subread/2.0.0-GCC-8.3.0
+module load SRA-Toolkit BWA SAMtools Subread
 
 
 
@@ -32,7 +33,7 @@ module load SRA-Toolkit/2.11.1-centos_linux64 BWA/0.7.17-GCC-8.3.0 SAMtools/1.10
 # Assuming ${OUTDIR} is already defined
 
 # Check if the input file exists
-if [ ! -f "SRAforEaf3Ash1Set7WTRco1withMeta.txt" ]; then
+if [ ! -f "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt" ]; then
     echo "Error: Input file SRAforEaf3Ash1Set7WTRco1.txt not found!"
     exit 1
 fi
