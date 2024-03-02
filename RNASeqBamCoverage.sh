@@ -39,6 +39,10 @@ if [ ! -f "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt" ]; then
 fi
 
 # Read SRR IDs and corresponding descriptive titles from the input file
+while IFS= read -r SRR_ID; do
+    prefetch -O "${OUTDIR}" "${SRR_ID}"
+done < "SRAforEaf3Ash1Set7WTRco1withMeta.txt"
+
 while IFS=$'\t' read -r SRR_ID Descriptive_Title; do
     # Perform fastq-dump for each SRR ID
     fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}" -O "${OUTDIR}"
