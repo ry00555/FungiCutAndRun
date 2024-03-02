@@ -18,10 +18,10 @@ cd $SLURM_SUBMIT_DIR
 
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
-then
-    mkdir -p $OUTDIR
-fi
+# if [ ! -d $OUTDIR ]
+# then
+#     mkdir -p $OUTDIR
+# fi
 
 #loading modules
 ml SRA-Toolkit Subread
@@ -41,7 +41,7 @@ fi
 # Read SRR IDs and corresponding descriptive titles from the input file
 while IFS= read -r SRR_ID; do
     prefetch -O "${OUTDIR}" "${SRR_ID}"
-done < "SRAforEaf3Ash1Set7WTRco1withMeta.txt"
+done < "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt"
 
 while IFS=$'\t' read -r SRR_ID Descriptive_Title; do
     # Perform fastq-dump for each SRR ID
@@ -49,7 +49,7 @@ while IFS=$'\t' read -r SRR_ID Descriptive_Title; do
 
     # Rename the output files
     mv "${OUTDIR}/${SRR_ID}_1.fastq.gz" "${OUTDIR}/${Descriptive_Title}_1.fastq.gz"
-done < "SRAforEaf3Ash1Set7WTRco1withMeta.txt"
+done < "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt"
 
 #downloading reference genome
 #curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/latest_assembly_versions/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.fna.gz  | gunzip -c > ${OUTDIR}/NC12_genome.fna
@@ -97,9 +97,9 @@ source config.txt
 #mkdir "${OUTDIR}/SortedBamFiles"
 #mkdir "${OUTDIR}/BigWigs"
 #mkdir "${OUTDIR}/Peaks"
-mkdir "${OUTDIR}/TrimmedReads"
-mkdir "$OUTDIR/Matrices"
-mkdir "$OUTDIR/Heatmaps"
+#mkdir "${OUTDIR}/TrimmedReads"
+#mkdir "$OUTDIR/Matrices"
+#mkdir "$OUTDIR/Heatmaps"
 
 ml BWA
 ml SAMtools
