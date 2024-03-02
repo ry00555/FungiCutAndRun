@@ -1,0 +1,53 @@
+ml deepTools/3.5.2-foss-2022a
+
+computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_22_ChIP_wt_K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  111_13_ChIP_K56R_40_K27me2_3_Rep1_S13_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_8_ChIP_K56R_13_K27me2_3_Rep1_S8_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_14_ChIP_K56R_40_K27me3_Rep1_S14_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_9_ChIP_K56R_13_K27me3_Rep1_S9_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_2_ChIP_dRTT109_K27me2_3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_3_ChIP_dRTT109_K27me3_Rep1_S3_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R heatmapPRC2genesEdit.bed --skipZeros -o Matrices6.gz
+
+
+plotHeatmap --matrixFile Matrices6.gz --outFileName "Rtt109_K27_3WT_newHeatmapbed3.png" --samplesLabel WTRep1 WTRep2 K56R40Rep1 K56R13Rep1 K56R40Rep2 K56R13Rep2 ∆rtt109Rep1 ∆rtt109Rep2 ∆rtt109Rep3 --hclust 1 --colorMap coolwarm --sortRegions descend --missingDataColor white
+
+/scratch/ry00555/WT_H3K27me3peaks.bed
+
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_22_ChIP_wt_K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  111_13_ChIP_K56R_40_K27me2_3_Rep1_S13_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_8_ChIP_K56R_13_K27me2_3_Rep1_S8_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_14_ChIP_K56R_40_K27me3_Rep1_S14_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_9_ChIP_K56R_13_K27me3_Rep1_S9_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_2_ChIP_dRTT109_K27me2_3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_3_ChIP_dRTT109_K27me3_Rep1_S3_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R /scratch/ry00555/neurospora.bed --skipZeros -o Matrices_WholeGenome.gz
+
+
+plotHeatmap --matrixFile Matrices_WholeGenome.gz --outFileName "Rtt109_K27_2WT_oldbed_wholeGenome2.png" --samplesLabel WTRep1 WTRep2 K56R40Rep1 K56R13Rep1 K56R40Rep2 K56R13Rep2 ∆rtt109Rep1 ∆rtt109Rep2 ∆rtt109Rep3 --kmeans 2 --colorMap coolwarm --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_22_ChIP_wt_K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw  111_13_ChIP_K56R_40_K27me2_3_Rep1_S13_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_8_ChIP_K56R_13_K27me2_3_Rep1_S8_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_14_ChIP_K56R_40_K27me3_Rep1_S14_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_9_ChIP_K56R_13_K27me3_Rep1_S9_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_2_ChIP_dRTT109_K27me2_3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 111_3_ChIP_dRTT109_K27me3_Rep1_S3_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R heatmapPRC2genesEdit.bed --skipZeros -o Matrices_newk27genes.gz
+
+
+plotHeatmap --matrixFile Matrices_newk27genes.gz --outFileName "Rtt109_K27_2WT_newbed_colors.png" --samplesLabel WTRep1 WTRep2 K56R40Rep1 K56R13Rep1 K56R40Rep2 K56R13Rep2 ∆rtt109Rep1 ∆rtt109Rep2 ∆rtt109Rep3 --colorMap OrRd --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 135-18_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw  135-22_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw 135-27_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw 135-79_ChIP_ncu06788_H3K27me3_Rep2_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-75_ChIP_ncu06787_H3K27me3_Rep2_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R /scratch/ry00555/HeatmapsRtt109/heatmapPRC2genesEdit.bed --skipZeros -o Matrices_newk27genes.gz
+
+plotHeatmap --matrixFile Matrices_newk27genes.gz --outFileName "Eaf3_K27_3WT_newbed.png" --samplesLabel WTRep1 WTRep2 WTRep3 NCU06788Rep1 NCU06788Rep2 --colorMap coolwarm --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-18_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw  135-22_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw 135-27_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw 135-79_ChIP_ncu06788_H3K27me3_Rep2_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-75_ChIP_ncu06787_H3K27me3_Rep2_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R /scratch/ry00555/neurospora.bed --skipZeros -o Matrices_WholeGenome_moreWT.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_moreWT.gz --outFileName "Eaf3_K27_3WT_wholegenome_MoreWT.png" --samplesLabel WTRep1 WTRep2 WTRep3 WTRep4 NCU06788Rep1 NCU06788Rep2 --colorMap coolwarm --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-79_ChIP_WT_H3K36me3_Rep1_S76_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-29_ChIP_WT_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 134-3_ChIP_WT_H3K36me3_Rep2_S3_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-12_ChIP_ncu06787_H3K36me3_Rep2_S9_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-15_ChIP_ncu06788_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 133-82_ChIP_rtt109_hph_H3K36me3_ACTUALLYNCU06788.bw -R /scratch/ry00555/neurospora.bed --skipZeros -o Matrices_WholeGenome_K36.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_K36.gz --outFileName "Eaf3_K36_extraWT_rtt109_wholegenome.png" --samplesLabel WTRep1 WTRep2 WTRep3 NCU06788Rep1 NCU06788Rep2 NCU06788Rep3 --colorMap coolwarm --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+
+# remove a wildtype
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-18_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw 135-27_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw 135-79_ChIP_ncu06788_H3K27me3_Rep2_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-75_ChIP_ncu06787_H3K27me3_Rep2_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R /scratch/ry00555/neurospora.bed --skipZeros -o Matrices_WholeGenome_WT2.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_WT2.gz --outFileName "Eaf3_K27_3WT_wholegenome2_newcolors2.png" --samplesLabel WTRep1 WTRep2 WTRep3 NCU06788Rep1 NCU06788Rep2 --colorMap YlOrRd --sortRegions descend --missingDataColor white --sortUsingSamples 1
+
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-79_ChIP_WT_H3K36me3_Rep1_S76_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-29_ChIP_WT_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 134-12_ChIP_ncu06787_H3K36me3_Rep2_S9_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-15_ChIP_ncu06788_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 133-82_ChIP_rtt109_hph_H3K36me3_ACTUALLYNCU06788.bw -R /scratch/ry00555/neurospora.bed --skipZeros -o Matrices_WholeGenome_K36_subtractWt.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_K36_subtractWt.gz --outFileName "Eaf3_K36_extraWT_rtt109_wholegenome_3.png" --samplesLabel WTRep1 WTRep2 NCU06788Rep1 NCU06788Rep2 NCU06788Rep3 --colorMap coolwarm --sortRegions descend --sortUsingSamples 1 --heatmapHeight 20
+
+computeMatrix reference-point --referencePoint center -b 500 -a 500 -S 134-44_ChIP_WT_H3K27me3_Rep1_S35_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-18_ChIP_WT_H3K27me2_3.bin_25.smooth_75Bulk.bw 135-27_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw 135-79_ChIP_ncu06788_H3K27me3_Rep2_S75_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 135-75_ChIP_ncu06787_H3K27me3_Rep2_S71_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R /scratch/ry00555/WT_H3K27me3peaks.bed --skipZeros -o Matrices_WholeGenome_domains.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_domains.gz --outFileName "Eaf3_K27_3WT_domains3.png" --samplesLabel WTRep1 WTRep2 WTRep3 NCU06788Rep1 NCU06788Rep2 --colorMap YlOrRd --sortRegions descend --sortUsingSamples 1 --heatmapHeight 15
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-79_ChIP_WT_H3K36me3_Rep1_S76_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-29_ChIP_WT_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 134-12_ChIP_ncu06787_H3K36me3_Rep2_S9_L001_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw 134-15_ChIP_ncu06788_H3K36me3_Rep2.bin_25.smooth_75Bulk.bw 133-82_ChIP_rtt109_hph_H3K36me3_ACTUALLYNCU06788.bw -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o Matrices_WholeGenome_K36_inK27Genes.gz
+
+plotHeatmap --matrixFile Matrices_WholeGenome_K36_inK27Genes.gz --outFileName "Eaf3_K36_inK27Genes.png" --samplesLabel WTRep1 WTRep2 NCU06788Rep1 NCU06788Rep2 NCU06788Rep3 --colorMap coolwarm --sortRegions descend --sortUsingSamples 1 --heatmapHeight 20
