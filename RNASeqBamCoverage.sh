@@ -8,7 +8,7 @@
 #SBATCH --output=../RNASeqBamCoverage.%j.out
 #SBATCH --error=../RNASeqBamCoverage.%j.err
 #SBATCH --mail-user=ry00555@uga.edu                    # Where to send mail - # replace cbergman with your myid
-#SBATCH --mail-type=END,FAIL                            # Mail events (BEGIN, END, FAIL, ALL)
+#SBATCH --mail-type=ALL                            # Mail events (BEGIN, END, FAIL, ALL)
 
 #set input and output directory variables
 OUTDIR="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
@@ -51,11 +51,9 @@ SRR_IDS=(
 #DOWNLOADING SRA IswiPaperFilz  aesFromMasayuki
 #prefetch -O ${OUTDIR} SRR8730382 SRR8730383 SRR8730380 SRR8730381 SRR8730378 SRR8730379 SRR8730376 SRR8730377
 #prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
-if [ -f "${OUTDIR}/${SRR_ID}" ]; then
-        fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}/${SRR_ID}.sra" -O "${OUTDIR}/FASTQ"
-    else
-        echo "Error: ${SRR_ID} not found in ${OUTDIR}. Skipping..."
-    fi
+
+fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}" -O "${OUTDIR}/FASTQ"
+
 
 
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730382
