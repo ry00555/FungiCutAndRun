@@ -27,29 +27,22 @@ cd $SLURM_SUBMIT_DIR
 ml SRA-Toolkit Subread
 
 
+#You can use a loop to prefetch each SRR ID and then subsequently run fastq-dump for each downloaded file. Here's how you can do it:
 
-#!/bin/bash
 
-# Assuming ${OUTDIR} is already defined
+# List of SRR IDs
+SRR_IDS=(
+    "SRR9027634" "SRR9027635" "SRR9027636" "SRR9027653" "SRR9027655"
+    "SRR9027701" "SRR9044213" "SRR9044244" "SRR9044324" "SRR10916182"
+    "SRR10916183" "SRR10916184" "SRR10916163" "SRR10916164" "SRR10916165"
+    "SRR8444005" "SRR8444042" "SRR8443998" "SRR12614222" "SRR12614223"
+    "SRR12614224" "SRR12614225" "SRR12614226"
+)
 
-# Check if the input file exists
-if [ ! -f "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt" ]; then
-    echo "Error: Input file SRAforEaf3Ash1Set7WTRco1.txt not found!"
-    exit 1
-fi
-
-# Read SRR IDs and corresponding descriptive titles from the input file
-while IFS= read -r SRR_ID; do
+# Prefetch SRA files
+for SRR_ID in "${SRR_IDS[@]}"; do
     prefetch -O "${OUTDIR}" "${SRR_ID}"
-done < "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt"
-
-while IFS=$'\t' read -r SRR_ID Descriptive_Title; do
-    # Perform fastq-dump for each SRR ID
-    fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}" -O "${OUTDIR}"
-
-    # Rename the output files
-    mv "${OUTDIR}/${SRR_ID}_1.fastq.gz" "${OUTDIR}/${Descriptive_Title}_1.fastq.gz"
-done < "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt"
+done
 
 #downloading reference genome
 #curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/latest_assembly_versions/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.fna.gz  | gunzip -c > ${OUTDIR}/NC12_genome.fna
@@ -57,7 +50,13 @@ done < "${OUTDIR}/SRAforEaf3Ash1Set7WTRco1withMeta.txt"
 
 #DOWNLOADING SRA IswiPaperFilz  aesFromMasayuki
 #prefetch -O ${OUTDIR} SRR8730382 SRR8730383 SRR8730380 SRR8730381 SRR8730378 SRR8730379 SRR8730376 SRR8730377
-
+#prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
+if [ -f "${OUTDIR}/${SRR_ID}.sra" ]; then
+        fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}.sra" -O "${OUTDIR}"
+    else
+        echo "Error: ${SRR_ID}.sra not found in ${OUTDIR}. Skipping..."
+    fi
+done
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730382
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730383
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730380
