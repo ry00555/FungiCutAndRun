@@ -15,7 +15,7 @@ OUTDIR="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
 
 cd $SLURM_SUBMIT_DIR
 
-
+source config.txt
 
 #if output directory doesn't exist, create it
 # if [ ! -d $OUTDIR ]
@@ -24,8 +24,7 @@ cd $SLURM_SUBMIT_DIR
 # fi
 
 #loading modules
-ml SRA-Toolkit Subread
-
+ml SRA-Toolkit
 
 #You can use a loop to prefetch each SRR ID and then subsequently run fastq-dump for each downloaded file. Here's how you can do it:
 
@@ -53,7 +52,7 @@ SRR_IDS=(
 #prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
 
 
-#fastq-dump --split-files --gzip ${OUTDIR}/${SRR_ID}/${SRR_ID}.sra -O ${FASTQ}
+fastq-dump --split-files --gzip ${OUTDIR}/${SRR_ID}/${SRR_ID}.sra -O ${FASTQ}
 
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730382
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730383
@@ -87,8 +86,6 @@ SRR_IDS=(
 # fastq-dump --split-files --gzip ${OUTDIR}/EPR-1_H3K27me2_3_N7480.sra -O ${OUTDIR}
 
 # #process reads using trimGalore
-
-source config.txt
 
 #
 #mkdir "${OUTDIR}/SortedBamFiles"
