@@ -52,9 +52,8 @@ SRR_IDS=(
 #prefetch -O ${OUTDIR} SRR8730382 SRR8730383 SRR8730380 SRR8730381 SRR8730378 SRR8730379 SRR8730376 SRR8730377
 #prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
 
-fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}" -O "${OUTDIR}/FASTQ"
 
-
+#fastq-dump --split-files --gzip ${OUTDIR}/${SRR_ID}/${SRR_ID}.sra -O ${FASTQ}
 
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730382
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730383
@@ -99,55 +98,54 @@ source config.txt
 #mkdir "$OUTDIR/Matrices"
 #mkdir "$OUTDIR/Heatmaps"
 
-# ml BWA
-# ml SAMtools
-# ml Trim_Galore
-#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-# #
-# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
-# #
+ml BWA
+ml SAMtools
+ml Trim_Galore
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
-# #
-# #Iterate over the files
-# for f in $FILES
-# do
-# #
-# # 	#Examples to Get Different parts of the file name
-# # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
-# 		#${string//substring/replacement}
-# # 		#dir=${f%/*}
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
-# 	file=${f##*/}
-# 	#remove ending from file name to create shorter names for bam files and other downstream output
-# 	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+
 #
-# #
-# # 	# File Vars
-# # 	#use sed to get the name of the second read matching the input file
-# 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-# 	#variable for naming bam file
-#  	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-# 	#variable name for bigwig output
-# 	bigwig="${OUTDIR}/BigWigs/${name}"
-# 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-# #
+#Iterate over the files
+for f in $FILES
+do
 #
-# #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-# samtools index "$bam"
+# 	#Examples to Get Different parts of the file name
+# 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
+		#${string//substring/replacement}
+# 		#dir=${f%/*}
+
+	file=${f##*/}
+	#remove ending from file name to create shorter names for bam files and other downstream output
+	name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+
+#
+# 	# File Vars
+# 	#use sed to get the name of the second read matching the input file
+	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+	#variable for naming bam file
+ 	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+	#variable name for bigwig output
+	bigwig="${OUTDIR}/BigWigs/${name}"
+	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+#
+
+#
+bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
 # #samtools index "$QualityBam"
 #
 # ############################
-# # # #deeptools
-#
-# ml deepTools
-# # #use these parameters for ChIP data
-# bamCoverage -p $THREADS $MNase -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}${MN}.bw"
-#
-#
-# done
+# # #deeptools
+
+ml deepTools
+# #use these parameters for ChIP data
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing CPM --ignoreDuplicates --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+
+ done
 #
 # for file_path in "${OUTDIR}/BigWigs"/*.bw; do
 #   # Get the base name of the file

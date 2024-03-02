@@ -1,13 +1,11 @@
 #number of CPUs
 THREADS=12
 
-#FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 #to download all files to local machine  scp -r ry00555@xfer.gacrc.uga.edu:/scratch/zlewis/Run133/2023_Run133_FASTQ/ /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133
 #then seperate my files into a new folder for Run133 on my local machine it is /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133/RYSamples/ZippedFastQ
 #transfer to the scratch folder scp -r *fastq.gz ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/OutputRun133/FastQ
 
-#number of CPUs
-THREADS=12
+
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
@@ -51,6 +49,6 @@ GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 BIN="25"
 
 #smoothlength setting, for smoothing the enrichment curve
-SMOOTH="75"
+SMOOTH="50"
 
 ##removed options for MNase analysis. Now, bulk reads will be plotted using deeptools using the bin and smooth parameters above ('_Bulk.bw'. A seperate MNase file will be generated to plot mononcleosome centers ('_MNase.bw') using a binsize of 1 and a smooth length of 25.
