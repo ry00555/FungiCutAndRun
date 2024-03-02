@@ -40,9 +40,9 @@ SRR_IDS=(
 )
 
 # Prefetch SRA files
-for SRR_ID in "${SRR_IDS[@]}"; do
-    prefetch -O "${OUTDIR}" "${SRR_ID}"
-done
+#for SRR_ID in "${SRR_IDS[@]}"; do
+#    prefetch -O "${OUTDIR}" "${SRR_ID}"
+#done
 
 #downloading reference genome
 #curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/latest_assembly_versions/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.fna.gz  | gunzip -c > ${OUTDIR}/NC12_genome.fna
@@ -52,11 +52,12 @@ done
 #prefetch -O ${OUTDIR} SRR8730382 SRR8730383 SRR8730380 SRR8730381 SRR8730378 SRR8730379 SRR8730376 SRR8730377
 #prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
 if [ -f "${OUTDIR}/${SRR_ID}.sra" ]; then
-        fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}.sra" -O "${OUTDIR}"
+        fastq-dump --split-files --gzip "${OUTDIR}/${SRR_ID}.sra" -O "${OUTDIR}/FASTQ"
     else
         echo "Error: ${SRR_ID}.sra not found in ${OUTDIR}. Skipping..."
     fi
-done
+
+
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730382
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730383
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR8730380
