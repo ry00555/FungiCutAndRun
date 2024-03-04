@@ -59,9 +59,10 @@ source config.txt
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR9027634
 #
 
+#Finish the reminaing SRR's as the script was interrupted halfway due to GACRC maintainence
 
-
-
+fastq-dump --split-files --gzip ${OUTDIR}/SRR12614226/SRR12614226.sra -O ${OUTDIR}/FASTQ
+fastq-dump --split-files --gzip ${OUTDIR}/SRR12614227/SRR12614227.sra -O ${OUTDIR}/FASTQ
 
 # #process reads using trimGalore
 
@@ -73,42 +74,46 @@ source config.txt
 #mkdir "$OUTDIR/Matrices"
 #mkdir "$OUTDIR/Heatmaps"
 
-# ml BWA
+ ml BWA
 ml SAMtools
-#ml Trim_Galore
+ml Trim_Galore
  #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614226*fastq\.gz
+
+ 
 #
 # FILES="${OUTDIR}/TrimmedReads/*.fq.gz" #Don't forget the *
 # #
 #
 # #
 # #Iterate over the files
-# for f in $FILES
-# do
-# #
-# # 	#Examples to Get Different parts of the file name
-# # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
-# 		#${string//substring/replacement}
-# # 		#dir=${f%/*}
+for f in $FILES
+do
 #
-# 	file=${f##*/}
-# 	#remove ending from file name to create shorter names for bam files and other downstream output
-# 	name=${file/*_1.fq.gz/}
+# 	#Examples to Get Different parts of the file name
+# 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
+		#${string//substring/replacement}
+# 		#dir=${f%/*}
+
+	file=${f##*/}
+	#remove ending from file name to create shorter names for bam files and other downstream output
+	name=${file/*_1.fq.gz/}
+
 #
-# #
-# # 	# File Vars
-# # 	#use sed to get the name of the second read matching the input file
-# 	read2=$(echo "$f" | sed 's/_1\.fq\.gz/_2\.fq\.gz/g')
-# 	#variable for naming bam file
-#  	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-# 	#variable name for bigwig output
-# 	bigwig="${OUTDIR}/BigWigs/${name}"
-# 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-# #
+# 	# File Vars
+# 	#use sed to get the name of the second read matching the input file
+	read2=$(echo "$f" | sed 's/_1\.fq\.gz/_2\.fq\.gz/g')
+	#variable for naming bam file
+ 	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+	#variable name for bigwig output
+	bigwig="${OUTDIR}/BigWigs/${name}"
+	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
-# #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-# samtools index "$bam"
+
+#
+bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
 # #samtools index "$QualityBam"
@@ -118,41 +123,41 @@ ml SAMtools
 
 ml deepTools
 # #use these parameters for ChIP data
-# bamCoverage -p $THREADS -bs $BIN --normalizeUsing CPM --ignoreDuplicates --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing CPM --ignoreDuplicates --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
 #  done
 #
-for file_path in "${OUTDIR}/BigWigs"/*.bw; do
-  # Get the base name of the file
-  BW_name=$(basename "${file_path}" .bw)
-
-  # Remove the file extension to create the sample ID
-  BW_id="${BW_name%.*}"
-  # Replace special characters with underscores in the sample ID
- BW_id=${BW_id//[^a-zA-Z0-9]/_}
-
- # Limit the length of the sample ID to avoid long filenames
- BW_id=${BW_id:0:50}
- # Compute matrix for the reference-point TSS
- computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
-
-  # Compute matrix for the reference-point TSS with specific regions (e.g., PRC2 genes)
-  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
-
-  # Preprocess the matrix files to replace nan values with zeros
-  zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
-  zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
-
-  # Plot heatmaps for the reference-point TSS
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens --sortRegions descend --missingDataColor white --sortUsingSamples 1
-
-  # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens
-
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens --sortRegions descend --missingDataColor white --sortUsingSamples 1
-
-  # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
- plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens
-
-
-done
+# for file_path in "${OUTDIR}/BigWigs"/*.bw; do
+#   # Get the base name of the file
+#   BW_name=$(basename "${file_path}" .bw)
+#
+#   # Remove the file extension to create the sample ID
+#   BW_id="${BW_name%.*}"
+#   # Replace special characters with underscores in the sample ID
+#  BW_id=${BW_id//[^a-zA-Z0-9]/_}
+#
+#  # Limit the length of the sample ID to avoid long filenames
+#  BW_id=${BW_id:0:50}
+#  # Compute matrix for the reference-point TSS
+#  computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_${BW_id}.gz"
+#
+#   # Compute matrix for the reference-point TSS with specific regions (e.g., PRC2 genes)
+#   computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz"
+#
+#   # Preprocess the matrix files to replace nan values with zeros
+#   zcat "${OUTDIR}/Matrices/matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz"
+#   zcat "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" | awk '{for (i=1; i<=NF; i++) if ($i == "nan") $i=0; print}' | gzip > "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz"
+#
+#   # Plot heatmaps for the reference-point TSS
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens --sortRegions descend --missingDataColor white --sortUsingSamples 1
+#
+#   # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens
+#
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens --sortRegions descend --missingDataColor white --sortUsingSamples 1
+#
+#   # Plot heatmaps for the reference-point TSS with specific regions (e.g., PRC2 genes)
+#  plotHeatmap --matrixFile "${OUTDIR}/Matrices/PRC2genes_matrix_${BW_id}_processed.gz" --outFileName "${OUTDIR}/Heatmaps/${BW_id}_hclust_PRC2genes.png" --samplesLabel "${BW_name}" --hclust 1 --colorMap Greens
+#
+#
+# done
