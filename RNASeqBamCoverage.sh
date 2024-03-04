@@ -25,7 +25,7 @@ source config.txt
 # fi
 
 #loading modules
-#ml SRA-Toolkit
+ml SRA-Toolkit
 
 #You can use a loop to prefetch each SRR ID and then subsequently run fastq-dump for each downloaded file. Here's how you can do it:
 
@@ -77,7 +77,7 @@ fastq-dump --split-files --gzip ${OUTDIR}/SRR12614227/SRR12614227.sra -O ${OUTDI
  ml BWA
 ml SAMtools
 ml Trim_Galore
- #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614226*fastq\.gz
 
