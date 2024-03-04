@@ -81,9 +81,9 @@ ml Trim_Galore
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614226*fastq\.gz
 
- 
+
 #
-# FILES="${OUTDIR}/TrimmedReads/*.fq.gz" #Don't forget the *
+FILES="${OUTDIR}/TrimmedReads/*.fq.gz" #Don't forget the *
 # #
 #
 # #
