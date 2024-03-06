@@ -60,9 +60,9 @@ source config.txt
 #
 
 #Finish the reminaing SRR's as the script was interrupted halfway due to GACRC maintainence
-ml SRA-Toolkit
-fastq-dump --split-files --gzip "${OUTDIR}/SRR12614226/SRR12614226.sra" -O ${OUTDIR}/FASTQ
-fastq-dump --split-files --gzip "${OUTDIR}/SRR12614227/SRR12614227.sra" -O ${OUTDIR}/FASTQ
+#ml SRA-Toolkit
+#fastq-dump --split-files --gzip "${OUTDIR}/SRR12614226/SRR12614226.sra" -O ${OUTDIR}/FASTQ
+#fastq-dump --split-files --gzip "${OUTDIR}/SRR12614227/SRR12614227.sra" -O ${OUTDIR}/FASTQ
 
 # #process reads using trimGalore
 
@@ -78,8 +78,8 @@ fastq-dump --split-files --gzip "${OUTDIR}/SRR12614227/SRR12614227.sra" -O ${OUT
 ml SAMtools
 ml Trim_Galore
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614226*fastq\.gz
+ #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
+ #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614226*fastq\.gz
 
 
 #
@@ -122,10 +122,9 @@ samtools index "$bam"
 # # #deeptools
 
 ml deepTools
-# #use these parameters for ChIP data
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing CPM --ignoreDuplicates --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
-#  done
+ done
 #
 # for file_path in "${OUTDIR}/BigWigs"/*.bw; do
 #   # Get the base name of the file
