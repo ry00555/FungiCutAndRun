@@ -1,0 +1,271 @@
+#!/bin/bash
+#SBATCH --job-name=CnR_setab_MO		                        # Job name
+#SBATCH --partition=batch		                            # Partition (queue) name
+#SBATCH --ntasks=1	                                # Single task job
+#SBATCH --cpus-per-task=24		                            # Number of cores per task - match this to the num_threads used by BLAST
+#SBATCH --mem=120gb			                                # Total memory for job
+#SBATCH --time=48:00:00  		                            # Time limit hrs:min:sec
+#SBATCH --output=/scratch/ara67776/CnR_setAB			    # Location of standard output and error log files (replace cbergman with your myid)
+#SBATCH --mail-user=ara67776@uga.edu                    # Where to send mail (replace cbergman with your myid)
+#SBATCH --mail-type=ALL                            # Mail events (BEGIN, END, FAIL, ALL)
+#SBATCH --output=/home/ara67776/work/error/log.%j			    # Location of standard output and error log files (replace cbergman with your myid)
+
+#set output directory
+OUTDIR="/scratch/ara67776/CnR_timecourse"
+
+# ml Trim_Galore
+#starting with raw files in $OUTDIR/raw
+#mkdir $OUTDIR/trimmed
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_IgG_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_IgG_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_1_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_1_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_2_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_2_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_3_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/24hpf_K9_3_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_IgG_1_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_IgG_1_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_1_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_1_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_2_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_2_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_3_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/2.5hpf_K9_3_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_IgG_1_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_IgG_1_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_1_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_1_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_2_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_2_R2.fastq.gz
+# trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_3_R1.fastq.gz $OUTDIR/raw/CnR_timecourse_K9_2_to_4h/4.5hpf_K9_3_R2.fastq.gz
+
+#aligning trimmed files to danio reference sequence & e. coli reference using bowtie/creating sam files
+# curl -s https://ftp.ensembl.org/pub/release-110/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.primary_assembly.fa.gz | gunzip -c > $OUTDIR/ref/danio_refseq.fa
+ # curl -s ftp://ftp.ensembl.org/pub/release-98/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.primary_assembly.fa.gz | gunzip -c > $OUTDIR/ref/danio_refseq_2.fa
+# curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ref/ecoli_refseq.fa
+# module load Bowtie2
+
+                                                                              ###DANIO####
+
+# bowtie2-build -f $OUTDIR/ref/danio_refseq.fa $OUTDIR/ref/danio_ref
+# mkdir $OUTDIR/sam_files
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/2.5hpf_IgG_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_IgG_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_IgG.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/2.5hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_1.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/2.5hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_2.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/2.5hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_3.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/4.5hpf_IgG_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_IgG_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_IgG.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/4.5hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_1.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/4.5hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_2.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/4.5hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_3.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/24hpf_IgG_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_IgG_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_IgG.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/24hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_1.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/24hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_2.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/24hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_3.sam
+
+                                                                              ###E. coli###
+
+# bowtie2-build -f $OUTDIR/ref/ecoli_refseq.fa $OUTDIR/ref/ecoli_ref
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/2.5hpf_IgG_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_IgG_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_IgG_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/2.5hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_1_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/2.5hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_2_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/2.5hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/2.5hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/2.5hpf_K9_3_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/4.5hpf_IgG_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_IgG_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_IgG_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/4.5hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_1_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/4.5hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_2_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/4.5hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/4.5hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/4.5hpf_K9_3_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/24hpf_IgG_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_IgG_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_IgG_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/24hpf_K9_1_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_1_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_1_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/24hpf_K9_2_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_2_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_2_ecoli.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/ecoli_ref -1 $OUTDIR/trimmed/24hpf_K9_3_R1_val_1.fq.gz -2 $OUTDIR/trimmed/24hpf_K9_3_R2_val_2.fq.gz -S $OUTDIR/sam_files/24hpf_K9_3_ecoli.sam
+
+
+
+#creating bam files WITH HEADER from previously created sam files
+# module load SAMtools
+# mkdir $OUTDIR/bam_files
+                    ##DANIO##
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_IgG_.sam  > $OUTDIR/bam_files/2.5hpf_IgG.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_1.sam  > $OUTDIR/bam_files/2.5hpf_K9_1.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_2.sam  > $OUTDIR/bam_files/2.5hpf_K9_2.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_3.sam  > $OUTDIR/bam_files/2.5hpf_K9_3.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_IgG.sam  > $OUTDIR/bam_files/4.5hpf_IgG.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_1.sam  > $OUTDIR/bam_files/4.5hpf_K9_1.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_2.sam  > $OUTDIR/bam_files/4.5hpf_K9_2.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_3.sam  > $OUTDIR/bam_files/4.5hpf_K9_3.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_IgG.sam  > $OUTDIR/bam_files/24hpf_IgG.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_1.sam  > $OUTDIR/bam_files/24hpf_K9_1.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_2.sam  > $OUTDIR/bam_files/24hpf_K9_2.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_3.sam  > $OUTDIR/bam_files/24hpf_K9_3.bam
+
+                  ##E .coli##
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_IgG_ecoli.sam  > $OUTDIR/bam_files/2.5hpf_IgG_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_1_ecoli.sam  > $OUTDIR/bam_files/2.5hpf_K9_1_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_2_ecoli.sam  > $OUTDIR/bam_files/2.5hpf_K9_2_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/2.5hpf_K9_3_ecoli.sam  > $OUTDIR/bam_files/2.5hpf_K9_3_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_IgG_ecoli.sam  > $OUTDIR/bam_files/4.5hpf_IgG_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_1_ecoli.sam  > $OUTDIR/bam_files/4.5hpf_K9_1_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_2_ecoli.sam  > $OUTDIR/bam_files/4.5hpf_K9_2_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/4.5hpf_K9_3_ecoli.sam  > $OUTDIR/bam_files/4.5hpf_K9_3_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_IgG_ecoli.sam  > $OUTDIR/bam_files/24hpf_IgG_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_1_ecoli.sam  > $OUTDIR/bam_files/24hpf_K9_1_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_2_ecoli.sam  > $OUTDIR/bam_files/24hpf_K9_2_ecoli.bam
+# samtools view -bS -h $OUTDIR/sam_files/24hpf_K9_3_ecoli.sam  > $OUTDIR/bam_files/24hpf_K9_3_ecoli.bam
+
+                      ##DANIO##
+##sorting bam files
+# samtools sort $OUTDIR/bam_files/2.5hpf_IgG.bam -o $OUTDIR/bam_files/2.5hpf_IgG.sorted.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_1.bam -o $OUTDIR/bam_files/2.5hpf_K9_1.sorted.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_2.bam -o $OUTDIR/bam_files/2.5hpf_K9_2.sorted.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_3.bam -o $OUTDIR/bam_files/2.5hpf_K9_3.sorted.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_IgG.bam -o $OUTDIR/bam_files/4.5hpf_IgG.sorted.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_1.bam -o $OUTDIR/bam_files/4.5hpf_K9_1.sorted.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_2.bam -o $OUTDIR/bam_files/4.5hpf_K9_2.sorted.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_3.bam -o $OUTDIR/bam_files/4.5hpf_K9_3.sorted.bam
+# samtools sort $OUTDIR/bam_files/24hpf_IgG.bam -o $OUTDIR/bam_files/24hpf_IgG.sorted.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_1.bam -o $OUTDIR/bam_files/24hpf_K9_1.sorted.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_2.bam -o $OUTDIR/bam_files/24hpf_K9_2.sorted.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_3.bam -o $OUTDIR/bam_files/24hpf_K9_3.sorted.bam
+
+                    ##E. coli##
+# samtools sort $OUTDIR/bam_files/2.5hpf_IgG_ecoli.bam -o $OUTDIR/bam_files/2.5hpf_IgG_ecoli.sorted.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_1_ecoli.bam -o $OUTDIR/bam_files/2.5hpf_K9_1.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_2_ecoli.bam -o $OUTDIR/bam_files/2.5hpf_K9_2.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/2.5hpf_K9_3_ecoli.bam -o $OUTDIR/bam_files/2.5hpf_K9_3.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_IgG_ecoli.bam -o $OUTDIR/bam_files/4.5hpf_IgG.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_1_ecoli.bam -o $OUTDIR/bam_files/4.5hpf_K9_1.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_2_ecoli.bam -o $OUTDIR/bam_files/4.5hpf_K9_2.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/4.5hpf_K9_3_ecoli.bam -o $OUTDIR/bam_files/4.5hpf_K9_3.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/24hpf_IgG_ecoli.bam -o $OUTDIR/bam_files/24hpf_IgG.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_1_ecoli.bam -o $OUTDIR/bam_files/24hpf_K9_1.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_2_ecoli.bam -o $OUTDIR/bam_files/24hpf_K9_2.sorted_ecoli.bam
+# samtools sort $OUTDIR/bam_files/24hpf_K9_3_ecoli.bam -o $OUTDIR/bam_files/24hpf_K9_3.sorted_ecoli.bam
+
+#merging IgG bam files for DNA spikein
+# ml SAMtools
+# samtools merge $OUTDIR/bam_files/timecourse_IgG_danio_merged.bam $OUTDIR/bam_files/2.5hpf_IgG.sorted.bam $OUTDIR/bam_files/4.5hpf_IgG.sorted.bam $OUTDIR/bam_files/24hpf_IgG.sorted.bam
+# samtools merge $OUTDIR/bam_files/timecourse_IgG_ecoli_merged.bam $OUTDIR/bam_files/2.5hpf_IgG_ecoli.sorted.bam $OUTDIR/bam_files/4.5hpf_IgG.sorted_ecoli.bam $OUTDIR/bam_files/24hpf_IgG.sorted_ecoli.bam
+# samtools merge $OUTDIR/bam_files/timecourse_IgG_merged.bam $OUTDIR/bam_files/timecourse_IgG_danio_merged.bam $OUTDIR/bam_files/timecourse_IgG_ecoli_merged.bam
+
+
+##turning sorted bam files into bed graphs for DNA spike in
+# mkdir $OUTDIR/bed_files
+# ml BEDTools
+
+                        ##DANIO##
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_IgG.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_IgG.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_1.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_1.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_2.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_2.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_3.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_3.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_IgG.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_IgG.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_1.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_1.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_2.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_2.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_3.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_3.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_IgG.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_IgG.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_1.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_1.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_2.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_2.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_3.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_3.btb.bed
+
+                        ##E. coli##
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_IgG_ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_IgG_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_1.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_1_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_2.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_2_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/2.5hpf_K9_3.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/2.5hpf_K9_3_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_IgG.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_IgG_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_1.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_1_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_2.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_2_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/4.5hpf_K9_3.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/4.5hpf_K9_3_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_IgG.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_IgG_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_1.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_1_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_2.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_2_ecoli.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/24hpf_K9_3.sorted_ecoli.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/24hpf_K9_3_ecoli.btb.bed
+
+
+                        ##IgG###
+# bedtools bamtobed -i $OUTDIR/bam_files/timecourse_IgG_danio_merged.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/timecourse_IgG_danio_merged.btb.bed
+# bedtools bamtobed -i $OUTDIR/bam_files/timecourse_IgG_ecoli_merged.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/timecourse_IgG_ecoli_merged.btb.bed
+
+
+#DNA-spike in normalization
+# mkdir $OUTDIR/bedgraphs
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/timecourse_IgG_danio_merged.btb.bed $OUTDIR/bed_files/timecourse_IgG_ecoli_merged.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/timecourse_IgG_merged.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/2.5hpf_IgG.btb.bed $OUTDIR/bed_files/2.5hpf_IgG_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/2.5hpf_IgG.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/2.5hpf_K9_1.btb.bed $OUTDIR/bed_files/2.5hpf_K9_1_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/2.5hpf_K9_1.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/2.5hpf_K9_2.btb.bed $OUTDIR/bed_files/2.5hpf_K9_2_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/2.5hpf_K9_2.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/2.5hpf_K9_3.btb.bed $OUTDIR/bed_files/2.5hpf_K9_3_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/2.5hpf_K9_3.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/4.5hpf_IgG.btb.bed $OUTDIR/bed_files/4.5hpf_IgG_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/4.5hpf_IgG.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/4.5hpf_K9_1.btb.bed $OUTDIR/bed_files/4.5hpf_K9_1_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/4.5hpf_K9_1.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/4.5hpf_K9_2.btb.bed $OUTDIR/bed_files/4.5hpf_K9_2_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/4.5hpf_K9_2.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/4.5hpf_K9_3.btb.bed $OUTDIR/bed_files/4.5hpf_K9_3_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/4.5hpf_K9_3.norm.bga
+#
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/24hpf_IgG.btb.bed $OUTDIR/bed_files/24hpf_IgG_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/24hpf_IgG.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/24hpf_K9_1.btb.bed $OUTDIR/bed_files/24hpf_K9_1_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/24hpf_K9_1.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/24hpf_K9_2.btb.bed $OUTDIR/bed_files/24hpf_K9_2_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/24hpf_K9_2.norm.bga
+# sh /home/ara67776/scripts/DNAspike_in.kd.sh $OUTDIR/bed_files/24hpf_K9_3.btb.bed $OUTDIR/bed_files/24hpf_K9_3_ecoli.btb.bed 100000 bga $OUTDIR/ref/chrNameLength.txt 1 1000 $OUTDIR/bedgraphs/24hpf_K9_3.norm.bga
+
+#sort bga files from  DNA spike in
+# ml ucsc
+# for infile in $OUTDIR/bedgraphs/*norm.bga
+# do
+#   base=$(basename ${infile} .norm.bga)
+#   bedSort $infile $OUTDIR/bedgraphs/${base}.norm_sort.bga
+# done
+
+#calling peaks
+# mkdir $OUTDIR/peaks
+#
+# for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+#   do base=$(basename ${infile} .norm_sort.bga)
+#   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/peaks/${base}.bgato.bed
+# done
+
+# ml Homer
+# for infile in $OUTDIR/peaks/*bgato.bed
+#   do base=$(basename ${infile} .bgato.bed)
+#   makeTagDirectory $OUTDIR/peaks/${base}.BtB.tagdir $infile -format bed
+# done
+
+##using IgG as input
+# for infile in $OUTDIR/peaks/*.tagdir
+# do
+#   base=$(basename ${infile} .tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/peaks/timecourse_IgG_merged.BtB.tagdir -F 4 -gsize 1.5e9 -o $OUTDIR/peaks/${base}.txt
+# done
+
+#changing peak txt files to bed files to input into chipr
+# for infile in $OUTDIR/peaks/*.txt
+# do
+#  base=$(basename ${infile} .txt)
+#  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/peaks/${base}.peaks.bed
+# done
+
+##intersecting peaks across all replicates with CHIPR
+# ml ChIP-R
+# chipr -i $OUTDIR/peaks/2.5hpf_K9_1.BtB.peaks.bed $OUTDIR/peaks/2.5hpf_K9_2.BtB.peaks.bed $OUTDIR/peaks/2.5hpf_K9_3.BtB.peaks.bed -m 2 -o $OUTDIR/peaks/2.5hpf_K9_intpeaks
+# chipr -i $OUTDIR/peaks/4.5hpf_K9_1.BtB.peaks.bed $OUTDIR/peaks/4.5hpf_K9_2.BtB.peaks.bed $OUTDIR/peaks/4.5hpf_K9_3.BtB.peaks.bed -m 2 -o $OUTDIR/peaks/4.5hpf_K9_intpeaks
+# chipr -i $OUTDIR/peaks/24hpf_K9_1.BtB.peaks.bed $OUTDIR/peaks/24hpf_K9_2.BtB.peaks.bed $OUTDIR/peaks/24hpf_K9_3.BtB.peaks.bed -m 2 -o $OUTDIR/peaks/24hpf_K9_intpeaks
+
+##annotating peak files with masked reference (use HOMER module)
+# curl -s http://ftp.ensembl.org/pub/release-103/gtf/danio_rerio/Danio_rerio.GRCz11.103.gtf.gz | gunzip -c > $OUTDIR/ref/danio_refann.gtf
+# annotatePeaks.pl $OUTDIR/peaks/2.5hpf_K9_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_refann.gtf > $OUTDIR/peaks/2.5hpf_K9_masked_ann.txt
+# annotatePeaks.pl $OUTDIR/peaks/4.5hpf_K9_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_refann.gtf > $OUTDIR/peaks/4.5hpf_K9_masked_ann.txt
+# annotatePeaks.pl $OUTDIR/peaks/24hpf_K9_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_refann.gtf > $OUTDIR/peaks/24hpf_K9_masked_ann.txt
+
+#now filtering for only peaks that are w/i 1000bps of their annotation:
+# for infile in $OUTDIR/peaks/*_masked_ann.txt
+# do
+#   base=$(basename ${infile} _masked_ann.txt)
+#   awk -F'\t' 'sqrt($10*$10) <=1000' $infile > $OUTDIR/peaks/${base}.1000bp_ann.txt
+# done
+
+
+###DONE! Compare gene lists in excel###
+
+##making bigwigs of the gene list curated##
+#mkdir $OUTDIR/bigwigs
+# ml ucsc
+# for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+# do
+#  base=$(basename ${infile} .norm_sort.bga)
+# bedGraphToBigWig $infile $OUTDIR/ref/chrNameLength.txt $OUTDIR/bigwigs/bigwigs_AA/${base}.bw
+# done
+
+###making bws of the mean of the replicates for profile plots
+# ml deepTools
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_1.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_2.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_rep1rep2.bw
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_rep1rep2.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_3.bw --operation add --scaleFactors 1:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/2.5hpf_K9_AVG.bw
+#
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_1.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_2.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_rep1rep2.bw
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_rep1rep2.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_3.bw --operation add --scaleFactors 1:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/4.5hpf_K9_AVG.bw
+#
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_1.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_2.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_rep1rep2.bw
+# bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_rep1rep2.bw -b2 $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_3.bw --operation add --scaleFactors 1:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AA/24hpf_K9_AVG.bw

@@ -9,7 +9,7 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-FASTQ="/scratch/ry00555/OutputRun138/2024_Run138_FASTQ"
+FASTQ="/scratch/ry00555/OutputRun138/2024_Run138_FASTQ/*"
 #FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
 
 #Edit Code to add Q score option
@@ -24,6 +24,8 @@ OutputFolderName="/scratch/ry00555/"
 #GENOME="path/to/IndexedGenomeFile"
 
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
+
+#GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3$
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO.fna" #Neurospora12 Genbank

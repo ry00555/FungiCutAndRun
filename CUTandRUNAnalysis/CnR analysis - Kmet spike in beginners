@@ -1,0 +1,220 @@
+#!/bin/bash
+#SBATCH --job-name=CnR_setab_MO		                        # Job name
+#SBATCH --partition=batch		                            # Partition (queue) name
+#SBATCH --ntasks=1	                                # Single task job
+#SBATCH --cpus-per-task=24		                            # Number of cores per task - match this to the num_threads used by BLAST
+#SBATCH --mem=40gb			                                # Total memory for job
+#SBATCH --time=48:00:00  		                            # Time limit hrs:min:sec
+#SBATCH --output=/scratch/ara67776/CnR_setAB			    # Location of standard output and error log files (replace cbergman with your myid)
+#SBATCH --mail-user=ara67776@uga.edu                    # Where to send mail (replace cbergman with your myid)
+#SBATCH --mail-type=ALL                            # Mail events (BEGIN, END, FAIL, ALL)
+#SBATCH --output=/home/ara67776/work/error/log.%j			    # Location of standard output and error log files (replace cbergman with your myid)
+
+#set output directory
+OUTDIR="/scratch/ara67776/CnR_setAB"
+
+ml Trim_Galore
+starting with raw files in $OUTDIR/raw
+mkdir $OUTDIR/trimmed
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/10_gfp_MO_IgG_4_5h_1_S10_L001_R1_001.fastq.gz $OUTDIR/raw/10_gfp_MO_IgG_4_5h_1_S10_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/1_suvAB_MO_K9_4_5h_1_S1_L001_R1_001.fastq.gz $OUTDIR/raw/1_suvAB_MO_K9_4_5h_1_S1_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/2_suvAB_MO_K9_4_5h_2_S2_L001_R1_001.fastq.gz $OUTDIR/raw/2_suvAB_MO_K9_4_5h_2_S2_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/3_suvAB_MO_K9_4_5h_3_S3_L001_R1_001.fastq.gz $OUTDIR/raw/3_suvAB_MO_K9_4_5h_3_S3_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/4_setAB_MO_K9_4_5h_1_S4_L001_R1_001.fastq.gz $OUTDIR/raw/4_setAB_MO_K9_4_5h_1_S4_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/5_setAB_MO_K9_4_5h_2_S5_L001_R1_001.fastq.gz $OUTDIR/raw/5_setAB_MO_K9_4_5h_2_S5_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/6_setAB_MO_K9_4_5h_3_S6_L001_R1_001.fastq.gz $OUTDIR/raw/6_setAB_MO_K9_4_5h_3_S6_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/7_gfp_MO_K9_4_5h_1_S7_L001_R1_001.fastq.gz $OUTDIR/raw/7_gfp_MO_K9_4_5h_1_S7_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/8_gfp_MO_K9_4_5h_2_S8_L001_R1_001.fastq.gz $OUTDIR/raw/8_gfp_MO_K9_4_5h_2_S8_L001_R2_001.fastq.gz
+trim_galore --fastqc -j 8 --output_dir $OUTDIR/trimmed --paired $OUTDIR/raw/9_gfp_MO_K9_4_5h_3_S9_L001_R1_001.fastq.gz $OUTDIR/raw/9_gfp_MO_K9_4_5h_3_S9_L001_R2_001.fastq.gz
+
+#aligning trimmed files to danio reference sequence using bowtie/creating sam files
+# curl -s https://ftp.ensembl.org/pub/release-110/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.primary_assembly.fa.gz | gunzip -c > $OUTDIR/ref/danio_refseq.fa
+
+curl -s ftp://ftp.ensembl.org/pub/release-98/fasta/danio_rerio/dna/Danio_rerio.GRCz11.dna.primary_assembly.fa.gz | gunzip -c > $OUTDIR/ref/danio_refseq_2.fa
+# module load Bowtie2
+# bowtie2-build -f $OUTDIR/ref/danio_refseq.fa $OUTDIR/ref/danio_ref
+# mkdir $OUTDIR/sam_files
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/1_suvAB_MO_K9_4_5h_1_S1_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/1_suvAB_MO_K9_4_5h_1_S1_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/1_suvAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/2_suvAB_MO_K9_4_5h_2_S2_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/2_suvAB_MO_K9_4_5h_2_S2_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/2_suvAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/3_suvAB_MO_K9_4_5h_3_S3_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/3_suvAB_MO_K9_4_5h_3_S3_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/3_suvAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/4_setAB_MO_K9_4_5h_1_S4_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/4_setAB_MO_K9_4_5h_1_S4_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/4_setAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/5_setAB_MO_K9_4_5h_2_S5_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/5_setAB_MO_K9_4_5h_2_S5_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/5_setAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/6_setAB_MO_K9_4_5h_3_S6_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/6_setAB_MO_K9_4_5h_3_S6_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/6_setAB_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/7_gfp_MO_K9_4_5h_1_S7_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/7_gfp_MO_K9_4_5h_1_S7_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/7_gfp_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/8_gfp_MO_K9_4_5h_2_S8_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/8_gfp_MO_K9_4_5h_2_S8_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/8_gfp_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/9_gfp_MO_K9_4_5h_3_S9_L001_R1_001_trimmed.fq.gz -2 $OUTDIR/trimmed/9_gfp_MO_K9_4_5h_3_S9_L001_R2_001_trimmed.fq.gz -S $OUTDIR/sam_files/9_gfp_MO_K9_4_5h.sam
+# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x $OUTDIR/ref/danio_ref -1 $OUTDIR/trimmed/10_gfp_MO_IgG_4_5h_1_S10_L001_R1_001_val_1.fq.gz -2 $OUTDIR/trimmed/10_gfp_MO_IgG_4_5h_1_S10_L001_R2_001_val_2.fq.gz -S $OUTDIR/sam_files/10_gfp_MO_IgG_4_5h.sam
+
+#creating bam files WITH HEADER from previously created sam files
+# module load SAMtools
+# mkdir $OUTDIR/bam_files
+# samtools view -bS -h $OUTDIR/sam_files/1_suvAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/1_suvAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/2_suvAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/2_suvAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/3_suvAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/3_suvAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/4_setAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/4_setAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/5_setAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/5_setAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/6_setAB_MO_K9_4_5h.sam  > $OUTDIR/bam_files/6_setAB_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/7_gfp_MO_K9_4_5h.sam  > $OUTDIR/bam_files/7_gfp_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/8_gfp_MO_K9_4_5h.sam  > $OUTDIR/bam_files/8_gfp_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/9_gfp_MO_K9_4_5h.sam  > $OUTDIR/bam_files/9_gfp_MO_K9_4_5h.bam
+# samtools view -bS -h $OUTDIR/sam_files/10_gfp_MO_IgG_4_5h.sam  > $OUTDIR/bam_files/10_gfp_MO_IgG_4_5h.bam
+
+##sorting bam files
+# samtools sort $OUTDIR/bam_files/1_suvAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/1_suvAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/2_suvAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/2_suvAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/3_suvAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/3_suvAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/4_setAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/4_setAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/5_setAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/5_setAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/6_setAB_MO_K9_4_5h.bam -o $OUTDIR/bam_files/6_setAB_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/7_gfp_MO_K9_4_5h.bam -o $OUTDIR/bam_files/7_gfp_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/8_gfp_MO_K9_4_5h.bam -o $OUTDIR/bam_files/8_gfp_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/9_gfp_MO_K9_4_5h.bam -o $OUTDIR/bam_files/9_gfp_MO_K9_4_5h.sorted.bam
+# samtools sort $OUTDIR/bam_files/10_gfp_MO_IgG_4_5h.bam -o $OUTDIR/bam_files/10_gfp_MO_IgG_4_5h.sorted.bam
+
+#kmet spike in
+# mkdir $OUTDIR/kmet_spike_in_results
+# Call your script with the provided arguments
+# mkdir $OUTDIR/bedgraphs
+# for file in $OUTDIR/bam_files/*sorted.bam;
+# do
+#   base=$(basename "${file}" .sorted.bam)
+#   sh /home/ara67776/scripts/kmet_spike.sh $OUTDIR/bedgraphs $base $OUTDIR/trimmed/${base}*L001_R1_001_val_1.fq.gz \
+#   $OUTDIR/trimmed/${base}*L001_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/genome/chrNameLength.txt
+# done
+
+#sort bga files from spike in
+# ml ucsc
+# for infile in $OUTDIR/bedgraphs/*kmet.bga
+# do
+#   base=$(basename ${infile} _kmet.bga)
+#   bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
+# done
+
+##sorting normalized bga files (peaks can be called directly from bed files)
+# mkdir $OUTDIR/peaks
+# for infile in $OUTDIR/bedgraphs/*kmet_sort.bga
+#  do base=$(basename ${infile} .kmet_sort.bga)
+#  cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/peaks/${base}.bgato.bed
+# done
+
+#making tag directories and calling peaks using IgG as an input
+# module load Homer
+# for infile in $OUTDIR/peaks/*bgato.bed
+#  do
+#  base=$(basename ${infile} .bgato.bed)
+#   makeTagDirectory $OUTDIR/peaks/${base}.BtB.tagdir $infile -format bed
+# done
+#
+# for infile in $OUTDIR/peaks/*tagdir
+# do
+# base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/peaks/10_gfp_MO_IgG_4_5h.BtB.tagdir -F 4 -gsize 1.5e9 -fdr 0.0001 -o $OUTDIR/peaks/${base}.txt
+# done
+
+#changing peak txt files to bed files to input into chipr
+# for infile in $OUTDIR/peaks/*.txt
+# do
+#  base=$(basename ${infile} .txt)
+#  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/peaks/${base}.peaks.bed
+# done
+
+##intersecting peaks across all replicates with CHIPR
+# ml ChIP-R
+# chipr -i $OUTDIR/peaks/1_suvAB_MO_K9_4_5h.peaks.bed $OUTDIR/peaks/2_suvAB_MO_K9_4_5h.peaks.bed $OUTDIR/peaks/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o $OUTDIR/peaks/suvAB_MO_K9_4_5h_intpeaks
+# chipr -i $OUTDIR/peaks/4_setAB_MO_K9_4_5h.peaks.bed $OUTDIR/peaks/5_setAB_MO_K9_4_5h.peaks.bed $OUTDIR/peaks/6_setAB_MO_K9_4_5h.peaks.bed -m 2 -o $OUTDIR/peaks/setAB_MO_K9_4_5h_intpeaks
+# chipr -i $OUTDIR/peaks/7_gfp_MO_K9_4_5h.peaks.bed $OUTDIR/peaks/8_gfp_MO_K9_4_5h.peaks.bed -m 2 -o $OUTDIR/peaks/gfp_MO_K9_4_5h_intpeaks
+
+##annotating peak files with masked reference (use HOMER module)
+# ml Homer
+# curl -s http://ftp.ensembl.org/pub/release-103/gtf/danio_rerio/Danio_rerio.GRCz11.103.gtf.gz | gunzip -c > $OUTDIR/ref/danio_refann.gtf
+# annotatePeaks.pl $OUTDIR/peaks/gfp_MO_K9_4_5h_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_annotation.gtf > $OUTDIR/peaks/suvAB_MO_K9_4_5h_masked_ann.txt
+# annotatePeaks.pl $OUTDIR/peaks/setAB_MO_K9_4_5h_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_annotation.gtf > $OUTDIR/peaks/setAB_MO_K9_4_5h_masked_ann.txt
+# annotatePeaks.pl $OUTDIR/peaks/suvAB_MO_K9_4_5h_intpeaks_all.bed danRer11 -gtf $OUTDIR/ref/danio_annotation.gtf > $OUTDIR/peaks/gfp_MO_K9_4_5h_masked_ann.txt
+#
+#now filtering for only peaks that are w/i 1000bps of their annotation:
+# for infile in $OUTDIR/peaks/*_masked_ann.txt
+# do
+#   base=$(basename ${infile} _masked_ann.txt)
+#   awk -F'\t' 'sqrt($10*$10) <=1000' $infile > $OUTDIR/peaks/${base}.1000bp_ann.txt
+# done
+
+#DOWNLOAD FILES WITH FILEZILLA AND LOOK AT DYSREGULATED GENES, YOU'RE DONE!!!!!!!!#####
+
+###now that you have gene list for genes w/ k9 in morphants and control, intersect control samples with experimental samples to see if there are peaks in my control that are lost in set morphants or if there are peaks gained in the morphants that are not present in the controls###
+# ml BEDTools
+# bedtools intersect -a $OUTDIR/peaks/gfp_MO_K9_4_5h_intpeaks_all.bed -b $OUTDIR/peaks/setAB_MO_K9_4_5h_intpeaks_all.bed -wa > $OUTDIR/peaks/MO_K9_setAB_gfp_peaks.bed
+
+###visualize gene list by creating bigwigs###
+
+#turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
+# module load ucsc/359
+# for infile in $OUTDIR/bedgraphs/*bga
+# do
+#  base=$(basename ${infile} .bga)
+#  bedSort $infile $OUTDIR/bedgraphs/${base}.sort.bga
+# done
+
+#mkdir $OUTDIR/bigwigs
+ml deepTools
+# for infile in $OUTDIR/bedgraphs/*.kmet_sort.bga
+# do
+#  base=$(basename ${infile} .kmet_sort.bga)
+# bedGraphToBigWig $infile $OUTDIR/ref/genome/chrNameLength.txt $OUTDIR/bigwigs/bigwigs_AArtis/${base}.bw
+# done
+
+###making bws of the mean of the replicates for profile plots
+bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AArtis/1_suvAB_MO_K9_4_5h.bw -b2 $OUTDIR/bigwigs/bigwigs_AArtis/2_suvAB_MO_K9_4_5h.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AArtis/suvAB_MO_K9_4_5h_rep1rep2.bw
+bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AArtis/suvAB_MO_K9_4_5h_rep1rep2.bw -b2 $OUTDIR/bigwigs/bigwigs_AArtis/3_suvAB_MO_K9_4_5h.bw --operation add --scaleFactors 1:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AArtis/suvAB_MO_K9_4_5h_AVG.bw
+
+bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AArtis/4_setAB_MO_K9_4_5h.bw -b2 $OUTDIR/bigwigs/bigwigs_AArtis/5_setAB_MO_K9_4_5h.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AArtis/setAB_MO_K9_4_5h_rep1rep2.bw
+bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AArtis/setAB_MO_K9_4_5h_rep1rep2.bw -b2 $OUTDIR/bigwigs/bigwigs_AArtis/6_setAB_MO_K9_4_5h.bw --operation add --scaleFactors 1:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AArtis/setAB_MO_K9_4_5h_AVG.bw
+
+bigwigCompare -b1 $OUTDIR/bigwigs/bigwigs_AArtis/7_gfp_MO_K9_4_5h.bw -b2 $OUTDIR/bigwigs/bigwigs_AArtis/8_gfp_MO_K9_4_5h.bw --operation add --scaleFactors 0.333:0.333 -bs 10 -p 20 -o $OUTDIR/bigwigs/bigwigs_AArtis/gfp_MO_K9_4_5h_AVG.bw
+
+####DONE###
+
+
+
+####extra stuff that wasn't used, but may use eventually###
+
+#turning bed files from spike in into bga files
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/10_gfp_MO_IgG_4_5h.btb.bed > $OUTDIR/bedgraphs/10_gfp_MO_IgG_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/1_suvAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/1_suvAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/2_suvAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/2_suvAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/3_suvAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/3_suvAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/4_setAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/4_setAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/5_setAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/5_setAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/6_setAB_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/6_setAB_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/7_gfp_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/7_gfp_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/8_gfp_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/8_gfp_MO_K9_4_5h.bga
+# awk '{ print $1"\t"$2"\t"$3"\t"$5 }' $OUTDIR/bedgraphs/9_gfp_MO_K9_4_5h.btb.bed > $OUTDIR/bedgraphs/9_gfp_MO_K9_4_5h.bga
+
+##converting sorted bam files to bed files using bedtools (maybe don't need)
+# ml BEDTools
+# bedtools bamtobed -i $OUTDIR/1_suvAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/1_suvAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/2_suvAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/2_suvAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/3_suvAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/3_suvAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/4_setAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/4_setAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/5_setAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/5_setAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/6_setAB_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/6_setAB_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/7_gfp_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/7_gfp_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/8_gfp_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/8_gfp_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/9_gfp_MO_K9_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/9_gfp_MO_K9_4_5h.btb.bed
+# bedtools bamtobed -i $OUTDIR/10_gfp_MO_IgG_4_5h.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/10_gfp_MO_IgG_4_5h.btb.bed
+
+# #converting into bed file for intersection with TPM Calc output
+# for infile in $OUTDIR/peaks/*.1000bp_ann.txt
+# do
+#   base=$(basename ${infile} .txt)
+#   awk '{print $2 "\t" $3 "\t" $4 }' $infile | tail -n +2 > $OUTDIR/peaks/${base}.bed
+# done
+
+#making cutNrun mods figures
+# computeMatrix scale-regions -S $BASEDIR/cutNrun_mods/bws/wt_K4_1.norm_sort.bw $BASEDIR/cutNrun_mods/bws/wt_K4_2.norm_sort.bw $BASEDIR/cutNrun_mods/bws/wt_K27_1.norm_sort.bw $BASEDIR/cutNrun_mods/bws/wt_K27_2.norm_sort.bw -R $BASEDIR/genes.bed -p 20 -b 2000 -a 2000 -bs=10 --missingDataAsZero -bl $BASEDIR/K9_chip/peaks/blacklist.bed -out $BASEDIR/cutNrun_mods/K4_K27_genes_reps.gz
+# plotHeatmap -m $BASEDIR/cutNrun_mods/K4_K27_genes_reps.gz -out $BASEDIR/figs/K4_K27_genes_reps.heatmap.pdf --whatToShow 'heatmap and colorbar' --colorMap Greens Purples --regionsLabel genes --samplesLabel H3K4me3 H3K4me3 H3K27me3 H3K27me3
+#
+# computeMatrix scale-regions -S $BASEDIR/cutNrun_mods/bws/wt_K4_1.norm_sort.bw $BASEDIR/cutNrun_mods/bws/wt_K27_1.norm_sort.bw -R $BASEDIR/genes.bed -p 20 -b 2000 -a 2000 -bs=10 --missingDataAsZero -out $BASEDIR/cutNrun_mods/K4_K27_genes_rep1.gz
+# plotProfile -m $BASEDIR/$BASEDIR/cutNrun_mods/K4_K27_genes_rep1.gz -out $BASEDIR/figs/K4_K27_rep1.profile.pdf --perGroup --colors green purple
+#
+# computeMatrix reference-point -S $BASEDIR/cutNrun_mods/bws/wt_K9_1.norm_sort.bw $BASEDIR/cutNrun_mods/bws/wt_K9_2.norm_sort.bw -R $BASEDIR/cutNrun_mods/peaks/wt_K9_intpeaks.bed --referencePoint center -p 20 -b 5000 -a 5000 -bs=10 --missingDataAsZero -bl $BASEDIR/K9_chip/peaks/blacklist.bed -o $BASEDIR/cutNrun_mods/K9_cNrPeaks_reps.gz
+# plotHeatmap -m $BASEDIR/cutNrun_mods/K9_cNrPeaks_reps.gz -out $BASEDIR/figs/K9_cNrPeaks_reps_heatmap.pdf --colorMap=Blues --whatToShow 'heatmap and colorbar' --regionsLabel cutNrun_peaks --samplesLabel H3K9me3 H3K9me3
