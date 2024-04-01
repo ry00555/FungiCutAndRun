@@ -17,11 +17,15 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 
 OUTDIR=/scratch/ry00555/OutputRun138
-mkdir "${OUTDIR}/SortedBamFiles"
+
+
+mkdir "${OUTDIR}/TrimmedReads"
 mkdir "${OUTDIR}/BigWigs"
 mkdir "${OUTDIR}/Peaks"
 mkdir "$OUTDIR/HomerTagDirectories"
 mkdir "$OUTDIR/TdfFiles"
+mkdir "$OUTDIR/SortedBamFiles"
+
 
 PEAKDIR="${OUTDIR}/Peaks"
 TAGDIR="${OUTDIR}/HomerTagDirectories"
