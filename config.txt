@@ -9,14 +9,14 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-#FASTQ="/scratch/ry00555/OutputRun132/FASTQ"
-FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
+FASTQ="/scratch/ry00555/OutputRun138/2024_Run138_FASTQ"
+#FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OutputFolderName="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
+OutputFolderName="/scratch/ry00555/"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
