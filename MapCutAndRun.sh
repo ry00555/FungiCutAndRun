@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR=/scratch/ry00555/OutputRun137
+OUTDIR="/scratch/ry00555/OutputRun135"
 
 
  # mkdir "${OUTDIR}/TrimmedReads"
