@@ -16,15 +16,15 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR=/scratch/ry00555/OutputRun138
+OUTDIR=/scratch/ry00555/OutputRun137
 
 
-# mkdir "${OUTDIR}/TrimmedReads"
-# mkdir "${OUTDIR}/BigWigs"
-# mkdir "${OUTDIR}/Peaks"
-# mkdir "$OUTDIR/HomerTagDirectories"
-# mkdir "$OUTDIR/TdfFiles"
-# mkdir "$OUTDIR/SortedBamFiles"
+ mkdir "${OUTDIR}/TrimmedReads"
+ mkdir "${OUTDIR}/BigWigs"
+ mkdir "${OUTDIR}/Peaks"
+ mkdir "$OUTDIR/HomerTagDirectories"
+ mkdir "$OUTDIR/TdfFiles"
+ mkdir "$OUTDIR/SortedBamFiles"
 #
 #
 PEAKDIR="${OUTDIR}/Peaks"
@@ -34,42 +34,42 @@ BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
 # #
-#  ml Trim_Galore
-#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+  ml Trim_Galore
+  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
 #
 # #
 # #Iterate over the files
-# for f in $FILES
-# do
+for f in $FILES
+ do
 # #
 # # 	#Examples to Get Different parts of the file name
 # # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 # 		#${string//substring/replacement}
 # # 		#dir=${f%/*}
 #
-# 	file=${f##*/}
+ 	file=${f##*/}
 # 	#remove ending from file name to create shorter names for bam files and other downstream output
-# 	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
+ 	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 #
 # #
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
-# 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+ 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 # 	#variable for naming bam file
-#bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
-# 	bigwig="${OUTDIR}/BigWigs/${name}"
+ 	bigwig="${OUTDIR}/BigWigs/${name}"
 # 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 # #
 #
-# ml SAMtools
-# ml BWA
+ml SAMtools
+ml BWA
 # #
-# bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-# samtools index "$bam"
+ bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+ samtools index "$bam"
 #
 # #samtools view -b -q 30 $bam > "$QualityBam"
 # #samtools index "$QualityBam"
@@ -77,13 +77,13 @@ BEDDIR="${OUTDIR}/Beds"
 # ############################
 # # # #deeptools
 #
-# ml deepTools
+ ml deepTools
 # #Plot all reads
-# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
-# #plot mononucleosomes
-# bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
-# done
+ #plot mononucleosomes
+ bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+ done
 
 ml Homer
 ml Perl
