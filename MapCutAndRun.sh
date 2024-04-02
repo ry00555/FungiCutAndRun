@@ -19,12 +19,12 @@ source config.txt
 OUTDIR=/scratch/ry00555/OutputRun137
 
 
- mkdir "${OUTDIR}/TrimmedReads"
- mkdir "${OUTDIR}/BigWigs"
- mkdir "${OUTDIR}/Peaks"
- mkdir "$OUTDIR/HomerTagDirectories"
- mkdir "$OUTDIR/TdfFiles"
- mkdir "$OUTDIR/SortedBamFiles"
+ # mkdir "${OUTDIR}/TrimmedReads"
+ # mkdir "${OUTDIR}/BigWigs"
+ # mkdir "${OUTDIR}/Peaks"
+ # mkdir "$OUTDIR/HomerTagDirectories"
+ # mkdir "$OUTDIR/TdfFiles"
+ # mkdir "$OUTDIR/SortedBamFiles"
 #
 #
 PEAKDIR="${OUTDIR}/Peaks"
