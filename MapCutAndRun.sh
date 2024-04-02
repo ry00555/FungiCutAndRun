@@ -16,7 +16,7 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR="/scratch/ry00555/OutputRun135"
+OUTDIR="/scratch/ry00555/OutputRun111"
 
 
  # mkdir "${OUTDIR}/TrimmedReads"
@@ -35,7 +35,7 @@ BEDDIR="${OUTDIR}/Beds"
 # # #process reads using trimGalore
 # #
   ml Trim_Galore
-  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/ChIP*fastq\.gz
 # #
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
