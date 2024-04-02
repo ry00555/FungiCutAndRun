@@ -85,23 +85,41 @@ BEDDIR="${OUTDIR}/Beds"
 # bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
 # done
 
+ml Homer
+ml Perl
+ml SAMtools
+ml BEDTools
 for bam_file in "${BAMDIR}"/*.bam; do
   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" .bam)
   # Remove everything after "Rep_1" in the sample ID
   sample_id="${sample_id%%_Rep_1*}"
 
-ml Homer
-ml Perl
-ml SAMtools
-ml BEDTools
 
-makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+#makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 #
 #   # Call peaks
 #
-  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${TAGDIR}/${sample_id}_peaks.txt"
+findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt"
 #
-#  # Calculate coverage for 1kb windows
- bedtools coverage -hist -a "/scratch/ry00555/neurospora.bed" -b "${bam_file}" > "${BEDDIR}/${sample_id}_coverage.bed"
 done
+#changing peak txt files to bed files to input into chipr
+ml ChIP-R
+ for infile in ${PEAKDIR}/${sample_id}_peaks.txt
+do
+  base=$(basename ${infile} .txt)
+  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${PEAKDIR}/${base}.peaks.bed
+done
+
+ml Homer
+ml Perl
+##annotating peak files with masked reference (use HOMER module)
+#curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
+ annotatePeaks.pl ${PEAKDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${PEAKDIR}/${base}_ann.txt
+
+#now filtering for only peaks that are w/i 1000bps of their annotation:
+ for infile in ${PEAKDIR}/${base}_ann.txt
+ do
+   base=$(basename ${infile} _masked_ann.txt)
+   awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${PEAKDIR}/${base}.1000bp_ann.txt
+ done
