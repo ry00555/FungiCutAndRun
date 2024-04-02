@@ -72,12 +72,12 @@ BEDDIR="${OUTDIR}/Beds"
 
 #Create mitochondrial normalization source files
 
-#genomeFile="/scratch/ry00555/GCA_000182925.2_NC12_genomic.fna"
+#genomeFile="/scratch/ry00555/Ncrassa.fna"
 #samtools faidx $genomeFile
 #Genome=$(basename $genomeFile .fna)
 
 #create txt file with Chromosome Name and Length
-#cut -f1,2 GCA_000182925.2_NC12_genomic.fna.fai > GCA_000182925.2_NC12_genomic.fna.sizes
+#cut -f1,2 Ncrassa.fna.fai > Ncrassa.fna.sizes
 #cut -f1,2 ${Genome}.fna.fai > ${Genome}.sizes
 
 
@@ -85,14 +85,18 @@ BEDDIR="${OUTDIR}/Beds"
 #perl -p -i -e 's/([A-Z]{2}[0-9]{6}\.1)\t(\d*)\t(\d*)\t(\d*)\t(\d*)/$1\t1\t$2/i' GCA_000182925.2_NC12_genomic.fna.fai
 
 #convert fai file to chromsomal bed file
-#cat GCA_000182925.2_NC12_genomic.fna.fai  > GCA_000182925.2_NC12_genomic.bed
+#cut -f1,2 Ncrassa.fna.fai  > Ncrassa.fna.sizes
 #cut -f1,2 ${Genome}.fna.fai > ${Genome}.sizes
 
 #create genomic file with desired window sizes
 windowSize=1000
 bedtools makewindows -g ${Genome}.sizes -w ${windowSize} > ${Genome}_1kbWindows.bed
-bedtools makewindows -g GCA_000182925.2_NC12_genomic.fna.sizes -w 1000 > GCA_000182925.2_NC12_genomic_1kbWindows.bed
+bedtools makewindows -g Ncrassa.fna.sizes -w 1000 > Ncrassa_1kbWindows.bed
 
+samtools faidx $Genome
+awk 'BEGIN {FS="\t"}; {print $1 FS "0" FS $2}' $Genome.fai > $Genome.bed
+
+awk 'BEGIN {FS="\t"}; {print $1 FS "0" FS $2}' Ncrassa.fna.fai > Ncrassa.bed
 
 # Iterate over each BAM file in the directory
 for bam_file in "${BAMDIR}"/*.bam; do
