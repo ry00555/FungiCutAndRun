@@ -129,7 +129,7 @@ do
   base_name=$(basename "$bam_file")
   # Define the output file path
   input_file="${SORTED_BAM_DIR}/${base_name}"
-samtools index input_file
+samtools index "$input_file"
 
 gatk CollectReadCounts \
 -I "$input_file" \
