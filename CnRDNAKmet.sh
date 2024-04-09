@@ -84,22 +84,57 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.g
 # sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
 # done
 #sort bga files from  DNA spike in
- ml ucsc
- for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
-  do
-    base=$(basename ${infile} .norm.bga)
-    bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
- done
+ # ml ucsc
+ # for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
+ #  do
+ #    base=$(basename ${infile} .norm.bga)
+ #    bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
+ # done
 
 module load Homer
  #calling peaks
  # mkdir $OUTDIR/Peaks
-  for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
-    do base=$(basename ${infile} .norm_sort.bga)
-cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
- done
+#   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
+#     do base=$(basename ${infile} .norm_sort.bga)
+# cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
+#  done
+#
+#   for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
+#    do base=$(basename ${infile} .bgato.bed)
+#     makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
+#  done
 
-  for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
-   do base=$(basename ${infile} .bgato.bed)
-    makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
- done
+ # for infile in $OUTDIR/TagDirectories/*K9*.tagdir w/ IgG as an input
+ #  do base=$(basename ${infile} .BtB.tagdir)
+ #    findPeaks $infile -style histone -minDist 1000 -gsize 4.4e7 -F 2 -i $OUTDIR/TagDirectories/timecourse_IgG_merged.BtB.tagdir -o $OUTDIR/TagDirectories/${base}.txt
+ #  done
+
+  #try to do the above but with more modifications
+
+# Set the directory containing the tag directories
+OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories/"
+
+# Iterate over the files
+for infile in $OUTDIR/*IgG_Rep1.BtB.tagdir
+do
+    # Extract the base name of the file
+    base=$(basename ${infile} _IgG_Rep1.BtB.tagdir)
+    # Construct the IgG control file name
+    IgG_control="${OUTDIR}/${base}_IgG_Rep1.BtB.tagdir"
+
+    # Iterate over the different histone modifications
+    for histone_modification in H3K27me3 H3K36me3 Input
+    do
+        # Skip IgG control files
+        if [[ $histone_modification == "Input" ]]; then
+            continue
+        fi
+
+        # Define the input file and output file
+        input_file="${OUTDIR}/${base}_${histone_modification}_Rep1.BtB.tagdir"
+        output_file="${OUTDIR}/${base}_${histone_modification}_vs_IgG.txt"
+
+        # Run findPeaks command
+        findPeaks $input_file -style histone -minDist 1000 -gsize 4.4e7 -F 2 -i $IgG_control -o $output_file
+    done
+done
