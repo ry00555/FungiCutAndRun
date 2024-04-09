@@ -110,37 +110,48 @@ module load Homer
  #  done
 
   #try to do the above but with more modifications
+  #!/bin/bash
 
-# Set the directory containing the tag directories
-OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories"
+  # Set the directory containing the tag directories
+  OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories/"
 
-# Iterate over the files
-for infile in $OUTDIR/*IgG_Rep1.BtB.tagdir
-do
-    # Extract the base name of the file
-    base=$(basename ${infile} _IgG_Rep1.BtB.tagdir)
-    # Construct the IgG control file name
-    IgG_control="${OUTDIR}/${base}_IgG_Rep1.BtB.tagdir"
+  # Iterate over the directories
+  for infile in $OUTDIR/*
+  do
+      # Extract the base name of the directory
+      base=$(basename ${infile})
 
-    # Iterate over the different histone modifications
-    for histone_modification in H3K27me3 H3K36me3 Input
-    do
-        # Skip IgG control files
-        if [[ $histone_modification == "Input" ]]; then
-            continue
-        fi
+      # Check if the directory name contains 'IgG_Rep1', skip if true
+      if [[ $base == *"IgG_Rep1"* ]]; then
+          continue
+      fi
 
-        # Define the input file and output file
-        input_file="${OUTDIR}/${base}_${histone_modification}_Rep1.BtB.tagdir"
-        output_file="${OUTDIR}/${base}_${histone_modification}_vs_IgG.txt"
+      # Extract the sample name from the directory name
+      sample_name=$(echo $base | cut -d'_' -f2)
 
-        # Run findPeaks command
-        findPeaks $input_file -style histone -minDist 1000 -gsize 4.4e7 -F 2 -i $IgG_control -o $output_file
-    done
-done
+      # Construct the IgG control file name
+      IgG_control="${OUTDIR}/${sample_name}_IgG_Rep1.BtB.tagdir"
 
-for infile in $OUTDIR/TagDirectories/*.txt
+      # Iterate over the different histone modifications
+      for histone_modification in H3K27me3 H3K36me3 Input
+      do
+          # Skip IgG control files
+          if [[ $histone_modification == "Input" ]]; then
+              continue
+          fi
+
+          # Define the input file and output file
+          input_file="${OUTDIR}/${base}/${base}_${histone_modification}_Rep1.BtB.tagdir"
+          output_file="${OUTDIR}/${base}/${base}_${histone_modification}_vs_IgG.txt"
+
+          # Run findPeaks command
+          findPeaks $input_file -style histone -minDist 1000 -gsize 4.4e7 -F 2 -i $IgG_control -o $output_file
+      done
+  done
+
+
+for infile in $OUTDIR/*.txt
  do
   base=$(basename ${infile} .txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/TagDirectories/${base}.peaks.bed
+  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/${base}.peaks.bed
  done
