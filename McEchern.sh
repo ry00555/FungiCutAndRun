@@ -11,57 +11,101 @@
 
 cd $SLURM_SUBMIT_DIR
 
-WorkDir = /scratch/ry00555/McEachern/
+OUTDIR= "/scratch/ry00555/McEachern/"
+FASTQ="/scratch/ry00555/McEachern/FastQ"
+GENOME="/scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic"
+#binsize for windows
+BIN="25"
+
+#smoothlength setting, for smoothing the enrichment curve
+SMOOTH="50"
+#number of CPUs
+THREADS=12
+
+mkdir "${OUTDIR}/TrimmedReads"
+mkdir "${OUTDIR}/BigWigs"
+mkdir "$OUTDIR/SortedBamFiles"
+
 
 #Load these modules that are compatible with GATK version 4.3
-ml GATK/4.3.0.0-GCCcore-8.3.0-Java-1.8
-ml picard/2.27.4-Java-13.0.2
-ml BWA/0.7.17-GCC-8.3.0
-module load BEDTools/2.29.2-GCC-8.3.0
-module load SAMtools/1.10-GCC-8.3.0
-module load BEDOPS/2.4.39-foss-2019b
+#module load BEDOPS/2.4.39-foss-2019b
 
-ml R/3.6.2-foss-2019b
-curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > klactis.fasta
+#ml R/3.6.2-foss-2019b
+# curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > klactis.fasta
+#
+# curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > $WorkDir/Genome/klactis.fasta
+#
+# module load SAMtools
+# samtools faidx $WorkDir/Genome/klactis.fasta
+# samtools faidx klactis.fasta
+#
+# module load Bowtie2
+#
+# faidx --transform bed klactis.fasta > klactis.bed
+#
+# ml picard/2.27.4-Java-13.0.2
+#
+# java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
+#       -R GCF_000002515.2_ASM251v1_genomic.fna \
+#       -O GCF_000002515.2_ASM251v1_genomic.dict
+#
+#       java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
+#       -I /scratch/ry00555/McEachern/Genome/Klactisgenes.bed \
+#       -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+#       -SD /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+#       -O /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.interval_list
+#
+# ml GATK/4.3.0.0-GCCcore-8.3.0-Java-1.8
+#
+# #WGS uses 1000 bp bins
+#       gatk PreprocessIntervals \
+#       -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+#       -L /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.interval_list \
+#       --interval-merging-rule OVERLAPPING_ONLY \
+#       --bin-length 1000 \
+#       --padding 0 \
+#       -O /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list
+#
+#       gatk AnnotateIntervals \
+#       -R GCF_000002515.2_ASM251v1_genomic.fna \
+#       -L klactis_preprocessed1000_intervals.interval_list \
+#        --interval-merging-rule OVERLAPPING_ONLY \
+#        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
-curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > $WorkDir/Genome/klactis.fasta
-
-module load SAMtools
-samtools faidx $WorkDir/Genome/klactis.fasta
-samtools faidx klactis.fasta
-
-module load Bowtie2
-# bowtie2-build -f $WorkDir/Genome/klactis.fasta $WorkDir/Genome/klactis
-bowtie2 -x  reference -U file.fasta -S file.sam
-
-
-1) Index the reference genome and map your reads or FASTA sequences to it (for example with bowtie2)
-
-# index reference genome (should be precomputed)
-bowtie2-build klactis.fasta klactis
-# map reads
-bowtie2 -p 4 -x klactis -U klactis.fasta -S klactis.sam
-
-faidx --transform bed klactis.fasta > klactis.bed
-
-
-# compress SAM to a BAM (binary) file
-samtools view -bS file.sam > file.bam
-2) Create a BED files from the BAM file using bedtools
-
-# extract BED file
-bedtools bamtobed -i file.bam > file.bed
-Alternatively, for sliding windows you can generate these from a reference sequence provided that you know the length of each chromosome (perhaps there is a way to extract these directly from reference.fasta):
-
-# length per chromosome
-samtools view -H file.bam | grep "SQ" | cut -d":" -f2-3 | sed 's/LN://' > file.chr.txt
-
-# create sliding windows
-bedtools makewindows -g file.chr.txt -w 1000 > windows.bed
-
-
-
-
-java -jar picard.jar CreateSequenceDictionary \
-      R=$WorkDir/Genome/klactis.fasta \
-      O=$WorkDir/Genome/klactis.dict
+       ml Trim_Galore
+       trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+       # #
+       FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+       # #
+       #
+       # #
+       # #Iterate over the files
+       for f in $FILES
+       do
+         file=${f##*/}
+       # 	#remove ending from file name to create shorter names for bam files and other downstream output
+        	name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
+       #
+       # #
+       # # 	# File Vars
+       # # 	#use sed to get the name of the second read matching the input file
+        	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+       # 	#variable for naming bam file
+       bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+       # 	#variable name for bigwig output
+        	bigwig="${OUTDIR}/BigWigs/${name}"
+       # 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+       # #
+       #
+       ml SAMtools
+       ml BWA
+       # #
+        bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+        samtools index "$bam"
+        ml deepTools
+       # #Plot all reads
+        bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+       #
+        #plot mononucleosomes
+        bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+        done
