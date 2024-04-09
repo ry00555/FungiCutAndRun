@@ -110,7 +110,8 @@ module load Homer
 OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories"
 
 # Iterate over the directories
-for infile in $OUTDIR/*.tagdir
+for infile in $OUTDIR/137-*-H3K27me3_Rep1.BtB.tagdir
+do
 do
     # Extract the base name of the directory
     base=$(basename ${infile})
@@ -137,8 +138,8 @@ done
 
 
 
-for infile in $OUTDIR/*.txt
- do
-  base=$(basename ${infile} .txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/${base}.peaks.bed
- done
+# for infile in $OUTDIR/*.txt
+#  do
+#   base=$(basename ${infile} .txt)
+#   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/${base}.peaks.bed
+#  done

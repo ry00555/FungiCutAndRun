@@ -80,43 +80,61 @@ OUTDIR="/scratch/ry00555/McEachern/"
      #mkdir "$OUTDIR/TdfFiles"
 
 
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
-
-# Iterate over the files
-for f in $FILES
-do
-    file=${f##*/}
-    name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-    read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-    bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-    bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-    # ml SAMtools
-    # ml BWA
-    # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-    # samtools index "$bam"
-    ml deepTools
-    bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-done
+# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
+#
+# # Iterate over the files
+# for f in $FILES
+# do
+#     file=${f##*/}
+#     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+#     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+#     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+#     bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+#     # ml SAMtools
+#     # ml BWA
+#     # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+#     # samtools index "$bam"
+#     ml deepTools
+#     bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+# done
 
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
 # Iterate over all BAM files in the directory
-for bam_file in $SORTED_BAM_DIR/*.bam
+# for bam_file in $SORTED_BAM_DIR/*.bam
+# do
+#     # Get the base name of the BAM file
+#     base_name=$(basename "$bam_file")
+#
+#     # Define the output file path
+#     output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+#
+#     # Run Picard to add or replace read groups
+#     java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#     -I "$bam_file" \
+#     -O "$output_file" \
+#     -RGID 2 \
+#     -RGLB lib1 \
+#     -RGPL illumina \
+#     -RGPU S34 \
+#     -RGSM "${base_name%.*}"
+# done
+
+mkdir CountTSVs
+
+for bam_file in $SORTED_BAM_DIR/*_output.bam
 do
-    # Get the base name of the BAM file
-    base_name=$(basename "$bam_file")
+  # Get the base name of the BAM file
+  base_name=$(basename "$bam_file")
+  # Define the output file path
+  input_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
 
-    # Define the output file path
-    output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+gatk CollectReadCounts \
+-I "$input_file" \
+-R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+-L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+--interval-merging-rule OVERLAPPING_ONLY \
+-O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
 
-    # Run Picard to add or replace read groups
-    java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-    -I "$bam_file" \
-    -O "$output_file" \
-    -RGID 2 \
-    -RGLB lib1 \
-    -RGPL illumina \
-    -RGPU S34 \
-    -RGSM "${base_name%.*}"
 done
