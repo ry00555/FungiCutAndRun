@@ -84,20 +84,16 @@ ml BWA
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 
 # Iterate over the files
-for f in $FILES
+for f in $FASTQ/*R1_001_val_1.fq.gz
 do
     file=${f##*/}
     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-
-    # Get the path to the second read matching the input file
     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-    bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-    bigwig="${OUTDIR}/BigWigs/${name}"
+    bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+    bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 
-    # Align reads using bwa and create sorted bam file
-    bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+    bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
     samtools index "$bam"
 
-    # Generate bigwig file using bamCoverage
     bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 done
