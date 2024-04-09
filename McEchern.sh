@@ -22,9 +22,9 @@ SMOOTH="50"
 #number of CPUs
 THREADS=12
 
-mkdir "${OUTDIR}/TrimmedReads"
-mkdir "${OUTDIR}/BigWigs"
-mkdir "$OUTDIR/SortedBamFiles"
+# mkdir TrimmedReads
+# mkdir BigWigs
+# mkdir SortedBamFiles
 
 
 #Load these modules that are compatible with GATK version 4.3
