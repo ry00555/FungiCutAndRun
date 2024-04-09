@@ -9,9 +9,9 @@
 #SBATCH --time=48:00:00
 #SBATCH --output=../MapCutAndRun132.%j.out
 #SBATCH --error=../MapCutAndRun132.%j.err
-cd $SLURM_SUBMIT_DIR
-$OUTDIR= "/scratch/ry00555/OutputRun137/CutandRun"
-#FASTQ= "/scratch/ry00555/OutputRun137/CutandRun"
+#cd $SLURM_SUBMIT_DIR
+#$OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
+#$FASTQ="/scratch/ry00555/OutputRun137/CutandRun"
 
 # ml Trim_Galore
 # #mkdir "$OUTDIR/TrimmedReads"
@@ -28,7 +28,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.g
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > ref/ecoli_refseq.fa
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > ref/Ncrassa_refseq.fa
 
-module load Bowtie2
+#module load Bowtie2
 # bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
 # #in line commands
 # bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
@@ -76,12 +76,12 @@ file=${f##*/}
 name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 
 ml BEDTools
-bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
-bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
+bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
+bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
 
 #DNA-spike in normalization
 #mkdir $OUTDIR/bedgraphs
-sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.bed $OUTDIR/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 $OUTDIR/bedgraphs/${name}.norm.bga
+sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
 done
 #sort bga files from  DNA spike in
  #ml ucsc
