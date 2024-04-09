@@ -78,20 +78,20 @@ OUTDIR="/scratch/ry00555/McEachern/"
       # mkdir "${OUTDIR}/Peaks"
      #mkdir "$OUTDIR/HomerTagDirectories"
      #mkdir "$OUTDIR/TdfFiles"
-ml SAMtools
-ml BWA
+
 
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 
 # Iterate over the files
-for f in $FASTQ/*R1_001_val_1.fq.gz
+for f in $FILES
 do
     file=${f##*/}
     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
     bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-
+    ml SAMtools
+    ml BWA
     bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
     samtools index "$bam"
 
