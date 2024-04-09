@@ -119,7 +119,7 @@ do
     sample_name=$(echo $base | cut -d'-' -f3)
 
     # Construct the IgG control file name
-    IgG_control="${OUTDIR}/${sample_name}_IgG_Rep1.BtB.tagdir/tagInfo"
+    IgG_control="${OUTDIR}/${sample_name}_IgG_Rep1.BtB.tagdir"
 
     # Iterate over the different histone modifications
     for histone_modification in H3K27me3 H3K36me3
