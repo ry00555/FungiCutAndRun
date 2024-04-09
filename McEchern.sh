@@ -128,7 +128,7 @@ do
   # Get the base name of the BAM file
   base_name=$(basename "$bam_file")
   # Define the output file path
-  input_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+  input_file="${SORTED_BAM_DIR}/${base_name}"
 
 gatk CollectReadCounts \
 -I "$input_file" \
