@@ -125,7 +125,7 @@ do
     for histone_modification in H3K27me3 H3K36me3
     do
         # Define the input file and output file
-        input_file="${OUTDIR}/${base}/tagInfo"
+        input_file="${OUTDIR}/${base}"
         output_file="${OUTDIR}/${base}/${base}_${histone_modification}_vs_IgG.txt"
 
         # Run findPeaks command
