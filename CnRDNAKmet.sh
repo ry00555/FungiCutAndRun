@@ -28,12 +28,14 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.g
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > ref/ecoli_refseq.fa
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > ref/Ncrassa_refseq.fa
 
-# module load Bowtie2
+module load Bowtie2
 # bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
 # #in line commands
 # bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
 # bowtie2-build -f ref/ecoli_refseq.fa ref/Ecoli_ref
 #
+for f in $FILES
+ do
 file=${f##*/}
 # 	#remove ending from file name to create shorter names for bam files and other downstream output
 name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
@@ -57,6 +59,7 @@ samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}_
 samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam"
 samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}_Ecoli.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam"
 
+done
 #ml SAMtools
 # samtools merge $OUTDIR/bam_files/timecourse_IgG_danio_merged.bam $OUTDIR/bam_files/2.5hpf_IgG.sorted.bam $OUTDIR/bam_files/4.5hpf_IgG.sorted.bam $OUTDIR/bam_files/24hpf_IgG.sorted.bam
 #samtools merge
