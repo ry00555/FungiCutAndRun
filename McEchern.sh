@@ -90,7 +90,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 #     bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-#     # ml SAMtools
+ml SAMtools
 #     # ml BWA
 #     # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 #     # samtools index "$bam"
@@ -121,7 +121,7 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 #     -RGSM "${base_name%.*}"
 # done
 
-mkdir CountTSVs
+#mkdir CountTSVs
 
 for bam_file in $SORTED_BAM_DIR/*_output.bam
 do
@@ -129,6 +129,7 @@ do
   base_name=$(basename "$bam_file")
   # Define the output file path
   input_file="${SORTED_BAM_DIR}/${base_name}"
+samtools index input_file
 
 gatk CollectReadCounts \
 -I "$input_file" \
