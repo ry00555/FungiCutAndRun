@@ -112,7 +112,7 @@ module load Homer
   #try to do the above but with more modifications
 
 # Set the directory containing the tag directories
-OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories/"
+OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories"
 
 # Iterate over the files
 for infile in $OUTDIR/*IgG_Rep1.BtB.tagdir
@@ -138,3 +138,9 @@ do
         findPeaks $input_file -style histone -minDist 1000 -gsize 4.4e7 -F 2 -i $IgG_control -o $output_file
     done
 done
+
+for infile in $OUTDIR/TagDirectories/*.txt
+ do
+  base=$(basename ${infile} .txt)
+  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/TagDirectories/${base}.peaks.bed
+ done
