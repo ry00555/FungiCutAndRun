@@ -76,8 +76,8 @@ file=${f##*/}
 name=${file/%_S[1-12]*_R1_001_val_1.fq.gz/}
 
 ml BEDTools
-bedtools bamtobed -i $OUTDIR/bam_files/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
-bedtools bamtobed -i $OUTDIR/bam_files/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
+bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
+bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
 
 #DNA-spike in normalization
 #mkdir $OUTDIR/bedgraphs
