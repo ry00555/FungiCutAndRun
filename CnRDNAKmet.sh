@@ -113,7 +113,7 @@ module load Homer
   #!/bin/bash
 
   # Set the directory containing the tag directories
-  OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories/"
+  OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories"
 
   # Iterate over the directories
   for infile in $OUTDIR/*
