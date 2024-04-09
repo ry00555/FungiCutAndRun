@@ -72,8 +72,8 @@ THREADS=12
 #        --interval-merging-rule OVERLAPPING_ONLY \
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
-       ml Trim_Galore
-       trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
+    #   ml Trim_Galore
+    #   trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
        # #
        FILES="/scratch/ry00555/McEachern/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
        # #
@@ -98,14 +98,13 @@ THREADS=12
        # #
        #
        ml SAMtools
-       ml BWA
        # #
-        bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-        samtools index "$bam"
+bwa mem -M -v 3 -t 12 "/scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna" $f $read2 | samtools view -bhSu - | samtools sort -@ 12 -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
         ml deepTools
        # #Plot all reads
-        bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
        #
         #plot mononucleosomes
-        bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
+        #bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --smoothLength 25 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_MNase.bw"
         done
