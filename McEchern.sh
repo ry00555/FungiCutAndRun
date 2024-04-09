@@ -73,9 +73,9 @@ THREADS=12
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
        ml Trim_Galore
-       trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+       trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
        # #
-       FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+       FILES="/scratch/ry00555/McEachern/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
        # #
        #
        # #
@@ -91,16 +91,16 @@ THREADS=12
        # # 	#use sed to get the name of the second read matching the input file
         	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
        # 	#variable for naming bam file
-       bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+       bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
        # 	#variable name for bigwig output
-        	bigwig="${OUTDIR}/BigWigs/${name}"
+        	bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
        # 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
        # #
        #
        ml SAMtools
        ml BWA
        # #
-        bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+        bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
         samtools index "$bam"
         ml deepTools
        # #Plot all reads
