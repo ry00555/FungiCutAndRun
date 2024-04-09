@@ -10,7 +10,7 @@
 #SBATCH --output=../MapCutAndRun132.%j.out
 #SBATCH --error=../MapCutAndRun132.%j.err
 cd $SLURM_SUBMIT_DIR
-#$OUTDIR= "/scratch/ry00555/OutputRun137/CutandRun"
+$OUTDIR= "/scratch/ry00555/OutputRun137/CutandRun"
 #FASTQ= "/scratch/ry00555/OutputRun137/CutandRun"
 
 # ml Trim_Galore
