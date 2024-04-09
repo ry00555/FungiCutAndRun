@@ -96,7 +96,7 @@ module load Homer
  # mkdir $OUTDIR/Peaks
   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
     do base=$(basename ${infile} .norm_sort.bga)
-cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/Peaks/${base}.bgato.bed
+cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
  done
 
   for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
