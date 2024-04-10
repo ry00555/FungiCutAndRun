@@ -107,38 +107,11 @@ module load Homer
 #!/bin/bash
 
 # Set the directory containing the tag directories
-OUTDIR="/scratch/ry00555/OutputRun137/CutandRun/TagDirectories"
+OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 
-# Iterate over the directories
-for infile in "$OUTDIR/*.tagdir"
+##using IgG as input
+for infile in $OUTDIR/TagDirectories/*rtt109*.tagdir
 do
-    # Extract the base name of the directory
-    base=$(basename ${infile})
-
-    # Extract the sample name from the directory name
-    sample_name=$(echo $base | cut -d'-' -f3)
-
-    # Construct the IgG control file name
-    IgG_control="${OUTDIR}/${sample_name}_IgG_Rep1.BtB.tagdir"
-
-    # Iterate over the different histone modifications
-    for histone_modification in H3K27me3 H3K36me3
-    do
-        # Define the input file and output file
-        input_file="${OUTDIR}/${base}"
-        output_file="${OUTDIR}/${base}/${base}_${histone_modification}_vs_IgG.txt"
-
-        # Run findPeaks command
-        findPeaks $input_file -style histone -minDist 1000 -gsize 44000000 -F 2 -i $IgG_control -o $output_file
-    done
+  base=$(basename ${infile} .tagdir)
+findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_R1_001_val_1.fq.gz.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
 done
-
-
-
-
-
-# for infile in $OUTDIR/*.txt
-#  do
-#   base=$(basename ${infile} .txt)
-#   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/${base}.peaks.bed
-#  done
