@@ -168,6 +168,10 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # done
 ml deepTools
 computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
+## command line
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 137-2_CUTANDRUN_WT_H3K27me3_Rep1_DNASpikeinNorm.bw 137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw 137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw 137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw 137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw 137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/Ncrassagenes.bed" --skipZeros -o "/scratch/ry00555/OutputRun137/CutandRun/Matrices/matrix_CnR_H3K27me3.gz"
+
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ../BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_DNASpikeinNorm.bw ../BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ../BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ../BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ../BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ../BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/Ncrassagenes.bed" --skipZeros -o matrix_CnR_H3K27me3.gz
 
 #plotHeatmap -m "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz" -out ${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT set-7 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
 
@@ -186,9 +190,25 @@ $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/
 done
 
 #sort bga files from spike in
-# ml ucsc
-# for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
-# do
-# base=$(basename ${infile} _kmet.bga)
-#    bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
-#   done
+ ml ucsc
+for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+do
+base=$(basename ${infile} _kmet.bga)
+    bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+  done
+
+  mkdir $OUTDIR/KmetSpikeIn/Peaks
+ for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
+   do base=$(basename ${infile} .kmet_sort.bga)
+   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+ done
+
+ module load Homer
+ mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+ for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+ do
+base=$(basename ${infile} .bgato.bed)
+makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+done
+
+# Do the same IgG analysis above for the KmetSpikeIn normalized for each strain at a time, then skip Chip-R and go straight to annotating peaks with input bed files use the same command as above and make sure to ml Perl then make bigwigs from the bga files with the end .kmet.sort.bga
