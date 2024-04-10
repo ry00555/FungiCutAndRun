@@ -102,31 +102,31 @@ ml GATK
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
 # Iterate over all BAM files in the directory
-# for bam_file in $SORTED_BAM_DIR/*.bam
-# do
-#     # Get the base name of the BAM file
-#     base_name=$(basename "$bam_file")
-#
-#     # Define the output file path
-#     output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
-#
-#     # Run Picard to add or replace read groups
-#     java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-#     -I "$bam_file" \
-#     -O "$output_file" \
-#     -RGID 2 \
-#     -RGLB lib1 \
-#     -RGPL illumina \
-#     -RGPU S34 \
-#     -RGSM "${base_name%.*}"
-# done
+for bam_file in $SORTED_BAM_DIR/*.bam
+do
+    # Get the base name of the BAM file
+    base_name=$(basename "$bam_file" .bam)
+
+    # Define the output file path
+    output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+
+    # Run Picard to add or replace read groups
+    java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+    -I "$bam_file" \
+    -O "$output_file" \
+    -RGID 2 \
+    -RGLB lib1 \
+    -RGPL illumina \
+    -RGPU S34 \
+    -RGSM "${base_name%.*}"
+done
 
 #mkdir CountTSVs
 
  for bam_file in $SORTED_BAM_DIR/*_output.bam
  do
 #   # Get the base name of the BAM file
-   base_name=$(basename "$bam_file")
+   base_name=$(basename "$bam_file" _output.bam)
 #   # Define the output file path
    input_file="${SORTED_BAM_DIR}/${base_name}"
 # samtools index "$input_file"
@@ -153,7 +153,7 @@ for count_files in $CountTSVsDIR/*M*tsv
 do
 
   # Get the base name of the counts file
-     base_name=$(basename "$count_files")
+     base_name=$(basename "$count_files" .counts.tsv)
  #   # Define the output file path
   input_file="${CountTSVsDIR}/${base_name}"
 gatk DenoiseReadCounts \
