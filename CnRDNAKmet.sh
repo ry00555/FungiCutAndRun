@@ -153,8 +153,12 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 
  ##annotating peak files with masked reference (use HOMER module)
  ml Perl
-annotatePeaks.pl $OUTDIR/Peaks/*peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/*.peaks_IgGNorm_ann.txt
+ for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
+ do
+   base=$(basename ${infile} .peaks_IgGNorm.bed)
+annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
 # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
+done
 
 ml ucsc
 for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
