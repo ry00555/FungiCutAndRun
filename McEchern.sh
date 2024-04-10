@@ -142,28 +142,28 @@ ml GATK
 
 CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 
-gatk CreateReadCountPanelOfNormals \
--I ${CountTSVsDIR}/138-1_Genomic_K1__Rep1_6252.bam_output.bam.counts.tsv \
--I ${CountTSVsDIR}/138-2_Genomic_K2__Rep1_6252.bam_output.bam.counts.tsv  \
--I ${CountTSVsDIR}/138-3_Genomic_K3__Rep1_6252_S3_L001_R1_001_val_1.fq.gz.bam_output.bam.counts.tsv \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
--O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
-
-for count_files in $CountTSVsDIR/*tsv
-do
-
-  # Get the base name of the counts file
-     base_name=$(basename "$count_files")
- #   # Define the output file path
-  input_file="${CountTSVsDIR}/${base_name}"
-gatk DenoiseReadCounts \
--I "$input_file" \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
---count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-
-done
+# gatk CreateReadCountPanelOfNormals \
+# -I ${CountTSVsDIR}/138-1_Genomic_K1__Rep1_6252.bam_output.bam.counts.tsv \
+# -I ${CountTSVsDIR}/138-2_Genomic_K2__Rep1_6252.bam_output.bam.counts.tsv  \
+# -I ${CountTSVsDIR}/138-3_Genomic_K3__Rep1_6252_S3_L001_R1_001_val_1.fq.gz.bam_output.bam.counts.tsv \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
+#
+# for count_files in $CountTSVsDIR/*tsv
+# do
+#
+#   # Get the base name of the counts file
+#      base_name=$(basename "$count_files")
+#  #   # Define the output file path
+#   input_file="${CountTSVsDIR}/${base_name}"
+# gatk DenoiseReadCounts \
+# -I "$input_file" \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+#
+# done
 
 for copy_ratios in ${OUTDIR}/CopyRatios/
 do
@@ -173,8 +173,8 @@ do
 input_file="${OUTDIR}/CopyRatios/${base_name}"
 
 gatk PlotDenoisedCopyRatios \
---standardized-copy-ratios CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv  \
+--standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
