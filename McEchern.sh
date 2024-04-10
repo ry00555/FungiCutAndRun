@@ -138,7 +138,7 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
  --interval-merging-rule OVERLAPPING_ONLY \
  -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
 
-# done
+done
 
 CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 
