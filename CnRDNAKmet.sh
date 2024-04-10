@@ -91,7 +91,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.g
  #    bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
  # done
 
-module load Homer
+#module load Homer
  #calling peaks
  # mkdir $OUTDIR/Peaks
 #   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
@@ -152,22 +152,27 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
  # don't need ChipR right now since I don't have replicates as of 4/10/24
 
  ##annotating peak files with masked reference (use HOMER module)
- ml Perl
- for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
- do
-   base=$(basename ${infile} .peaks_IgGNorm.bed)
-annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
-# you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
-done
+#  ml Perl
+#  for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
+#  do
+#    base=$(basename ${infile} .peaks_IgGNorm.bed)
+# annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
+# # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
+# done
 
-ml ucsc
-for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
-do
-base=$(basename ${infile} .norm_sort.bga)
-bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
-done
+# ml ucsc
+# for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+# do
+# base=$(basename ${infile} .norm_sort.bga)
+# bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+# done
+ml deepTools
+computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${OUTDIR}/BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_DNASpikeinNorm.bw" "${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw" "${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw" "${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw" "${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw" "${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
 
-# computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
+plotHeatmap -m "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz" -out ${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT set-7 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
+
+scp -r ry00555@xfer.gacrc.uga.edu${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png /Users/ry00555/Desktop/
+
 # computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K36me3.gz"
 #
 
