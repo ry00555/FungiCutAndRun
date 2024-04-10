@@ -143,17 +143,17 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # done
 
 #changing peak txt files to bed files to input into chipr
-for infile in $OUTDIR/Peaks/*_IgGNorm.txt
-do
-base=$(basename ${infile} _IgGNorm.txt)
-sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
- done
+# for infile in $OUTDIR/Peaks/*_IgGNorm.txt
+# do
+# base=$(basename ${infile} _IgGNorm.txt)
+# sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
+#  done
 
  # don't need ChipR right now since I don't have replicates as of 4/10/24
 
  ##annotating peak files with masked reference (use HOMER module)
  ml Perl
-annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > ${base}.peaks_IgGNorm_ann.txt
+annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
 # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
 
 #kmet spike in for both reg sorted and ecoli sorted
