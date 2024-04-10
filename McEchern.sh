@@ -40,7 +40,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #
 # faidx --transform bed klactis.fasta > klactis.bed
 #
-# ml picard/2.27.4-Java-13.0.2
+ ml picard/2.27.4-Java-13.0.2
 #
 # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
 #       -R GCF_000002515.2_ASM251v1_genomic.fna \
@@ -80,23 +80,23 @@ ml GATK
      #mkdir "$OUTDIR/TdfFiles"
 
 
-# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
+ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 #
 # # Iterate over the files
-# for f in $FILES
-# do
-#     file=${f##*/}
-#     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-#     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-#     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+ for f in $FILES
+ do
+     file=${f##*/}
+     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 #     bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-#ml SAMtools
-#     # ml BWA
-#     # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-#     # samtools index "$bam"
+ml SAMtools
+ml BWA
+ bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
 #     ml deepTools
 #     bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-# done
+ done
 
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
