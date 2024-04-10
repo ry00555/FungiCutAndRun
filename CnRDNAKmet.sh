@@ -145,7 +145,7 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 #changing peak txt files to bed files to input into chipr
 for infile in $OUTDIR/Peaks/*_IgGNorm.txt
 do
-base=$(basename ${infile} .txt)
+base=$(basename ${infile} _IgGNorm.txt)
 sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
  done
 
@@ -153,7 +153,7 @@ sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t
 
  ##annotating peak files with masked reference (use HOMER module)
  ml Perl
-annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed -gtf /scratch/ry00555/Ncrassa.gtf > ${base}.peaks_IgGNorm_ann.txt
+annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > ${base}.peaks_IgGNorm_ann.txt
 # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
 
 #kmet spike in for both reg sorted and ecoli sorted
@@ -165,9 +165,9 @@ sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR
 done
 
 #sort bga files from spike in
-ml ucsc
-for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
-do
-base=$(basename ${infile} _kmet.bga)
-   bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
-  done
+# ml ucsc
+# for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+# do
+# base=$(basename ${infile} _kmet.bga)
+#    bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+#   done
