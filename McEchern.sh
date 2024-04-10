@@ -52,7 +52,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #       -SD /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 #       -O /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.interval_list
 #
-# ml GATK/4.3.0.0-GCCcore-8.3.0-Java-1.8
+ml GATK
 #
 # #WGS uses 1000 bp bins
 #       gatk PreprocessIntervals \
