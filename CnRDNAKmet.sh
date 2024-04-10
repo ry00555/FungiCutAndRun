@@ -156,12 +156,24 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
 # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
 
+ml ucsc
+for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+do
+base=$(basename ${infile} .norm_sort.bga)
+bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+done
+
+# computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
+# computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K36me3.gz"
+#
+
 #kmet spike in for both reg sorted and ecoli sorted
 for file in $OUTDIR/SortedBamFiles/*sorted.bam
  do
    base=$(basename "${file}" .sorted.bam)
+
 sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*L001_R1_001_val_1.fq.gz \
- $OUTDIR/TrimmedReads/${base}*L001_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+$OUTDIR/TrimmedReads/${base}*L001_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
 done
 
 #sort bga files from spike in
