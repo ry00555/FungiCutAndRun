@@ -40,7 +40,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #
 # faidx --transform bed klactis.fasta > klactis.bed
 #
- ml picard
+ #ml picard
 #
 # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
 #       -R GCF_000002515.2_ASM251v1_genomic.fna \
@@ -52,7 +52,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #       -SD /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 #       -O /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.interval_list
 #
-ml GATK
+#ml GATK
 #
 # #WGS uses 1000 bp bins
 #       gatk PreprocessIntervals \
@@ -69,8 +69,8 @@ ml GATK
 #        --interval-merging-rule OVERLAPPING_ONLY \
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
-    #   ml Trim_Galore
-    #   trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
+ml Trim_Galore
+trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
        # #
      #
       # mkdir "${OUTDIR}/SortedBamFiles"
@@ -89,19 +89,20 @@ ml GATK
      name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
      read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-#     bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+#bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
 ml BWA
  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
-#     ml deepTools
-#     bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ml deepTools
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
  done
 
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
 # Iterate over all BAM files in the directory
+ ml picard
 for bam_file in $SORTED_BAM_DIR/*.bam
 do
     # Get the base name of the BAM file
@@ -122,7 +123,7 @@ do
 done
 
 #mkdir CountTSVs
-
+ml GATK
  for bam_file in $SORTED_BAM_DIR/*_output.bam
  do
 #   # Get the base name of the BAM file
@@ -149,21 +150,21 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
 #
-for count_files in $CountTSVsDIR/*M*tsv
-do
-
-  # Get the base name of the counts file
-     base_name=$(basename "$count_files" .counts.tsv)
- #   # Define the output file path
-  input_file="${CountTSVsDIR}/${base_name}"
-gatk DenoiseReadCounts \
--I "$input_file" \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
---count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-
-done
+# for count_files in $CountTSVsDIR/*M*tsv
+# do
+#
+#   # Get the base name of the counts file
+#      base_name=$(basename "$count_files" .counts.tsv)
+#  #   # Define the output file path
+#   input_file="${CountTSVsDIR}/${base_name}"
+# gatk DenoiseReadCounts \
+# -I "$input_file" \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+#
+# done
 #
 # for copy_ratios in ${OUTDIR}/CopyRatios/
 # do
