@@ -40,7 +40,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #
 # faidx --transform bed klactis.fasta > klactis.bed
 #
- ml picard/2.27.4-Java-13.0.2
+ ml picard
 #
 # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
 #       -R GCF_000002515.2_ASM251v1_genomic.fna \
@@ -129,7 +129,7 @@ done
    base_name=$(basename "$bam_file" _output.bam)
 #   # Define the output file path
    input_file="${SORTED_BAM_DIR}/${base_name}"
-# samtools index "$input_file"
+samtools index "$input_file"
 #
  gatk CollectReadCounts \
  -I "$input_file" \
