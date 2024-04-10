@@ -152,6 +152,7 @@ sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t
  # don't need ChipR right now since I don't have replicates as of 4/10/24
 
  ##annotating peak files with masked reference (use HOMER module)
+ ml Perl
 annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed -gtf /scratch/ry00555/Ncrassa.gtf > ${base}.peaks_IgGNorm_ann.txt
 # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
 
