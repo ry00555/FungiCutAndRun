@@ -182,7 +182,7 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 #
 
 #kmet spike in for both reg sorted and ecoli sorted
-for file in $OUTDIR/SortedBamFiles/*rtt109*sorted.bam
+for file in $OUTDIR/SortedBamFiles/*sorted.bam
  do
     base=$(basename "${file}" .sorted.bam)
  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
@@ -213,14 +213,20 @@ done
 
 # Do the same IgG analysis above for the KmetSpikeIn normalized for each strain at a time, then skip Chip-R and go straight to annotating peaks with input bed files use the same command as above and make sure to ml Perl then make bigwigs from the bga files with the end .kmet.sort.bga
 ##using IgG as input
-for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*WT*.tagdir
-do
- base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
- done
+# for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*WT*.tagdir
+# do
+#  base=$(basename ${infile} .tagdir)
+#  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+#  done
 
  # for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*rtt109*.tagdir
  # do
  #  base=$(basename ${infile} .tagdir)
  #  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
  #  done
+#set-7 is also missing ../
+ # for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*set-7*.tagdir
+ # do
+ #  base=$(basename ${infile} .tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+ # done
