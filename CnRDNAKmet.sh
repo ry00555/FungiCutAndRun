@@ -191,21 +191,21 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # done
 #
 # #sort bga files from spike in
-#  ml ucsc
-# for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
-# do
-# base=$(basename ${infile} _kmet.bga)
-#     bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
-#   done
+ ml ucsc
+for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+ do
+ base=$(basename ${infile} _kmet.bga)
+     bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+   done
 
-  mkdir $OUTDIR/KmetSpikeIn/Peaks
+  #mkdir $OUTDIR/KmetSpikeIn/Peaks
  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
    do base=$(basename ${infile} .kmet_sort.bga)
    cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
  done
 
  module load Homer
- mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+# mkdir $OUTDIR/KmetSpikeIn/TagDirectories
  for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
  do
 base=$(basename ${infile} .bgato.bed)
