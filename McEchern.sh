@@ -70,7 +70,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
 ml Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/*fastq\.gz
+trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
        # #
      #
       # mkdir "${OUTDIR}/SortedBamFiles"
@@ -86,8 +86,8 @@ trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/T
  for f in $FILES
  do
      file=${f##*/}
-     name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+     name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
+     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 #bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
