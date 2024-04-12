@@ -103,7 +103,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # bam2="/scratch/ry00555/McEachern/SortedBamFiles/113-12-gDNA-7B520_merged.bam"
 # bigwig2="/scratch/ry00555/McEachern/BigWigs/113-12-gDNA-7B520_merged"
 #
-# ml SAMtools
+#ml SAMtools
 # ml BWA
 #  bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-1-gDNA-CBS2359_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 #  bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-12-gDNA-7B520_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam2" -
@@ -147,7 +147,8 @@ ml GATK
 #   # Get the base name of the BAM file
    base_name=$(basename "$bam_file" _output.bam)
 #   # Define the output file path
-   input_file="${SORTED_BAM_DIR}/${base_name}"
+   input_file="${SORTED_BAM_DIR}/*_output.bam"
+   ml SAMtools
 samtools index "$input_file"
 #
  gatk CollectReadCounts \
