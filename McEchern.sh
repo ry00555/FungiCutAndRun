@@ -210,8 +210,8 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.preprocessAndStandardizeSample(SVDDenoisingUtils.java:406)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
-
-ml GATK R
+ml R
+ml GATK
 for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
 do
 
@@ -227,3 +227,17 @@ do
  --output-prefix ${base_name} \
  --output ${OUTDIR}/PlotDenoisedCopyRatios
  done
+
+ #R not working try command line
+# files: 113-1-gDNA-CBS2359_merged.denoisedCR.tsv      138-1_Genomic_K1__Rep1_6252.denoisedCR.tsv      138-3_Genomic_K3__Rep1_6252_S3_L001_R1_001_val_1.fq.gz.denoisedCR.tsv
+# 113-1-gDNA-CBS2359_merged.standardizedCR.tsv  138-1_Genomic_K1__Rep1_6252.standardizedCR.tsv  138-3_Genomic_K3__Rep1_6252_S3_L001_R1_001_val_1.fq.gz.standardizedCR.tsv
+# 113-12-gDNA-7B520_merged.denoisedCR.tsv       138-2_Genomic_K2__Rep1_6252.denoisedCR.tsv
+# 113-12-gDNA-7B520_merged.standardizedCR.tsv   138-2_Genomic_K2__Rep1_6252.standardizedCR.tsv
+
+# gatk PlotDenoisedCopyRatios \
+# --standardized-copy-ratios 138-1_Genomic_K1__Rep1_6252.standardizedCR.tsv \
+# --denoised-copy-ratios 138-1_Genomic_K1__Rep1_6252.denoisedCR.tsv  \
+# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+# --point-size-copy-ratio 1 \
+# --output-prefix 138-1_Genomic_K1__Rep1_6252 \
+# --output /scratch/ry00555/McEachern/PlotDenoisedCopyRatios

@@ -58,8 +58,8 @@ bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry
 #
 module load SAMtools
 # #mkdir "$OUTDIR/bam_files"
-samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}.sam"  > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam"
-samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}_Ecoli.sam"  > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}_Ecoli.bam"
+samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam"
+samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}_Ecoli.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}_Ecoli.bam"
 #
 # #mkdir "$OUTDIR/SortedBamFiles"
 samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam"
@@ -182,19 +182,19 @@ done
 
 #kmet spike in for both reg sorted and ecoli sorted
 #The issue is the base name for all the files do not match
-for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
- do
-    base=$(basename "${file}" _Ecoli.sorted.bam)
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
-$OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-done
-
-for file in $OUTDIR/SortedBamFiles/*sorted.bam
- do
-    base=$(basename "${file}" sorted.bam)
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
-$OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-done
+# for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
+#  do
+#     base=$(basename "${file}" _Ecoli.sorted.bam)
+#  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
+# $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+# done
+#
+# for file in $OUTDIR/SortedBamFiles/*sorted.bam
+#  do
+#     base=$(basename "${file}" sorted.bam)
+#  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
+# $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+# done
 #
 # #sort bga files from spike in
 #  ml ucsc
@@ -210,7 +210,7 @@ done
  #   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
  # done
 
- module load Homer
+ #module load Homer
 # mkdir $OUTDIR/KmetSpikeIn/TagDirectories
 #  for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
 #  do
