@@ -141,16 +141,18 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 
 #mkdir CountTSVs
+#did this in command line
+#   input_file="${SORTED_BAM_DIR}/*_output.bam"
+
+#   ml SAMtools
+#samtools index "$input_file"
+
 ml GATK
- for bam_file in ${SORTED_BAM_DIR}/*_output.bam
- do
+for bam_file in ${SORTED_BAM_DIR}/*_output.bam
+do
 #   # Get the base name of the BAM file
-   base_name=$(basename "$bam_file" _output.bam)
-#   # Define the output file path
-   input_file="${SORTED_BAM_DIR}/*_output.bam"
-   ml SAMtools
-samtools index "$input_file"
-#
+  base_name=$(basename "$bam_file" _output.bam)
+  input_file="${SORTED_BAM_DIR}/*_output.bam"
  gatk CollectReadCounts \
  -I "$input_file" \
  -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
