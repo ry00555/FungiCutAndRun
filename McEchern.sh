@@ -168,33 +168,59 @@ ml GATK
 # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # -O ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5
 #
-for count_files in $CountTSVsDIR/*.counts.tsv
-do
-
-#   # Get the base name of the counts file
-base_name=$(basename "$count_files" .counts.tsv)
-#  #   # Define the output file path
-gatk DenoiseReadCounts \
--I "$count_files" \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
---count-panel-of-normals ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5 \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-
-done
-#
-# for copy_ratios in ${OUTDIR}/CopyRatios/
+# for count_files in $CountTSVsDIR/*.counts.tsv
 # do
-# # Get the base name of the counts file
-#    base_name=$(basename "$copy_ratios")
-# #   # Define the output file path
-# input_file="${OUTDIR}/CopyRatios/${base_name}"
 #
-# gatk PlotDenoisedCopyRatios \
+# #   # Get the base name of the counts file
+# base_name=$(basename "$count_files" .counts.tsv)
+# #  #   # Define the output file path
+# gatk DenoiseReadCounts \
+# -I "$count_files" \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5 \
 # --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
-# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-# --point-size-copy-ratio 1 \
-# --output-prefix ${base_name} \
-# --output ${OUTDIR}/PlotDenoisedCopyRatios
+# -denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+#
 # done
+#for some reason even with the new WT panel of normals they don't work just proceed with K samples error is
+#13:25:48.915 INFO  H5 - HDF5 library:
+# 13:25:48.915 INFO  H5 -  successfully loaded.
+# 13:25:48.919 INFO  DenoiseReadCounts - Reading read-counts file (/scratch/ry00555/McEachern/CountTSVs/138-9_Genomic_M6__Rep1_6252_S9_L001_R1_001_val_1.fq.gz.counts.tsv)...
+# 13:25:49.068 WARN  DenoiseReadCounts - Panel of normals was provided; ignoring input GC-content annotations...
+# 13:25:49.084 INFO  SVDDenoisingUtils - Validating sample intervals against original intervals used to build panel of normals...
+# 13:25:49.092 INFO  SVDDenoisingUtils - Preprocessing and standardizing sample read counts...
+# 13:25:49.096 INFO  SVDDenoisingUtils - Preprocessing read counts...
+# 13:25:49.097 INFO  SVDDenoisingUtils - Transforming read counts to fractional coverage...
+# 13:25:49.099 INFO  SVDDenoisingUtils - Performing GC-bias correction...
+# 13:25:49.164 INFO  SVDDenoisingUtils - Subsetting sample intervals to post-filter panel intervals...
+# 13:25:49.193 INFO  SVDDenoisingUtils - Dividing by interval medians from the panel of normals...
+# 13:25:49.194 INFO  SVDDenoisingUtils - Sample read counts preprocessed.
+# 13:25:49.194 INFO  SVDDenoisingUtils - Standardizing read counts...
+# 13:25:49.194 INFO  SVDDenoisingUtils - Dividing by sample medians and transforming to log2 space...
+# 13:25:49.199 INFO  DenoiseReadCounts - Shutting down engine
+# [April 12, 2024 at 1:25:49 PM EDT] org.broadinstitute.hellbender.tools.copynumber.DenoiseReadCounts done. Elapsed time: 0.01 minutes.
+# Runtime.totalMemory()=162267136
+# java.lang.IllegalArgumentException: Sample does not have a positive sample median.
+#         at org.broadinstitute.hellbender.utils.Utils.validateArg(Utils.java:798)
+#         at org.broadinstitute.hellbender.utils.param.ParamUtils.isPositive(ParamUtils.java:165)
+#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.lambda$divideBySampleMedianAndTransformToLog2$27(SVDDenoisingUtils.java:484)
+#         at java.base/java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Streams.java:104)
+#         at java.base/java.util.stream.IntPipeline$Head.forEach(IntPipeline.java:617)
+#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.divideBySampleMedianAndTransformToLog2(SVDDenoisingUtils.java:483)
+#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.preprocessAndStandardizeSample(SVDDenoisingUtils.java:406)
+#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
+#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
+for copy_ratios in ${OUTDIR}/CopyRatios/
+do
+# # Get the base name of the counts file
+   base_name=$(basename "$copy_ratios")
+# #   # Define the output file path
+#
+ gatk PlotDenoisedCopyRatios \
+ --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
+ --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+ --point-size-copy-ratio 1 \
+ --output-prefix ${base_name} \
+ --output ${OUTDIR}/PlotDenoisedCopyRatios
+ done
