@@ -148,19 +148,24 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #samtools index "$input_file"
 
 ml GATK
-for bam_file in ${SORTED_BAM_DIR}/*_output.bam
-do
-#   # Get the base name of the BAM file
-  base_name=$(basename "$bam_file" _output.bam)
-  input_file="${SORTED_BAM_DIR}/*_output.bam"
- gatk CollectReadCounts \
- -I "$input_file" \
- -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
- -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
- --interval-merging-rule OVERLAPPING_ONLY \
- -O ${CountTSVsDIR}/${base_name}.counts.tsv
-
+for bam_file in ${SORTED_BAM_DIR}/*_output.bam; do
+    # Get the base name of the BAM file
+    base_name=$(basename "$bam_file" _output.bam)
+    gatk CollectReadCounts \
+    -I "$bam_file" \
+    -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+    -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+    --interval-merging-rule OVERLAPPING_ONLY \
+    -O "${CountTSVsDIR}/${base_name}.counts.tsv"
 done
+
+## command line
+# gatk CollectReadCounts \
+# -I *_output.bam \
+# -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+# -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+# --interval-merging-rule OVERLAPPING_ONLY \
+# -O /scratch/ry00555/McEachern/CountTSVs/*.counts.tsv
 
 
 # gatk CreateReadCountPanelOfNormals \
