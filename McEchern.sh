@@ -174,9 +174,8 @@ do
 #   # Get the base name of the counts file
 base_name=$(basename "$count_files" .counts.tsv)
 #  #   # Define the output file path
-input_file="${CountTSVsDIR}/${base_name}"
 gatk DenoiseReadCounts \
--I "$input_file" \
+-I "$count_files" \
 --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 --count-panel-of-normals ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5 \
 --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
