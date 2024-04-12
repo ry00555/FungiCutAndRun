@@ -69,8 +69,8 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #        --interval-merging-rule OVERLAPPING_ONLY \
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
-ml Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
+#ml Trim_Galore
+#trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
        # #
      #
       # mkdir "${OUTDIR}/SortedBamFiles"
@@ -89,7 +89,7 @@ trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/T
      name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
      read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-#bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
 ml BWA
  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
@@ -98,6 +98,22 @@ ml deepTools
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
  done
 
+ FILES113="${OUTDIR}/TrimmedReads/113*_merged_trimmed.fq.gz" # Don't forget the *
+
+ for f in $FILES113
+ do
+     file=${f##*/}
+     name=${file/*_merged_trimmed.fq.gz/}
+     #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
+     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+ml SAMtools
+ml BWA
+ bwa mem -M -v 3 -t $THREADS $GENOME $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
+ml deepTools
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ done
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
