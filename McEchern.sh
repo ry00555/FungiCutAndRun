@@ -83,37 +83,38 @@ OUTDIR="/scratch/ry00555/McEachern/"
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 #
 # # Iterate over the files
- for f in $FILES
- do
-     file=${f##*/}
-     name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
-     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
-     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+#  for f in $FILES
+#  do
+#      file=${f##*/}
+#      name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
+#      read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
+#      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+# bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+# ml SAMtools
+# ml BWA
+#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+# samtools index "$bam"
+# ml deepTools
+# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#  done
+
+bam="/scratch/ry00555/McEachern/SortedBamFiles/113-1-gDNA-CBS2359_merged.bam"
+bigwig="/scratch/ry00555/McEachern/BigWigs/113-1-gDNA-CBS2359_merged"
+bam2="/scratch/ry00555/McEachern/SortedBamFiles/113-12-gDNA-7B520_merged.bam"
+bigwig2="/scratch/ry00555/McEachern/BigWigs/113-12-gDNA-7B520_merged"
+
 ml SAMtools
 ml BWA
- bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+ bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-1-gDNA-CBS2359_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+ bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-12-gDNA-7B520_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam2" -
+
 samtools index "$bam"
+samtools index "$bam2"
+
 ml deepTools
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
- done
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam2" -o "${bigwig2}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
- FILES113="${OUTDIR}/TrimmedReads/113*_merged_trimmed.fq.gz" # Don't forget the *
-
- for f in $FILES113
- do
-     file=${f##*/}
-     name=${file/*_merged_trimmed.fq.gz/}
-     #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
-     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-ml SAMtools
-ml BWA
- bwa mem -M -v 3 -t $THREADS $GENOME $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-samtools index "$bam"
-ml deepTools
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
- done
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
@@ -137,10 +138,11 @@ do
     -RGPU S34 \
     -RGSM "${base_name%.*}"
 done
+CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 
 #mkdir CountTSVs
 ml GATK
- for bam_file in $SORTED_BAM_DIR/*_output.bam
+ for bam_file in ${SORTED_BAM_DIR}/*_output.bam
  do
 #   # Get the base name of the BAM file
    base_name=$(basename "$bam_file" _output.bam)
@@ -153,11 +155,10 @@ samtools index "$input_file"
  -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
  -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
  --interval-merging-rule OVERLAPPING_ONLY \
- -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+ -O ${CountTSVsDIR}/${base_name}.counts.tsv
 
 done
 
-CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 
 # gatk CreateReadCountPanelOfNormals \
 # -I ${CountTSVsDIR}/138-1_Genomic_K1__Rep1_6252.bam_output.bam.counts.tsv \
