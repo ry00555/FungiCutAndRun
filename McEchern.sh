@@ -210,8 +210,8 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.preprocessAndStandardizeSample(SVDDenoisingUtils.java:406)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
-ml R
-ml GATK
+ml R/4.3.1-foss-2022a
+ml GATK/4.3.0.0-GCCcore-11.3.0-Java-11
 for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
 do
 
