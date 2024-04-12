@@ -162,13 +162,13 @@ ml GATK
 
 
 
-gatk CreateReadCountPanelOfNormals \
--I ${CountTSVsDIR}/113-1-gDNA-CBS2359_merged.counts.tsv \
--I ${CountTSVsDIR}/113-12-gDNA-7B520_merged.counts.tsv  \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
--O ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5
+# gatk CreateReadCountPanelOfNormals \
+# -I ${CountTSVsDIR}/113-1-gDNA-CBS2359_merged.counts.tsv \
+# -I ${CountTSVsDIR}/113-12-gDNA-7B520_merged.counts.tsv  \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# -O ${OUTDIR}/PanelofNormals/113_WT_Samples.pon.hdf5
 #
-for count_files in $CountTSVsDIR/138*tsv
+for count_files in $CountTSVsDIR/*.counts.tsv
 do
 
 #   # Get the base name of the counts file
