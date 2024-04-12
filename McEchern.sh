@@ -210,10 +210,11 @@ ml GATK
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.preprocessAndStandardizeSample(SVDDenoisingUtils.java:406)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
-for copy_ratios in ${OUTDIR}/CopyRatios/
+for copy_ratios in ${OUTDIR}/CopyRatios/*.tsv
 do
+
 # # Get the base name of the counts file
-   base_name=$(basename "$copy_ratios")
+   base_name=$(basename "$copy_ratios" .tsv)
 # #   # Define the output file path
 #
  gatk PlotDenoisedCopyRatios \
