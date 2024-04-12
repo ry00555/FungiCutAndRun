@@ -147,7 +147,7 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #   ml SAMtools
 #samtools index "$input_file"
 
-ml GATK
+#ml GATK
 # for bam_file in ${SORTED_BAM_DIR}/*_output.bam; do
 #     # Get the base name of the BAM file
 #     base_name=$(basename "$bam_file" _output.bam)
@@ -211,6 +211,7 @@ ml GATK
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
 #         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
 ml R
+ml GATK
 for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
 do
 
