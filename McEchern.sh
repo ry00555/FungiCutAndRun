@@ -116,7 +116,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam2" -o "${bigwig2}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
 # Set the directory containing the sorted BAM files
-SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
+SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 
 # Iterate over all BAM files in the directory
 #  ml picard
