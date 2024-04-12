@@ -80,7 +80,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
      #mkdir "$OUTDIR/TdfFiles"
 
 
- FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
+ # FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 #
 # # Iterate over the files
 #  for f in $FILES
@@ -98,46 +98,46 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  done
 
-bam="/scratch/ry00555/McEachern/SortedBamFiles/113-1-gDNA-CBS2359_merged.bam"
-bigwig="/scratch/ry00555/McEachern/BigWigs/113-1-gDNA-CBS2359_merged"
-bam2="/scratch/ry00555/McEachern/SortedBamFiles/113-12-gDNA-7B520_merged.bam"
-bigwig2="/scratch/ry00555/McEachern/BigWigs/113-12-gDNA-7B520_merged"
-
-ml SAMtools
-ml BWA
- bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-1-gDNA-CBS2359_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
- bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-12-gDNA-7B520_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam2" -
-
-samtools index "$bam"
-samtools index "$bam2"
-
-ml deepTools
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam2" -o "${bigwig2}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+# bam="/scratch/ry00555/McEachern/SortedBamFiles/113-1-gDNA-CBS2359_merged.bam"
+# bigwig="/scratch/ry00555/McEachern/BigWigs/113-1-gDNA-CBS2359_merged"
+# bam2="/scratch/ry00555/McEachern/SortedBamFiles/113-12-gDNA-7B520_merged.bam"
+# bigwig2="/scratch/ry00555/McEachern/BigWigs/113-12-gDNA-7B520_merged"
+#
+# ml SAMtools
+# ml BWA
+#  bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-1-gDNA-CBS2359_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+#  bwa mem -M -v 3 -t $THREADS $GENOME ${OUTDIR}/TrimmedReads/113-12-gDNA-7B520_merged_trimmed.fq.gz | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam2" -
+#
+# samtools index "$bam"
+# samtools index "$bam2"
+#
+# ml deepTools
+# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam2" -o "${bigwig2}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
 # Set the directory containing the sorted BAM files
 SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
 
 # Iterate over all BAM files in the directory
- ml picard
-for bam_file in $SORTED_BAM_DIR/*.bam
-do
-    # Get the base name of the BAM file
-    base_name=$(basename "$bam_file" .bam)
-
-    # Define the output file path
-    output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
-
-    # Run Picard to add or replace read groups
-    java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-    -I "$bam_file" \
-    -O "$output_file" \
-    -RGID 2 \
-    -RGLB lib1 \
-    -RGPL illumina \
-    -RGPU S34 \
-    -RGSM "${base_name%.*}"
-done
+#  ml picard
+# for bam_file in $SORTED_BAM_DIR/*.bam
+# do
+#     # Get the base name of the BAM file
+#     base_name=$(basename "$bam_file" .bam)
+#
+#     # Define the output file path
+#     output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+#
+#     # Run Picard to add or replace read groups
+#     java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#     -I "$bam_file" \
+#     -O "$output_file" \
+#     -RGID 2 \
+#     -RGLB lib1 \
+#     -RGPL illumina \
+#     -RGPU S34 \
+#     -RGSM "${base_name%.*}"
+# done
 CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 
 #mkdir CountTSVs
