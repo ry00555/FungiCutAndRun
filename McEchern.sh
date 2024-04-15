@@ -25,7 +25,6 @@ OUTDIR="/scratch/ry00555/McEachern/"
 
 
 #Load these modules that are compatible with GATK version 4.3
-#module load BEDOPS/2.4.39-foss-2019b
 
 #ml R/3.6.2-foss-2019b
 # curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > klactis.fasta
@@ -35,12 +34,9 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # module load SAMtools
 # samtools faidx $WorkDir/Genome/klactis.fasta
 # samtools faidx klactis.fasta
-#
-# module load Bowtie2
-#
-# faidx --transform bed klactis.fasta > klactis.bed
-#
- #ml picard
+#module load BEDOPS/2.4.39-foss-2019b
+#gtf2bed < klactis.gtf > klactis.bed
+#ml picard
 #
 # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
 #       -R GCF_000002515.2_ASM251v1_genomic.fna \
@@ -69,27 +65,68 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #        --interval-merging-rule OVERLAPPING_ONLY \
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
 
+
+#4/15/24 Potentially M1-7 are Kluveromyces marxianus so prep genomes just like klactis Reference: https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_001417885.1/
+# curl -s http://ftp.ensemblgenomes.org/pub/fungi/release-58/fasta/fungi_ascomycota1_collection/kluyveromyces_lactis_gca_000002515/dna/Kluyveromyces_lactis_gca_000002515.ASM251v1.dna.toplevel.fa.gz | gunzip -c > klactis.fasta
+# curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/417/885/GCF_001417885.1_Kmar_1.0/GCF_001417885.1_Kmar_1.0_genomic.fna.gz | gunzip -c > Kluyveromycesmarxianus.fna
+# module load SAMtools
+# samtools faidx Kluyveromycesmarxianus.fna
+# curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/001/417/885/GCF_001417885.1_Kmar_1.0/GCF_001417885.1_Kmar_1.0_genomic.gtf.gz | gunzip -c > Kluyveromycesmarxianus.gtf
+# module load BEDOPS/2.4.39-foss-2019b
+# gtf2bed < Kluyveromycesmarxianus.gtf > Kluyveromycesmarxianus.bed --max-mem 10G
+# awk '$8 == "gene"' Kluyveromycesmarxianus.bed > Kluyveromycesmarxianus_genes.bed
+
+# ml picard
+# #
+# java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
+# -R Kluyveromycesmarxianus.fna \
+# -O Kluyveromycesmarxianus.dict
+# #
+# java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
+# -I Kluyveromycesmarxianus_genes.bed \
+# -R Kluyveromycesmarxianus.fna \
+# -SD Kluyveromycesmarxianus.dict \
+# -O Kluyveromycesmarxianus.interval_list
+# #
+# ml GATK
+# #
+# #WGS uses 1000 bp bins
+# gatk PreprocessIntervals \
+# -R Kluyveromycesmarxianus.fna \
+# -L Kluyveromycesmarxianus.interval_list \
+# --interval-merging-rule OVERLAPPING_ONLY \
+# --bin-length 1000 \
+# --padding 0 \
+# -O Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list
+
 #ml Trim_Galore
 #trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
-       # #
-     #
-      # mkdir "${OUTDIR}/SortedBamFiles"
-      # mkdir "${OUTDIR}/BigWigs"
-      # mkdir "${OUTDIR}/Peaks"
-     #mkdir "$OUTDIR/HomerTagDirectories"
-     #mkdir "$OUTDIR/TdfFiles"
+     # #
+   #
+    # mkdir "${OUTDIR}/SortedBamFiles"
+    # mkdir "${OUTDIR}/BigWigs"
+    # mkdir "${OUTDIR}/Peaks"
+   #mkdir "$OUTDIR/HomerTagDirectories"
+   #mkdir "$OUTDIR/TdfFiles"
 
 
- # FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
+# FILES="${OUTDIR}/TrimmedReads/113*_S11_L002_R1_001_trimmed.fq.gz" # Don't forget the *
 #
 # # Iterate over the files
 #  for f in $FILES
 #  do
+
+# for Trimmedreads in ${OUTDIR}/TrimmedReads/113*_S11_L002_R1_001_trimmed.fq.gz
+# do
+#     # Get the base name of the BAM file
+#     base_name=$(basename "$Trimmedreads" _S11_L002_R1_001_trimmed.fq.gz)
+#Example 113-11-gDNA-CBS2Asm-Int3A_S11_L002_R1_001_trimmed.fq.gz
+
+
 #      file=${f##*/}
 #      name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
-#      read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
 #      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-# bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+#bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 # ml SAMtools
 # ml BWA
 #  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
@@ -98,6 +135,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  done
 
+#Command lines for the two 113 wildtype samples
 # bam="/scratch/ry00555/McEachern/SortedBamFiles/113-1-gDNA-CBS2359_merged.bam"
 # bigwig="/scratch/ry00555/McEachern/BigWigs/113-1-gDNA-CBS2359_merged"
 # bam2="/scratch/ry00555/McEachern/SortedBamFiles/113-12-gDNA-7B520_merged.bam"
@@ -115,8 +153,17 @@ OUTDIR="/scratch/ry00555/McEachern/"
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 # bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam2" -o "${bigwig2}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
+
+#Redo all the Run 113 samples
+#ml Trim_Galore
+#trim_galore  --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/Run113/113*fastq\.gz
+# FILES="${OUTDIR}/TrimmedReads/113*.fq.gz" # Don't forget the *
+#need to merge the fastq files after trimming
+#for
+
+#Stop here 4/15/24 I processed the K. marxianus genome and i copied over all of the files
 # Set the directory containing the sorted BAM files
-SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
+#SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 
 # Iterate over all BAM files in the directory
 #  ml picard
@@ -182,36 +229,8 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 # -denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
 #
 # done
-#for some reason even with the new WT panel of normals they don't work just proceed with K samples error is
-#13:25:48.915 INFO  H5 - HDF5 library:
-# 13:25:48.915 INFO  H5 -  successfully loaded.
-# 13:25:48.919 INFO  DenoiseReadCounts - Reading read-counts file (/scratch/ry00555/McEachern/CountTSVs/138-9_Genomic_M6__Rep1_6252_S9_L001_R1_001_val_1.fq.gz.counts.tsv)...
-# 13:25:49.068 WARN  DenoiseReadCounts - Panel of normals was provided; ignoring input GC-content annotations...
-# 13:25:49.084 INFO  SVDDenoisingUtils - Validating sample intervals against original intervals used to build panel of normals...
-# 13:25:49.092 INFO  SVDDenoisingUtils - Preprocessing and standardizing sample read counts...
-# 13:25:49.096 INFO  SVDDenoisingUtils - Preprocessing read counts...
-# 13:25:49.097 INFO  SVDDenoisingUtils - Transforming read counts to fractional coverage...
-# 13:25:49.099 INFO  SVDDenoisingUtils - Performing GC-bias correction...
-# 13:25:49.164 INFO  SVDDenoisingUtils - Subsetting sample intervals to post-filter panel intervals...
-# 13:25:49.193 INFO  SVDDenoisingUtils - Dividing by interval medians from the panel of normals...
-# 13:25:49.194 INFO  SVDDenoisingUtils - Sample read counts preprocessed.
-# 13:25:49.194 INFO  SVDDenoisingUtils - Standardizing read counts...
-# 13:25:49.194 INFO  SVDDenoisingUtils - Dividing by sample medians and transforming to log2 space...
-# 13:25:49.199 INFO  DenoiseReadCounts - Shutting down engine
-# [April 12, 2024 at 1:25:49 PM EDT] org.broadinstitute.hellbender.tools.copynumber.DenoiseReadCounts done. Elapsed time: 0.01 minutes.
-# Runtime.totalMemory()=162267136
-# java.lang.IllegalArgumentException: Sample does not have a positive sample median.
-#         at org.broadinstitute.hellbender.utils.Utils.validateArg(Utils.java:798)
-#         at org.broadinstitute.hellbender.utils.param.ParamUtils.isPositive(ParamUtils.java:165)
-#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.lambda$divideBySampleMedianAndTransformToLog2$27(SVDDenoisingUtils.java:484)
-#         at java.base/java.util.stream.Streams$RangeIntSpliterator.forEachRemaining(Streams.java:104)
-#         at java.base/java.util.stream.IntPipeline$Head.forEach(IntPipeline.java:617)
-#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.divideBySampleMedianAndTransformToLog2(SVDDenoisingUtils.java:483)
-#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.preprocessAndStandardizeSample(SVDDenoisingUtils.java:406)
-#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDDenoisingUtils.denoise(SVDDenoisingUtils.java:123)
-#         at org.broadinstitute.hellbender.tools.copynumber.denoising.SVDReadCountPanelOfNormals.denoise(SVDReadCountPanelOfNormals.java:88)
-#ml R/4.3.1-foss-2022a
-ml R/3.6.2-foss-2019b
+
+#ml R/3.6.2-foss-2019b
 ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
 # for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
 # do
@@ -236,16 +255,17 @@ do
 base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
 
 gatk ModelSegments \
---denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
 --output-prefix ${base_name} \
 -O ${OUTDIR}/ModelSegments
 
 
- gatk PlotModeledSegments \
---denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+gatk PlotModeledSegments \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
 --segments ModelSegments/${base_name}.modelFinal.seg \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-         --point-size-copy-ratio 1 \
-         --output-prefix ${base_name} \
-         -O PlotModelSegments
+       --point-size-copy-ratio 1 \
+       --output-prefix ${base_name} \
+       -O PlotModelSegments
 done
+### map the rest of Ailieen's samples from Run 113 copy all the files
