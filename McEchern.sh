@@ -158,7 +158,7 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #ml Trim_Galore
 #trim_galore  --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/Run113/113*fastq\.gz
 # FILES="${OUTDIR}/TrimmedReads/113*.fq.gz" # Don't forget the *
-#need to merge the fastq files after trimming
+#need to merge the fastq files before trimming so do this cat 113-1* > ../113-1-gDNA-CBS2359_merged.fq.gz in Run113 directory don't do it again for samples 1 and 12
 #for
 
 #Stop here 4/15/24 I processed the K. marxianus genome and i copied over all of the files
