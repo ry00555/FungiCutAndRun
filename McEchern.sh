@@ -213,20 +213,39 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #ml R/4.3.1-foss-2022a
 ml R/3.6.2-foss-2019b
 ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
-for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
+# for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
+# do
+#
+# # # Get the base name of the counts file
+#    base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+# # #   # Define the output file path
+# #
+#  gatk PlotDenoisedCopyRatios \
+#  --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
+#  --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+#  --point-size-copy-ratio 1 \
+#  --output-prefix ${base_name} \
+#  --output ${OUTDIR}/PlotDenoisedCopyRatios
+#  done
+# #on local machine
+#  scp -r ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/McEachern/PlotDenoisedCopyRatios /Users/rochelleyap/Desktop/McEchernBigWigs
+for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
 do
 
-# # Get the base name of the counts file
-   base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
-# #   # Define the output file path
-#
- gatk PlotDenoisedCopyRatios \
- --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
- --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
- --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
- --point-size-copy-ratio 1 \
- --output-prefix ${base_name} \
- --output ${OUTDIR}/PlotDenoisedCopyRatios
- done
-#on local machine
- scp -r ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/McEachern/PlotDenoisedCopyRatios /Users/rochelleyap/Desktop/McEchernBigWigs
+base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+
+gatk ModelSegments \
+--denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+--output-prefix ${base_name} \
+-O ${OUTDIR}/ModelSegments
+
+
+ gatk PlotModeledSegments \
+--denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+--segments ModelSegments/${base_name}.modelFinal.seg \
+--sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+         --point-size-copy-ratio 1 \
+         --output-prefix ${base_name} \
+         -O PlotModelSegments
+done
