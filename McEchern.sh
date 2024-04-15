@@ -230,7 +230,7 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 #
 # done
 
-#ml R/3.6.2-foss-2019b
+ml R/3.6.2-foss-2019b
 ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
 # for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
 # do
