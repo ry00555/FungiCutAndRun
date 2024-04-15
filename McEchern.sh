@@ -262,10 +262,10 @@ gatk ModelSegments \
 
 gatk PlotModeledSegments \
 --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
---segments ModelSegments/${base_name}.modelFinal.seg \
+--segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
        --point-size-copy-ratio 1 \
        --output-prefix ${base_name} \
-       -O PlotModelSegments
+       -O ${OUTDIR}/PlotModelSegments
 done
 ### map the rest of Ailieen's samples from Run 113 copy all the files
