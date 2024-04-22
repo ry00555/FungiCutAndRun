@@ -68,78 +68,78 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #       -L klactis_preprocessed1000_intervals.interval_list \
 #        --interval-merging-rule OVERLAPPING_ONLY \
 #        -O GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv
-
-ml Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
-       # #
-     #
-      # mkdir "${OUTDIR}/SortedBamFiles"
-      # mkdir "${OUTDIR}/BigWigs"
-      # mkdir "${OUTDIR}/Peaks"
-     #mkdir "$OUTDIR/HomerTagDirectories"
-     #mkdir "$OUTDIR/TdfFiles"
-
-
- FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
 #
-# # Iterate over the files
- for f in $FILES
- do
-     file=${f##*/}
-     name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
-     read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
-     bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-#bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-ml SAMtools
-ml BWA
- bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-samtools index "$bam"
-ml deepTools
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
- done
-
-# Set the directory containing the sorted BAM files
-SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
-
-# Iterate over all BAM files in the directory
- ml picard
-for bam_file in $SORTED_BAM_DIR/*.bam
-do
-    # Get the base name of the BAM file
-    base_name=$(basename "$bam_file" .bam)
-
-    # Define the output file path
-    output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
-
-    # Run Picard to add or replace read groups
-    java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-    -I "$bam_file" \
-    -O "$output_file" \
-    -RGID 2 \
-    -RGLB lib1 \
-    -RGPL illumina \
-    -RGPU S34 \
-    -RGSM "${base_name%.*}"
-done
-
-#mkdir CountTSVs
-ml GATK
- for bam_file in $SORTED_BAM_DIR/*_output.bam
- do
-#   # Get the base name of the BAM file
-   base_name=$(basename "$bam_file" _output.bam)
-#   # Define the output file path
-   input_file="${SORTED_BAM_DIR}/${base_name}"
-samtools index "$input_file"
+# ml Trim_Galore
+# trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/113*fastq\.gz
+#        # #
+#      #
+#       # mkdir "${OUTDIR}/SortedBamFiles"
+#       # mkdir "${OUTDIR}/BigWigs"
+#       # mkdir "${OUTDIR}/Peaks"
+#      #mkdir "$OUTDIR/HomerTagDirectories"
+#      #mkdir "$OUTDIR/TdfFiles"
 #
- gatk CollectReadCounts \
- -I "$input_file" \
- -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
- -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
- --interval-merging-rule OVERLAPPING_ONLY \
- -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
-
-done
+#
+#  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1.fq.gz" # Don't forget the *
+# #
+# # # Iterate over the files
+#  for f in $FILES
+#  do
+#      file=${f##*/}
+#      name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
+#      read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
+#      bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+# #bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+# ml SAMtools
+# ml BWA
+#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+# samtools index "$bam"
+# ml deepTools
+# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#  done
+#
+# # Set the directory containing the sorted BAM files
+# SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles/"
+#
+# # Iterate over all BAM files in the directory
+#  ml picard
+# for bam_file in $SORTED_BAM_DIR/*.bam
+# do
+#     # Get the base name of the BAM file
+#     base_name=$(basename "$bam_file" .bam)
+#
+#     # Define the output file path
+#     output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+#
+#     # Run Picard to add or replace read groups
+#     java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#     -I "$bam_file" \
+#     -O "$output_file" \
+#     -RGID 2 \
+#     -RGLB lib1 \
+#     -RGPL illumina \
+#     -RGPU S34 \
+#     -RGSM "${base_name%.*}"
+# done
+#
+# #mkdir CountTSVs
+# ml GATK
+#  for bam_file in $SORTED_BAM_DIR/*_output.bam
+#  do
+# #   # Get the base name of the BAM file
+#    base_name=$(basename "$bam_file" _output.bam)
+# #   # Define the output file path
+#    input_file="${SORTED_BAM_DIR}/${base_name}"
+# samtools index "$input_file"
+# #
+#  gatk CollectReadCounts \
+#  -I "$input_file" \
+#  -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+#  -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+#  --interval-merging-rule OVERLAPPING_ONLY \
+#  -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+#
+# done
 
 CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 
@@ -166,18 +166,21 @@ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs/"
 #
 # done
 #
-# for copy_ratios in ${OUTDIR}/CopyRatios/
-# do
+
+ml R/3.6.2-foss-2019b
+ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+for copy_ratios in ${OUTDIR}/CopyRatios/
+do
 # # Get the base name of the counts file
-#    base_name=$(basename "$copy_ratios")
-# #   # Define the output file path
+    base_name=$(basename "$copy_ratios")
+ #   # Define the output file path
 # input_file="${OUTDIR}/CopyRatios/${base_name}"
 #
-# gatk PlotDenoisedCopyRatios \
-# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
-# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-# --point-size-copy-ratio 1 \
-# --output-prefix ${base_name} \
-# --output ${OUTDIR}/PlotDenoisedCopyRatios
-# done
+ gatk PlotDenoisedCopyRatios \
+ --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
+ --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+ --point-size-copy-ratio 1 \
+ --output-prefix ${base_name} \
+ --output ${OUTDIR}/PlotDenoisedCopyRatios
+ done
