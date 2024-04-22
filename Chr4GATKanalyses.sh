@@ -12,7 +12,7 @@
 cd $SLURM_SUBMIT_DIR
 Working Directory = /home/ry00555/Bioinformatics/CrassaGenome
  scp -r ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/Bioinformatics/GATK/GATK109Bam /Users/ry00555/Desktop/BamFiles/Run109mus30mei3V2/GATKBamFiles
- 
+
 #Load these modules that are compatible with GATK version 4.3
 ml GATK/4.3.0.0-GCCcore-8.3.0-Java-1.8
 ml picard/2.27.4-Java-13.0.2
