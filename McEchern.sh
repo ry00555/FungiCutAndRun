@@ -141,14 +141,14 @@ OUTDIR="/scratch/ry00555/McEachern/"
 #ml Trim_Galore
 #trim_galore  --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads 113*merged.fastq.gz
 #trim_galore  --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/TrimmedReads /scratch/ry00555/McEachern/FastQ/Run113/113*fastq\.gz
-FILES="${OUTDIR}/TrimmedReads/113*merged.fq.gz" # Don't forget the *
+FILES="${OUTDIR}/TrimmedReads/113*_merged_trimmed.fq.gz" # Don't forget the *
 
 #need to merge the fastq files after trimming	#need to merge the fastq files before trimming so do this cat 113-1* > ../113-1-gDNA-CBS2359_merged.fq.gz in Run113 directory don't do it again for samples 1 and 12
 
 for f in $FILES
 do
-file=${f##*/}
-name=${file/%_S[1-12]*merged.fq.gz/}
+
+name=$(basename "$f" _merged_trimmed.fq.gz)
 bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
@@ -167,10 +167,10 @@ done
 # for bam_file in $SORTED_BAM_DIR/113*.bam
 # do
 # #     # Get the base name of the BAM file
-#      base_name=$(basename "$bam_file" .bam)
+ base_name=$(basename "$bam_file" .bam)
 # #
 # #     # Define the output file path
-#      output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+# output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
 # #
 # #     # Run Picard to add or replace read groups
 #      java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
