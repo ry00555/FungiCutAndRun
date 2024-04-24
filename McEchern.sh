@@ -184,24 +184,24 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 #   done
 # #
 # # #mkdir CountTSVs
-  ml GATK
-  OUTPUTBAM="$SORTED_BAM_DIR/113*_output.bam"
-   for bam_file in $OUTPUTBAM
-   do
-# # #   # Get the base name of the BAM file
-     base_name=$(basename "$bam_file" _output.bam)
-# # #   # Define the output file path
-#ml SAMtools
-#  samtools index "$SORTED_BAM_DIR/113*_output.bam"
-# # #
-  gatk CollectReadCounts \
-   -I "$bam_file" \
-   -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
-   -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
-   --interval-merging-rule OVERLAPPING_ONLY \
-   -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
-#
-  done
+#   ml GATK
+#   OUTPUTBAM="$SORTED_BAM_DIR/113*_output.bam"
+#    for bam_file in $OUTPUTBAM
+#    do
+# # # #   # Get the base name of the BAM file
+#      base_name=$(basename "$bam_file" _output.bam)
+# # # #   # Define the output file path
+# #ml SAMtools
+# #  samtools index "$SORTED_BAM_DIR/113*_output.bam"
+# # # #
+#   gatk CollectReadCounts \
+#    -I "$bam_file" \
+#    -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+#    -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+#    --interval-merging-rule OVERLAPPING_ONLY \
+#    -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+# #
+#   done
 #
  CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 # #
@@ -216,9 +216,8 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 # Get the base name of the counts file
         base_name=$(basename "$count_files" .counts.tsv)
    # Define the output file path
-    input_file="${CountTSVsDIR}/${base_name}"
    gatk DenoiseReadCounts \
-   -I "$input_file" \
+   -I "$count_files" \
    --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
  --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
    --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
@@ -232,8 +231,6 @@ do
 #Get the base name of the counts file
 base_name=$(basename "$copy_ratios")
 # Define the output file path
-input_file="${OUTDIR}/CopyRatios/${base_name}"
-#
 gatk PlotDenoisedCopyRatios \
 --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
 --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
@@ -243,42 +240,61 @@ gatk PlotDenoisedCopyRatios \
 --output ${OUTDIR}/PlotDenoisedCopyRatios
 done
 
-#   for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
-#   do
+ for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
+do
 #
-#   base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+ base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
 #
-#   gatk ModelSegments \
-#   --denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
-#   --output-prefix ${base_name} \
-#   -O ${OUTDIR}/ModelSegments
-#   gatk PlotModeledSegments \
-#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
-#   --segments ModelSegments/${base_name}.modelFinal.seg \
-#   --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-#          --point-size-copy-ratio 1 \
-#          --output-prefix ${base_name} \
-#  -O ${OUTDIR}/PlotModelSegments
-#   done
-# #
-# #
+gatk ModelSegments \
+ --denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+--output-prefix ${base_name} \
+ -O ${OUTDIR}/ModelSegments
+ gatk PlotModeledSegments \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+--segments ModelSegments/${base_name}.modelFinal.seg \
+--sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+ --point-size-copy-ratio 1 \
+  --output-prefix ${base_name} \
+ -O ${OUTDIR}/PlotModelSegments
+ done
+
 # #  #Do the script for the Km samples
-#   for bam_file in $SORTED_BAM_DIR/*_output.bam
-#  do
+ KM="${OUTDIR}/TrimmedReads/138*M[1-7]*R1_001_val_1.fq.gz" # Don't forget the *
+
+for f in $KM
+do
+#
+       file=${f##*/}
+       name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
+       read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
+
+bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+ml SAMtools
+ml BWA
+bwa mem -M -v 3 -t $THREADS $GENOME $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
+ml deepTools
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+done
+
+
+ for bam_file in $SORTED_BAM_DIR/138*_output.bam
+do
 #      # Check if the file name contains M1-M7
-#      if [[ "$bam_file" == *M1* || "$bam_file" == *M2* || "$bam_file" == *M3* || "$bam_file" == *M4* || "$bam_file" == *M5* || "$bam_file" == *M6* || "$bam_file" == *M7* ]]; then
+ if [[ "$bam_file" == *M1* || "$bam_file" == *M2* || "$bam_file" == *M3* || "$bam_file" == *M4* || "$bam_file" == *M5* || "$bam_file" == *M6* || "$bam_file" == *M7* ]]; then
 #          # Get the base name of the BAM file
-#          base_name=$(basename "$bam_file" _output.bam)
+base_name=$(basename "$bam_file" _output.bam)
 # #         # Define the output file path
-#          input_file="${SORTED_BAM_DIR}/${base_name}"
-# ml SAMtools
-#          samtools index "$input_file"
-# ml GATK
-#         gatk CollectReadCounts \
-#              -I "$input_file" \
-#        -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-#            -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-#              --interval-merging-rule OVERLAPPING_ONLY \
-#              -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
-#      fi
-#  done
+input_file="${SORTED_BAM_DIR}/${base_name}"
+ ml SAMtools
+       samtools index "$bam_file"
+ml GATK
+gatk CollectReadCounts \
+-I "$input_file" \
+-R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+-L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+ --interval-merging-rule OVERLAPPING_ONLY \
+-O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+fi
+done
