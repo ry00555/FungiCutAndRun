@@ -12,7 +12,7 @@
 cd $SLURM_SUBMIT_DIR
 
 #Make output directory
-OUTDIR="/scratch/ry00555/McEachern/"
+OUTDIR="/scratch/ry00555/McEachern"
 
 
 # mkdir TrimmedReads
@@ -270,41 +270,42 @@ OUTDIR="/scratch/ry00555/McEachern/"
 
 source config.txt
 
-FILES="${OUTDIR}/KmTrimmedReads/*_R1_001_val_1.fq.gz" # Don't forget the *
+FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 
 
 # # Iterate over the files
+ for f in $FILES
+ do
+  file=${f##*/}
+   name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
+#
+   read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
+   bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
+   bigwig="${OUTDIR}/KmBigWigs/${name}"
+  ml SAMtools/0.1.20-GCC-11.2.0
+   ml BWA/0.7.17-GCCcore-12.2.0
+   bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
+   samtools index "$bam"
+   ml deepTools/3.5.2-foss-2022a
+   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ done
+
+
 # for f in $FILES
 # do
-#  file=${f##*/}
-#   name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+# #
+#  name=$(basename "$f" _R1_001_val_1.fq.gz)
+#  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #
-#   read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-#   bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
-#   bigwig="${OUTDIR}/KmBigWigs/${name}"
-#   ml SAMtools/0.1.20-GCC-11.2.0
-#   ml BWA/0.7.17-GCCcore-12.2.0
-#   bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
-#   samtools index "$bam"
-#   ml deepTools/3.5.2-foss-2022a
-#   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-# done
-
-for f in $FILES
-do
-#
- name=$(basename "$f" _R1_001_val_1.fq.gz)
- read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-
- bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
- bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
- ml SAMtools
- ml BWA
- bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-samtools index "$bam"
- ml deepTools
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
- done
+#  bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
+#  bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
+#  ml SAMtools
+#  ml BWA
+#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+# samtools index "$bam"
+#  ml deepTools
+#  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#  done
 
 # SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
