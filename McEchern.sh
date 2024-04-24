@@ -226,16 +226,16 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 
  ml R/3.6.2-foss-2019b
  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- standardizedCR="${OUTDIR}/CopyRatios/113*.standardizedCR.tsv"
- Denoised="${OUTDIR}/CopyRatios/113*.denoisedCR.tsv"
+standardizedCR="${OUTDIR}/CopyRatios/113*.standardizedCR.tsv"
+Denoised="${OUTDIR}/CopyRatios/113*.denoisedCR.tsv"
  for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
 do
 #Get the base name of the counts file
 base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
 # Define the output file path
 gatk PlotDenoisedCopyRatios \
---standardized-copy-ratios $standardizedCR \
---denoised-copy-ratios $Denoised \
+--standardized-copy-ratios ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
@@ -265,8 +265,10 @@ KM="${OUTDIR}/TrimmedReads/138*M[1-7]*L001_R1_001_val_1.fq.gz" # Don't forget th
 
 for f in $KM
 do
-  file=${f##*/}
-name=${file/%_S[1-9][0-9]*_L001_R1_001_val_1.fq.gz/}
+  #file=${f##*/}
+#name=${file/%_S[1-9][0-9]*_L001_R1_001_val_1.fq.gz/}
+name=${f/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
+
 #Extracts the name part
 read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')  # Modifies the R1 file to R2
 bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
@@ -275,8 +277,8 @@ ml SAMtools
 ml BWA
 bwa mem -M -v 3 -t $THREADS $Kluyveromycesmarxianus $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
-ml deepTools
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#ml deepTools
+#bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 done
 
 
