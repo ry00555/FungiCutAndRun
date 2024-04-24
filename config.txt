@@ -20,7 +20,7 @@ OutputFolderName="/scratch/ry00555/McEachern/"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
-GENOME="/scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna"
+#GENOME="/scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna"
 Kluyveromycesmarxianus="/scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna"
 #GENOME="path/to/IndexedGenomeFile"
 
