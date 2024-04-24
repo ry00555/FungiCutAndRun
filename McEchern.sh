@@ -184,7 +184,7 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 #   done
 # #
 # # #mkdir CountTSVs
-#   ml GATK
+ml GATK
 #   OUTPUTBAM="$SORTED_BAM_DIR/113*_output.bam"
 #    for bam_file in $OUTPUTBAM
 #    do
