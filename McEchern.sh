@@ -225,11 +225,17 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 
 ml R/3.6.2-foss-2019b
  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
- do
-# #Get the base name of the counts file
- base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
- Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+ for copy_ratios in "${OUTDIR}/CopyRatios/113"*.standardizedCR.tsv; do
+     # Get the base name of the counts file
+     base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+     Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+
+
+#  for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
+#  do
+# # #Get the base name of the counts file
+#  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+#  Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
 
 # # Define the output file path
  gatk PlotDenoisedCopyRatios \
@@ -241,24 +247,24 @@ ml R/3.6.2-foss-2019b
 --output ${OUTDIR}/PlotDenoisedCopyRatios
 done
 
-for copy_ratios in ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv
- do
-# #
- base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
-# #
-# gatk ModelSegments \
-#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
-#  --output-prefix ${base_name} \
-#   -O ${OUTDIR}/ModelSegments
-
-  gatk PlotModeledSegments \
- --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
- --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
- --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-  --point-size-copy-ratio 1 \
-   --output-prefix ${base_name} \
-  -O ${OUTDIR}/PlotModelSegments
-  done
+# for copy_ratios in ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv
+#  do
+# # #
+#  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+# # #
+# # gatk ModelSegments \
+# #   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+# #  --output-prefix ${base_name} \
+# #   -O ${OUTDIR}/ModelSegments
+#
+#   gatk PlotModeledSegments \
+#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+#  --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+#  --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+#   --point-size-copy-ratio 1 \
+#    --output-prefix ${base_name} \
+#   -O ${OUTDIR}/PlotModelSegments
+#   done
 source config.txt
 # #  #Do the script for the Km samples Move the M samples to a different directory to make it easier
 FILES="${OUTDIR}/KmTrimmedReads/*_R1_001_val_1.fq.gz" # Don't forget the *
@@ -281,7 +287,7 @@ do
   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 done
 
-# SORTED_BAM_DIR2="/scratch/ry00555/McEachern/SortedBamFiles"
+# SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
 # for bam_file in $SORTED_BAM_DIR2/*_output.bam
 # do
