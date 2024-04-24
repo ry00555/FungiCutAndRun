@@ -210,36 +210,36 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 # # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
 # # #
- for count_files in $CountTSVsDIR/113*.counts.tsv
-  do
-# # # Get the base name of the counts file
-base_name=$(basename "$count_files" .counts.tsv)
-# #    # Define the output file path
-gatk DenoiseReadCounts \
- -I "$count_files" \
---annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
---count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-done
-
-#  ml R/3.6.2-foss-2019b
-#  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
-# standardizedCR="${OUTDIR}/CopyRatios/113*.standardizedCR.tsv"
-# Denoised="${OUTDIR}/CopyRatios/113*.denoisedCR.tsv"
-#  for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
-# do
-# #Get the base name of the counts file
-# base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
-# # Define the output file path
-# gatk PlotDenoisedCopyRatios \
-# --standardized-copy-ratios ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv \
-# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-# --point-size-copy-ratio 1 \
-# --output-prefix ${base_name} \
-# --output ${OUTDIR}/PlotDenoisedCopyRatios
+#  for count_files in $CountTSVsDIR/113*.counts.tsv
+#   do
+# # # # Get the base name of the counts file
+# base_name=$(basename "$count_files" .counts.tsv)
+# # #    # Define the output file path
+# gatk DenoiseReadCounts \
+#  -I "$count_files" \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
 # done
+
+ml R/3.6.2-foss-2019b
+ ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+ standardizedCR="${OUTDIR}/CopyRatios/113*.standardizedCR.tsv"
+ Denoised="${OUTDIR}/CopyRatios/113*.denoisedCR.tsv"
+ for copy_ratios in ${OUTDIR}/CopyRatios/113*.tsv
+ do
+# #Get the base name of the counts file
+ base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+# # Define the output file path
+ gatk PlotDenoisedCopyRatios \
+ --standardized-copy-ratios ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv \
+--sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+--point-size-copy-ratio 1 \
+--output-prefix ${base_name} \
+--output ${OUTDIR}/PlotDenoisedCopyRatios
+done
 
 #  for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
 # do
@@ -279,13 +279,14 @@ bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools
 samtools index "$bam"
 ml deepTools
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+fi
 done
 
 
 #  for bam_file in $SORTED_BAM_DIR/138*_output.bam
 # do
 # #      # Check if the file name contains M1-M7
-if [[ "$bam_file" == *M1* || "$bam_file" == *M2* || "$bam_file" == *M3* || "$bam_file" == *M4* || "$bam_file" == *M5* || "$bam_file" == *M6* || "$bam_file" == *M7* ]]; then
+#if [[ "$bam_file" == *M1* || "$bam_file" == *M2* || "$bam_file" == *M3* || "$bam_file" == *M4* || "$bam_file" == *M5* || "$bam_file" == *M6* || "$bam_file" == *M7* ]]; then
 # #          # Get the base name of the BAM file
 # base_name=$(basename "$bam_file" _output.bam)
 # # #         # Define the output file path
