@@ -225,11 +225,11 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 
 ml R/3.6.2-foss-2019b
  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- for copy_ratios in ${OUTDIR}/CopyRatios/113*.tsv
+ for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
  do
 # #Get the base name of the counts file
  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
- Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+ Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
 
 # # Define the output file path
  gatk PlotDenoisedCopyRatios \
@@ -241,37 +241,41 @@ ml R/3.6.2-foss-2019b
 --output ${OUTDIR}/PlotDenoisedCopyRatios
 done
 
-#  for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
-# do
+for copy_ratios in ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv
+ do
 # #
-#  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+ base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
 # #
-# gatk ModelSegments \
-#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
-# --output-prefix ${base_name} \
-#  -O ${OUTDIR}/ModelSegments
-#  gatk PlotModeledSegments \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
-# --segments ModelSegments/${base_name}.modelFinal.seg \
-# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-#  --point-size-copy-ratio 1 \
-#   --output-prefix ${base_name} \
-#  -O ${OUTDIR}/PlotModelSegments
-#  done
+gatk ModelSegments \
+  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+ --output-prefix ${base_name} \
+  -O ${OUTDIR}/ModelSegments
+  gatk PlotModeledSegments \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+ --segments ModelSegments/${base_name}.modelFinal.seg \
+ --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+  --point-size-copy-ratio 1 \
+   --output-prefix ${base_name} \
+  -O ${OUTDIR}/PlotModelSegments
+  done
 source config.txt
 # #  #Do the script for the Km samples Move the M samples to a different directory to make it easier
 FILES="${OUTDIR}/KmTrimmedReads/*L001_R1_001_val_1.fq.gz" # Don't forget the *
 
 
 # Iterate over the files
+ml SAMtools
+ml BWA
+ml deepTools
+
 for f in $FILES
 do
  file=${f##*/}
   name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
   read2=$(echo "$f" | sed 's/L001_R1_001_val_1\.fq\.gz/L001_R2_001_val_2\.fq\.gz/g')
-  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
-  bigwig="${OUTDIR}/BigWigs/${name}"
+  bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
+  bigwig="${OUTDIR}/KmBigWigs/${name}"
 
   bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
   samtools index "$bam"
