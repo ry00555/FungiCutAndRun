@@ -211,19 +211,20 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 # # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
 # # #
-   for count_files in $CountTSVsDIR/113*counts.tsv
-   do
-# Get the base name of the counts file
-        base_name=$(basename "$count_files" .counts.tsv)
-   # Define the output file path
-   gatk DenoiseReadCounts \
-   -I "$count_files" \
-   --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
- --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
-   --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
- --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-
+  for count_files in $CountTSVsDIR/113*counts.tsv
+  do
+# # Get the base name of the counts file
+     base_name=$(basename "$count_files" .counts.tsv)
+#    # Define the output file path
+ gatk DenoiseReadCounts \
+ -I "$count_files" \
+ --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+--count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+--standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+#
 done
+
  ml R/3.6.2-foss-2019b
  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
  for copy_ratios in ${OUTDIR}/CopyRatios/
@@ -272,7 +273,7 @@ bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
 ml BWA
-bwa mem -M -v 3 -t $THREADS $GENOME $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $Kluyveromycesmarxianus $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 ml deepTools
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
@@ -291,7 +292,7 @@ input_file="${SORTED_BAM_DIR}/${base_name}"
        samtools index "$bam_file"
 ml GATK
 gatk CollectReadCounts \
--I "$input_file" \
+-I "$bam_file" \
 -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
 -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
  --interval-merging-rule OVERLAPPING_ONLY \
