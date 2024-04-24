@@ -234,7 +234,7 @@ ml R/3.6.2-foss-2019b
 # # Define the output file path
  gatk PlotDenoisedCopyRatios \
  --standardized-copy-ratios "$copy_ratios" \
---denoised-copy-ratios "$Denoised" \
+--denoised-copy-ratios "${OUTDIR}/CopyRatios/$Denoised" \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
@@ -246,13 +246,14 @@ for copy_ratios in ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv
 # #
  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
 # #
-gatk ModelSegments \
-  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
- --output-prefix ${base_name} \
-  -O ${OUTDIR}/ModelSegments
+# gatk ModelSegments \
+#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+#  --output-prefix ${base_name} \
+#   -O ${OUTDIR}/ModelSegments
+
   gatk PlotModeledSegments \
  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
- --segments ModelSegments/${base_name}.modelFinal.seg \
+ --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
  --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
   --point-size-copy-ratio 1 \
    --output-prefix ${base_name} \
@@ -260,45 +261,53 @@ gatk ModelSegments \
   done
 source config.txt
 # #  #Do the script for the Km samples Move the M samples to a different directory to make it easier
-FILES="${OUTDIR}/KmTrimmedReads/*L001_R1_001_val_1.fq.gz" # Don't forget the *
+FILES="${OUTDIR}/KmTrimmedReads/*_R1_001_val_1.fq.gz" # Don't forget the *
 
 
 # Iterate over the files
-ml SAMtools
-ml BWA
-ml deepTools
-
 for f in $FILES
 do
  file=${f##*/}
   name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 
-  read2=$(echo "$f" | sed 's/L001_R1_001_val_1\.fq\.gz/L001_R2_001_val_2\.fq\.gz/g')
+  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
   bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
   bigwig="${OUTDIR}/KmBigWigs/${name}"
-
-  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  ml SAMtools
+  ml BWA
+  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
   samtools index "$bam"
+  ml deepTools
   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 done
 
-
-#  for bam_file in $SORTED_BAM_DIR/138*_output.bam
+# SORTED_BAM_DIR2="/scratch/ry00555/McEachern/SortedBamFiles"
+#
+# for bam_file in $SORTED_BAM_DIR2/*_output.bam
 # do
-# #      # Check if the file name contains M1-M7
-#if [[ "$bam_file" == *M1* || "$bam_file" == *M2* || "$bam_file" == *M3* || "$bam_file" == *M4* || "$bam_file" == *M5* || "$bam_file" == *M6* || "$bam_file" == *M7* ]]; then
-# #          # Get the base name of the BAM file
+# # #          # Get the base name of the BAM file
 # base_name=$(basename "$bam_file" _output.bam)
-# # #         # Define the output file path
-# input_file="${SORTED_BAM_DIR}/${base_name}"
+# # # #         # Define the output file path
 #  ml SAMtools
-#        samtools index "$bam_file"
+#  samtools index "$bam_file"
 # ml GATK
-# gatk CollectReadCounts \
+#  gatk CollectReadCounts \
 # -I "$bam_file" \
-# -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-# -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-#  --interval-merging-rule OVERLAPPING_ONLY \
-# -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
-# fi
+#  -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+#  -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+#   --interval-merging-rule OVERLAPPING_ONLY \
+#  -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
+# done
+#
+# KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
+# for count_files in $KmCounts/*.counts.tsv
+#    do
+# # # # # Get the base name of the counts file
+#  base_name=$(basename "$count_files" .counts.tsv)
+# # # #    # Define the output file path
+#  gatk DenoiseReadCounts \
+#   -I "$count_files" \
+#  --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
 # done
