@@ -211,30 +211,32 @@ ml GATK
 # # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
 # # #
-  for count_files in $CountTSVsDIR/113*counts.tsv
-  do
-# # Get the base name of the counts file
-     base_name=$(basename "$count_files" .counts.tsv)
-#    # Define the output file path
- gatk DenoiseReadCounts \
- -I "$count_files" \
- --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
---count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-#
-done
+#   for count_files in $CountTSVsDIR/113*counts.tsv
+#   do
+# # # Get the base name of the counts file
+#      base_name=$(basename "$count_files" .counts.tsv)
+# #    # Define the output file path
+#  gatk DenoiseReadCounts \
+#  -I "$count_files" \
+#  --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+# #
+# done
 
  ml R/3.6.2-foss-2019b
  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- for copy_ratios in ${OUTDIR}/CopyRatios/
+ standardizedCR="${OUTDIR}/CopyRatios/113*.standardizedCR.tsv"
+ Denoised="${OUTDIR}/CopyRatios/113*.denoisedCR.tsv"
+ for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
 do
 #Get the base name of the counts file
-base_name=$(basename "$copy_ratios")
+base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
 # Define the output file path
 gatk PlotDenoisedCopyRatios \
---standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
+--standardized-copy-ratios $standardizedCR \
+--denoised-copy-ratios $Denoised  \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
@@ -247,7 +249,7 @@ do
  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
 #
 gatk ModelSegments \
- --denoised-copy-ratios CopyRatios/${base_name}.denoisedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
 --output-prefix ${base_name} \
  -O ${OUTDIR}/ModelSegments
  gatk PlotModeledSegments \
@@ -260,20 +262,20 @@ gatk ModelSegments \
  done
 
 # #  #Do the script for the Km samples
- KM="${OUTDIR}/TrimmedReads/138*M[1-7]*R1_001_val_1.fq.gz" # Don't forget the *
+ KM="${OUTDIR}/TrimmedReads/138*M[1-7]*L001_R1_001_val_1.fq.gz" # Don't forget the *
 
 for f in $KM
 do
-#
-       file=${f##*/}
-       name=${file/%_S[1-12]*R1_001_val_1.fq.gz/}
-       read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')
+  file=${f##*/}
+
+name=$(echo "$file" | sed 's/_S[1-9][0-9]*_L001_R1_001_val_1.fq.gz//')  # Extracts the name part
+    read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R1_001_val_2\.fq\.gz/g')  # Modifies the R1 file to R2
 
 bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
 bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
 ml SAMtools
 ml BWA
-bwa mem -M -v 3 -t $THREADS $Kluyveromycesmarxianus $f | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $Kluyveromycesmarxianus $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 ml deepTools
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
