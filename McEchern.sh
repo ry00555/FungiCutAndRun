@@ -223,12 +223,12 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
 # --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
 # done
 
-ml R/3.6.2-foss-2019b
- ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- for copy_ratios in "${OUTDIR}/CopyRatios/113"*.standardizedCR.tsv; do
-     # Get the base name of the counts file
-     base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
-     Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+# ml R/3.6.2-foss-2019b
+#  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+#  for copy_ratios in "${OUTDIR}/CopyRatios/113"*.standardizedCR.tsv; do
+#      # Get the base name of the counts file
+#      base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+#      Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
 
 
 #  for copy_ratios in ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv
@@ -238,14 +238,14 @@ ml R/3.6.2-foss-2019b
 #  Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
 
 # # Define the output file path
- gatk PlotDenoisedCopyRatios \
- --standardized-copy-ratios "$copy_ratios" \
---denoised-copy-ratios "${OUTDIR}/CopyRatios/$Denoised" \
---sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
---point-size-copy-ratio 1 \
---output-prefix ${base_name} \
---output ${OUTDIR}/PlotDenoisedCopyRatios
-done
+#  gatk PlotDenoisedCopyRatios \
+#  --standardized-copy-ratios "$copy_ratios" \
+# --denoised-copy-ratios "${OUTDIR}/CopyRatios/$Denoised" \
+# --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+# --point-size-copy-ratio 1 \
+# --output-prefix ${base_name} \
+# --output ${OUTDIR}/PlotDenoisedCopyRatios
+# done
 
 # for copy_ratios in ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv
 #  do
