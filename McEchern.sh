@@ -192,8 +192,8 @@ SORTED_BAM_DIR="/scratch/ry00555/McEachern/SortedBamFiles"
      base_name=$(basename "$bam_file" _output.bam)
 # # #   # Define the output file path
      input_file="${SORTED_BAM_DIR}/${base_name}"
-ml SAMtools
-  samtools index "$input_file"
+#ml SAMtools
+#  samtools index "$SORTED_BAM_DIR/113*_output.bam"
 # # #
   gatk CollectReadCounts \
    -I "$input_file" \
@@ -204,7 +204,7 @@ ml SAMtools
 #
   done
 #
-# CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
+ CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 # #
 # # # gatk CreateReadCountPanelOfNormals \
 # # # -I ${CountTSVsDIR}/113-1-gDNA-CBS2359_merged.counts.tsv \
@@ -212,41 +212,38 @@ ml SAMtools
 # # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
 # # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
 # # #
-#   for count_files in $CountTSVsDIR/113*tsv
-#   do
-# # #
-# # #   # Get the base name of the counts file
-#        base_name=$(basename "$count_files" .counts.tsv)
-# # #  #   # Define the output file path
-#     input_file="${CountTSVsDIR}/${base_name}"
-#   gatk DenoiseReadCounts \
-#   -I "$input_file" \
-#   --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
-#   --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
-#   --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
-#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-# # #
-#  done
-# # #
-# #
-# ml R/3.6.2-foss-2019b
-#  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
-#  for copy_ratios in ${OUTDIR}/CopyRatios/
-#  do
-#  # # Get the base name of the counts file
-#      base_name=$(basename "$copy_ratios")
-# #  #   # Define the output file path
-# input_file="${OUTDIR}/CopyRatios/${base_name}"
-# # #
-#   gatk PlotDenoisedCopyRatios \
-#   --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
-#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
-#     --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
-#  --point-size-copy-ratio 1 \
-#   --output-prefix ${base_name} \
-#   --output ${OUTDIR}/PlotDenoisedCopyRatios
-#   done
-# #
+   for count_files in $CountTSVsDIR/113*counts.tsv
+   do
+# Get the base name of the counts file
+        base_name=$(basename "$count_files" .counts.tsv)
+   # Define the output file path
+    input_file="${CountTSVsDIR}/${base_name}"
+   gatk DenoiseReadCounts \
+   -I "$input_file" \
+   --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+ --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+   --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+
+done
+ ml R/3.6.2-foss-2019b
+ ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+ for copy_ratios in ${OUTDIR}/CopyRatios/
+do
+#Get the base name of the counts file
+base_name=$(basename "$copy_ratios")
+# Define the output file path
+input_file="${OUTDIR}/CopyRatios/${base_name}"
+#
+gatk PlotDenoisedCopyRatios \
+--standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+--denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv  \
+--sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
+--point-size-copy-ratio 1 \
+--output-prefix ${base_name} \
+--output ${OUTDIR}/PlotDenoisedCopyRatios
+done
+
 #   for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
 #   do
 #
