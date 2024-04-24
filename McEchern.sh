@@ -233,8 +233,8 @@ ml R/3.6.2-foss-2019b
  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
 # # Define the output file path
  gatk PlotDenoisedCopyRatios \
- --standardized-copy-ratios ${OUTDIR}/CopyRatios/113*.standardizedCR.tsv \
---denoised-copy-ratios ${OUTDIR}/CopyRatios/113*.denoisedCR.tsv \
+ --standardized-copy-ratios "$copy_ratios" \
+--denoised-copy-ratios "$Denoised" \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
