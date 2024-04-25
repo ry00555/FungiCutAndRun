@@ -325,10 +325,10 @@ do
  base_name=$(basename "$bam_file" _output.bam)
 # # # #         # Define the output file path
   ml SAMtools
-  samtools index $OUTPUTBAM
+  samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
  ml GATK
 gatk CollectReadCounts \
--I "$bam_file" \
+-I $bam_file \
 -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
   -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
    --interval-merging-rule OVERLAPPING_ONLY \
