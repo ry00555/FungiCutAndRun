@@ -181,23 +181,22 @@ OUTDIR="/scratch/ry00555/McEachern"
 # #
 # # #mkdir CountTSVs
 #ml GATK
-#   OUTPUTBAM="$SORTED_BAM_DIR/113*_output.bam"
-#    for bam_file in $OUTPUTBAM
-#    do
-# # # #   # Get the base name of the BAM file
-#      base_name=$(basename "$bam_file" _output.bam)
-# # # #   # Define the output file path
-# #ml SAMtools
-# #  samtools index "$SORTED_BAM_DIR/113*_output.bam"
-# # # #
-#   gatk CollectReadCounts \
-#    -I "$bam_file" \
-#    -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
-#    -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
-#    --interval-merging-rule OVERLAPPING_ONLY \
-#    -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
-# #
-#   done
+#  OUTPUTBAM="$SORTED_BAM_DIR/113*_output.bam"
+#     for bam_file in $OUTPUTBAM
+#     do
+# # # # #   # Get the base name of the BAM file
+# #      base_name=$(basename "$bam_file" _output.bam)
+# # # # #   # Define the output file path
+# # #ml SAMtools
+#   samtools index "$SORTED_BAM_DIR/113*_output.bam"
+# # # # #
+#    gatk CollectReadCounts \
+#     -I "$bam_file" \
+#     -R /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna \
+#     -L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+#     --interval-merging-rule OVERLAPPING_ONLY \
+#     -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+#    done
 #
  #CountTSVsDIR="/scratch/ry00555/McEachern/CountTSVs"
 # #
@@ -297,7 +296,7 @@ FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 #  done
 
 
-OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles"
+OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #
 
 # # # Iterate over all BAM files in the directory
@@ -320,13 +319,13 @@ OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #        -RGPU S34 \
 #        -RGSM "${base_name%.*}"
 #   done
-for bam_file in $OUTPUTBAM/*_output.bam
+for bam_file in $OUTPUTBAM
 do
 # # #          # Get the base name of the BAM file
  base_name=$(basename "$bam_file" _output.bam)
 # # # #         # Define the output file path
   ml SAMtools
-  samtools index "$bam_file"
+  samtools index $OUTPUTBAM
  ml GATK
 gatk CollectReadCounts \
 -I "$bam_file" \
