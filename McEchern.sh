@@ -301,34 +301,34 @@ SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
 
 # # # Iterate over all BAM files in the directory
-  ml picard
-  for bam_file in $SORTED_BAM_DIR2/*.bam
- do
-# # #     # Get the base name of the BAM file
-  base_name=$(basename "$bam_file" .bam)
- # #
-# # #     # Define the output file path
- output_file="${SORTED_BAM_DIR2}/${base_name}_output.bam"
-
-# # #     # Run Picard to add or replace read groups
-       java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-       -I "$bam_file" \
-       -O "$output_file" \
-       -RGID 2 \
-       -RGLB lib1 \
-       -RGPL illumina \
-       -RGPU S34 \
-       -RGSM "${base_name%.*}"
-  done
- for bam_file in $SORTED_BAM_DIR2/*_output.bam
- do
+#   ml picard
+#   for bam_file in $SORTED_BAM_DIR2/*.bam
+#  do
+# # # #     # Get the base name of the BAM file
+#   base_name=$(basename "$bam_file" .bam)
+#  # #
+# # # #     # Define the output file path
+#  output_file="${SORTED_BAM_DIR2}/${base_name}_output.bam"
+#
+# # # #     # Run Picard to add or replace read groups
+#        java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#        -I "$bam_file" \
+#        -O "$output_file" \
+#        -RGID 2 \
+#        -RGLB lib1 \
+#        -RGPL illumina \
+#        -RGPU S34 \
+#        -RGSM "${base_name%.*}"
+#   done
+for bam_file in $SORTED_BAM_DIR2/*_output.bam
+do
 # # #          # Get the base name of the BAM file
  base_name=$(basename "$bam_file" _output.bam)
 # # # #         # Define the output file path
   ml SAMtools
   samtools index "$bam_file"
  ml GATK
-gatk CollectReadCounts \
+gatk CollectReadCounts/*_output.bam \
 -I "$bam_file" \
 -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
   -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
