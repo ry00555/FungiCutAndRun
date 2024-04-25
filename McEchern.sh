@@ -297,18 +297,18 @@ FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 #  done
 
 
-SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
+OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
 
 # # # Iterate over all BAM files in the directory
 #   ml picard
-#   for bam_file in $SORTED_BAM_DIR2/*.bam
+#   for bam_file in $OUTPUTBAM/*.bam
 #  do
 # # # #     # Get the base name of the BAM file
 #   base_name=$(basename "$bam_file" .bam)
 #  # #
 # # # #     # Define the output file path
-#  output_file="${SORTED_BAM_DIR2}/${base_name}_output.bam"
+#  output_file="${OUTPUTBAM}/${base_name}_output.bam"
 #
 # # # #     # Run Picard to add or replace read groups
 #        java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
@@ -320,7 +320,7 @@ SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #        -RGPU S34 \
 #        -RGSM "${base_name%.*}"
 #   done
-for bam_file in $SORTED_BAM_DIR2/*_output.bam
+for bam_file in $OUTPUTBAM/*_output.bam
 do
 # # #          # Get the base name of the BAM file
  base_name=$(basename "$bam_file" _output.bam)
@@ -328,7 +328,7 @@ do
   ml SAMtools
   samtools index "$bam_file"
  ml GATK
-gatk CollectReadCounts/*_output.bam \
+gatk CollectReadCounts \
 -I "$bam_file" \
 -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
   -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
@@ -336,15 +336,15 @@ gatk CollectReadCounts/*_output.bam \
   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
  done
 #
- KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
- for count_files in $KmCounts/*.counts.tsv
-    do
-# # # # # Get the base name of the counts file
-  base_name=$(basename "$count_files" .counts.tsv)
-# # # #    # Define the output file path
-  gatk DenoiseReadCounts \
-   -I "$count_files" \
-  --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
- --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
- --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
- done
+#  KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
+#  for count_files in $KmCounts/*.counts.tsv
+#     do
+# # # # # # Get the base name of the counts file
+#   base_name=$(basename "$count_files" .counts.tsv)
+# # # # #    # Define the output file path
+#   gatk DenoiseReadCounts \
+#    -I "$count_files" \
+#   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+#  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
+#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
+#  done
