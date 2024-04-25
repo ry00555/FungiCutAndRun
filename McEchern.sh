@@ -269,6 +269,12 @@ OUTDIR="/scratch/ry00555/McEachern"
 ##read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
+#for this to occur in the genome directory first bwa index the genome
+#ml BWA
+#bwa index -a bwtsw Kluyveromycesmarxianus.fna Kluyveromycesmarxianus
+
+ml Trim_Galore
+trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/KmTrimmedReads /scratch/ry00555/McEachern/FastQ/*M*fastq\.gz
 
 FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 
