@@ -280,66 +280,50 @@ FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 
 
 # # Iterate over the files
- for f in $FILES
- do
-  file=${f##*/}
-   name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
-#
-   read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
-   bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
-   bigwig="${OUTDIR}/KmBigWigs/${name}"
-ml SAMtools/1.16.1-GCC-11.3.0
-   ml BWA/0.7.17-GCCcore-11.3.0
-   bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
-   samtools index "$bam"
-   ml deepTools/3.5.2-foss-2022a
-   bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
- done
-
-
-# for f in $FILES
-# do
+#  for f in $FILES
+#  do
+#   file=${f##*/}
+#    name=${file/%_S[1-99]*_L001_R1_001_val_1.fq.gz/}
 # #
-#  name=$(basename "$f" _R1_001_val_1.fq.gz)
-#  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-#
-#  bam="/scratch/ry00555/McEachern/SortedBamFiles/${name}.bam"
-#  bigwig="/scratch/ry00555/McEachern/BigWigs/${name}"
-#  ml SAMtools
-#  ml BWA
-#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T /scratch/ry00555/McEachern/SortedBamFiles/tempReps -o "$bam" -
-# samtools index "$bam"
-#  ml deepTools
-#  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+#    read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
+#    bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
+#    bigwig="${OUTDIR}/KmBigWigs/${name}"
+# ml SAMtools/1.16.1-GCC-11.3.0
+#    ml BWA/0.7.17-GCCcore-11.3.0
+#    bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
+#    samtools index "$bam"
+#    ml deepTools/3.5.2-foss-2022a
+#    bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  done
 
-# SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
+
+SORTED_BAM_DIR2="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
-# for bam_file in $SORTED_BAM_DIR2/*_output.bam
-# do
+ for bam_file in $SORTED_BAM_DIR2/*_output.bam
+ do
 # # #          # Get the base name of the BAM file
-# base_name=$(basename "$bam_file" _output.bam)
+ base_name=$(basename "$bam_file" _output.bam)
 # # # #         # Define the output file path
-#  ml SAMtools
-#  samtools index "$bam_file"
-# ml GATK
-#  gatk CollectReadCounts \
-# -I "$bam_file" \
-#  -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-#  -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-#   --interval-merging-rule OVERLAPPING_ONLY \
-#  -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
-# done
+  ml SAMtools
+  samtools index "$bam_file"
+ ml GATK
+  gatk CollectReadCounts \
+ -I "$bam_file" \
+  -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+  -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+   --interval-merging-rule OVERLAPPING_ONLY \
+  -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
+ done
 #
-# KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
-# for count_files in $KmCounts/*.counts.tsv
-#    do
+ KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
+ for count_files in $KmCounts/*.counts.tsv
+    do
 # # # # # Get the base name of the counts file
-#  base_name=$(basename "$count_files" .counts.tsv)
+  base_name=$(basename "$count_files" .counts.tsv)
 # # # #    # Define the output file path
-#  gatk DenoiseReadCounts \
-#   -I "$count_files" \
-#  --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-# --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
-# done
+  gatk DenoiseReadCounts \
+   -I "$count_files" \
+  --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+ --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
+ done
