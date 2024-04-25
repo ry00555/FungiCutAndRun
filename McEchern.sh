@@ -288,8 +288,8 @@ FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
    read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
    bam="${OUTDIR}/KmSortedBamFiles/${name}.bam"
    bigwig="${OUTDIR}/KmBigWigs/${name}"
-  ml SAMtools/0.1.20-GCC-11.2.0
-   ml BWA/0.7.17-GCCcore-12.2.0
+ml SAMtools/1.16.1-GCC-11.3.0
+   ml BWA/0.7.17-GCCcore-11.3.0
    bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/KmSortedBamFiles/tempReps -o "$bam" -
    samtools index "$bam"
    ml deepTools/3.5.2-foss-2022a
