@@ -78,25 +78,31 @@ OUTDIR="/scratch/ry00555/McEachern"
 # ml picard
 # #
 # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
-# -R Kluyveromycesmarxianus.fna \
-# -O Kluyveromycesmarxianus.dict
+#-R Kluyveromycesmarxianus.fna \
+#-O Kluyveromycesmarxianus.dict
 # #
 # java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
-# -I Kluyveromycesmarxianus_genes.bed \
-# -R Kluyveromycesmarxianus.fna \
-# -SD Kluyveromycesmarxianus.dict \
-# -O Kluyveromycesmarxianus.interval_list
+ #-I Kluyveromycesmarxianus_genes.bed \
+ #-R Kluyveromycesmarxianus.fna \
+ #-SD Kluyveromycesmarxianus.dict \
+ #-O Kluyveromycesmarxianus.interval_list
 # #
 # ml GATK
 # #
 # #WGS uses 1000 bp bins
 # gatk PreprocessIntervals \
-# -R Kluyveromycesmarxianus.fna \
-# -L Kluyveromycesmarxianus.interval_list \
-# --interval-merging-rule OVERLAPPING_ONLY \
-# --bin-length 1000 \
-# --padding 0 \
-# -O Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list
+ #-R Kluyveromycesmarxianus.fna \
+ #-L Kluyveromycesmarxianus.interval_list \
+ #--interval-merging-rule OVERLAPPING_ONLY \
+ #--bin-length 1000 \
+ #--padding 0 \
+ #-O Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list
+
+ gatk AnnotateIntervals \
+ -R Kluyveromycesmarxianus.fna \
+-L Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+--interval-merging-rule OVERLAPPING_ONLY \
+-O Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv
 ##########################################
 #Now handle the samples for Run 113
 # ml Trim_Galore
@@ -321,19 +327,19 @@ OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #   done
 # for bam_file in $OUTPUTBAM
 # do
-# # # #          # Get the base name of the BAM file
-#  base_name=$(basename "$bam_file" _output.bam)
+#  Get the base name of the BAM file
+# base_name=$(basename "$bam_file" _output.bam)
 # # # # #         # Define the output file path
 #   ml SAMtools
 #   samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 ml GATK
-# gatk CollectReadCounts \
-# -I $bam_file \
-# -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-#   -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-#    --interval-merging-rule OVERLAPPING_ONLY \
-#   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
-# done
+ # gatk CollectReadCounts \
+ # -I $bam_file \
+ # -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+ #   -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+ #    --interval-merging-rule OVERLAPPING_ONLY \
+ #   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
+ # done
 
 
 #
@@ -345,9 +351,9 @@ ml GATK
 # # # # #    # Define the output file path
    gatk DenoiseReadCounts \
     -I "$count_files" \
-   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
-  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
+   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv \
+  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv \
+  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
   done
 
 
