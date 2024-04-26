@@ -302,15 +302,15 @@ source config.txt
 #  done
 
 ml GATK
-OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles"
+#OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #
 
 # # # Iterate over all BAM files in the directory
 #   ml picard
-for bam_file in $OUTPUTBAM/*.bam
-do
+#for bam_file in $OUTPUTBAM/*.bam
+#do
 # # # #     # Get the base name of the BAM file
- base_name=$(basename "$bam_file" .bam)
+ #base_name=$(basename "$bam_file" .bam)
 #  # #
 # # # #     # Define the output file path
 #  output_file="${OUTPUTBAM}/${base_name}_output.bam"
@@ -357,8 +357,8 @@ do
 #   done
 
 
-#  ml R/3.6.2-foss-2019b
-#  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+  ml R/3.6.2-foss-2019b
+ ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
 #  for copy_ratios in "${OUTDIR}/CopyRatios/Km/"*.standardizedCR.tsv; do
 #      # Get the base name of the counts file
 #   base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
@@ -405,9 +405,28 @@ do
   KmAlellicCounts="/scratch/ry00555/McEachern/KmAllelicCounts"
 
 
-gatk CollectAllelicCounts \
--I "$bam_file"  \
- -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
--L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
--O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
-done
+# gatk CollectAlelicCounts \
+# -I "$bam_file"  \
+#  -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+# -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+# -O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
+# done
+
+for copy_ratios in ${KmAlellicCounts}/*.allelicCounts.tsv
+  do
+#   # # #
+  base_name=$(basename "$copy_ratios" .allelicCounts.tsv)
+#   # # #
+  gatk ModelSegments \
+--allelic-counts ${copy_ratios} \
+  --output-prefix ${base_name} \
+    -O ${OUTDIR}/ModelSegments
+#   #
+     gatk PlotModeledSegments \
+     --allelic-counts ${copy_ratios} \
+ --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+     --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+      --point-size-copy-ratio 1 \
+       --output-prefix ${base_name} \
+      -O ${OUTDIR}/PlotModelSegments
+   done
