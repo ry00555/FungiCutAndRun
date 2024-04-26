@@ -423,9 +423,11 @@ for copy_ratios in ${KmAlellicCounts}/*.allelicCounts.tsv
 #     -O ${OUTDIR}/ModelSegments
 #   #
      gatk PlotModeledSegments \
+     --allelic-counts "$copy_ratios" \
  --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
      --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
       --point-size-copy-ratio 1 \
+      --minimum-total-allele-count-case 0 \
        --output-prefix ${base_name} \
       -O ${OUTDIR}/PlotModelSegments
    done
