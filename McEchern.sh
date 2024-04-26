@@ -330,10 +330,18 @@ do
 gatk CollectReadCounts \
 -I $bam_file \
 -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-  -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+  -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
    --interval-merging-rule OVERLAPPING_ONLY \
   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
  done
+
+ gatk CollectReadCounts \
+ -I *_output.bam \
+ -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+   -L /scratch/ry00555/McEachern/Genome/ Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+    --interval-merging-rule OVERLAPPING_ONLY \
+   -O /scratch/ry00555/McEachern/KmCountTSVs/*.counts.tsv
+  done
 #
 #  KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
 #  for count_files in $KmCounts/*.counts.tsv
