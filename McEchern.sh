@@ -405,7 +405,7 @@ do
   KmAlellicCounts="/scratch/ry00555/McEachern/KmAllelicCounts"
 
 
-gatk Collect AlelicCounts \
+gatk CollectAllelicCounts \
 -I "$bam_file"  \
  -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
 -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
