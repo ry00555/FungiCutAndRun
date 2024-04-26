@@ -425,7 +425,7 @@ for Msegments in ${KmModelSegments}/*_output.hets.tsv
 #   #
 gatk PlotModeledSegments \
 --allelic-counts $Msegments \
---segments ${KmModelSegments}/${base_name}.modelFinal.seg \
+--segments ${KmModelSegments}/${base_name}_output.modelFinal.seg \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
 --point-size-copy-ratio 1 \
 --output-prefix ${base_name} \
