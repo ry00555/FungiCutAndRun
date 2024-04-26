@@ -326,7 +326,7 @@ OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 # # # # #         # Define the output file path
 #   ml SAMtools
 #   samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
-#  ml GATK
+ml GATK
 # gatk CollectReadCounts \
 # -I $bam_file \
 # -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
