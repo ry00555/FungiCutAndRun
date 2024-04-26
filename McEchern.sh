@@ -98,11 +98,11 @@ OUTDIR="/scratch/ry00555/McEachern"
  #--padding 0 \
  #-O Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list
 
- gatk AnnotateIntervals \
- -R Kluyveromycesmarxianus.fna \
--L Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
---interval-merging-rule OVERLAPPING_ONLY \
--O Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv
+#  gatk AnnotateIntervals \
+#  -R Kluyveromycesmarxianus.fna \
+# -L Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+# --interval-merging-rule OVERLAPPING_ONLY \
+# -O Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv
 ##########################################
 #Now handle the samples for Run 113
 # ml Trim_Galore
@@ -281,7 +281,7 @@ source config.txt
 #ml Trim_Galore
 #trim_galore --paired --length 20 --fastqc --gzip -o /scratch/ry00555/McEachern/KmTrimmedReads /scratch/ry00555/McEachern/FastQ/*M*fastq\.gz
 
-FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
+#FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 
 
 # # Iterate over the files
@@ -301,16 +301,16 @@ FILES="${OUTDIR}/KmTrimmedReads/*_L001_R1_001_val_1.fq.gz" # Don't forget the *
 #    bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  done
 
-
+ml GATK
 OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #
 
 # # # Iterate over all BAM files in the directory
 #   ml picard
-#   for bam_file in $OUTPUTBAM/*.bam
-#  do
+for bam_file in $OUTPUTBAM/*.bam
+do
 # # # #     # Get the base name of the BAM file
-#   base_name=$(basename "$bam_file" .bam)
+ base_name=$(basename "$bam_file" .bam)
 #  # #
 # # # #     # Define the output file path
 #  output_file="${OUTPUTBAM}/${base_name}_output.bam"
@@ -332,70 +332,82 @@ OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 # # # # #         # Define the output file path
 #   ml SAMtools
 #   samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
-ml GATK
+#ml GATK
  # gatk CollectReadCounts \
  # -I $bam_file \
  # -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
- #   -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+ #   -L /scratch/ry00555/McEacheK marxianus genome rn/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
  #    --interval-merging-rule OVERLAPPING_ONLY \
  #   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
  # done
 
-
+#Error againm ven with java.lang.IllegalArgumentException: Sample does not have a positive sample median.
 #
- KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
-  for count_files in $KmCounts/*.counts.tsv
-     do
-# # # # # # Get the base name of the counts file
-   base_name=$(basename "$count_files" .counts.tsv)
-# # # # #    # Define the output file path
-   gatk DenoiseReadCounts \
-    -I "$count_files" \
-   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv \
-  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv \
-  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
-  done
+#  KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
+#   for count_files in $KmCounts/*.counts.tsv
+#      do
+# # # # # # # Get the base name of the counts file
+#    base_name=$(basename "$count_files" .counts.tsv)
+# # # # # #    # Define the output file path
+#    gatk DenoiseReadCounts \
+#     -I "$count_files" \
+#    --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_annotated_intervals.tsv \
+#   --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv \
+#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
+#   done
 
 
- ml R/3.6.2-foss-2019b
- ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
- for copy_ratios in "${OUTDIR}/CopyRatios/Km/"*.standardizedCR.tsv; do
-     # Get the base name of the counts file
-  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
-  Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+#  ml R/3.6.2-foss-2019b
+#  ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+#  for copy_ratios in "${OUTDIR}/CopyRatios/Km/"*.standardizedCR.tsv; do
+#      # Get the base name of the counts file
+#   base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+#   Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+#
+#
+#  for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv
+# do
+#   # # #Get the base name of the counts file
+#  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+# Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+#
+#   # # Define the output file path
+#  gatk PlotDenoisedCopyRatios \
+#  --standardized-copy-ratios "$copy_ratios" \
+# --denoised-copy-ratios "${OUTDIR}/CopyRatios/Km/$Denoised" \
+# --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+# --point-size-copy-ratio 1 \
+# --output-prefix ${base_name} \
+# --output ${OUTDIR}/PlotDenoisedCopyRatios
+#  done
+
+# for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
+#  do
+#   # # #
+#  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+#   # # #
+#  gatk ModelSegments \
+#   --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
+#  --output-prefix ${base_name} \
+#    -O ${OUTDIR}/ModelSegments
+#   #
+#      gatk PlotModeledSegments \
+#     --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
+#     --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+#     --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+#      --point-size-copy-ratio 1 \
+#       --output-prefix ${base_name} \
+#      -O ${OUTDIR}/PlotModelSegments
+#   done
+
+  # try allelic counts into model segments into plotmodel segments
+
+  KmAlellicCounts="/scratch/ry00555/McEachern/KmAllelicCounts"
 
 
- for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv
-do
-  # # #Get the base name of the counts file
- base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
-Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
-
-  # # Define the output file path
- gatk PlotDenoisedCopyRatios \
- --standardized-copy-ratios "$copy_ratios" \
---denoised-copy-ratios "${OUTDIR}/CopyRatios/Km/$Denoised" \
---sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
---point-size-copy-ratio 1 \
---output-prefix ${base_name} \
---output ${OUTDIR}/PlotDenoisedCopyRatios
- done
-
-for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
- do
-  # # #
- base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
-  # # #
- gatk ModelSegments \
-  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
- --output-prefix ${base_name} \
-   -O ${OUTDIR}/ModelSegments
-  #
-     gatk PlotModeledSegments \
-    --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
-    --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
-    --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
-     --point-size-copy-ratio 1 \
-      --output-prefix ${base_name} \
-     -O ${OUTDIR}/PlotModelSegments
-  done
+gatk Collect AlelicCounts \
+-I "$bam_file"  \
+ -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+-L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+-O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
+done
