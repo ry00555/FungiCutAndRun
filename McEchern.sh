@@ -319,33 +319,77 @@ OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #        -RGPU S34 \
 #        -RGSM "${base_name%.*}"
 #   done
-for bam_file in $OUTPUTBAM
-do
-# # #          # Get the base name of the BAM file
- base_name=$(basename "$bam_file" _output.bam)
-# # # #         # Define the output file path
-  ml SAMtools
-  samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
- ml GATK
-gatk CollectReadCounts \
--I $bam_file \
--R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
-  -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-   --interval-merging-rule OVERLAPPING_ONLY \
-  -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
- done
+# for bam_file in $OUTPUTBAM
+# do
+# # # #          # Get the base name of the BAM file
+#  base_name=$(basename "$bam_file" _output.bam)
+# # # # #         # Define the output file path
+#   ml SAMtools
+#   samtools index "/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
+#  ml GATK
+# gatk CollectReadCounts \
+# -I $bam_file \
+# -R /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna \
+#   -L /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+#    --interval-merging-rule OVERLAPPING_ONLY \
+#   -O /scratch/ry00555/McEachern/KmCountTSVs/$base_name.counts.tsv
+# done
 
 
 #
-#  KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
-#  for count_files in $KmCounts/*.counts.tsv
-#     do
+ KmCounts="/scratch/ry00555/McEachern/KmCountTSVs"
+  for count_files in $KmCounts/*.counts.tsv
+     do
 # # # # # # Get the base name of the counts file
-#   base_name=$(basename "$count_files" .counts.tsv)
+   base_name=$(basename "$count_files" .counts.tsv)
 # # # # #    # Define the output file path
-#   gatk DenoiseReadCounts \
-#    -I "$count_files" \
-#   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
-#  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
-#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
-#  done
+   gatk DenoiseReadCounts \
+    -I "$count_files" \
+   --annotated-intervals /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus_preprocessed1000_intervals.interval_list \
+  --standardized-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.standardizedCR.tsv \
+  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv
+  done
+
+
+ ml R/3.6.2-foss-2019b
+ ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+ for copy_ratios in "${OUTDIR}/CopyRatios/Km/"*.standardizedCR.tsv; do
+     # Get the base name of the counts file
+  base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+  Denoised=$(echo "$base_name" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+
+
+ for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.standardizedCR.tsv
+do
+  # # #Get the base name of the counts file
+ base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+
+  # # Define the output file path
+ gatk PlotDenoisedCopyRatios \
+ --standardized-copy-ratios "$copy_ratios" \
+--denoised-copy-ratios "${OUTDIR}/CopyRatios/Km/$Denoised" \
+--sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+--point-size-copy-ratio 1 \
+--output-prefix ${base_name} \
+--output ${OUTDIR}/PlotDenoisedCopyRatios
+ done
+
+for copy_ratios in ${OUTDIR}/CopyRatios/Km/*.denoisedCR.tsv
+ do
+  # # #
+ base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+  # # #
+ gatk ModelSegments \
+  --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
+ --output-prefix ${base_name} \
+   -O ${OUTDIR}/ModelSegments
+  #
+     gatk PlotModeledSegments \
+    --denoised-copy-ratios ${OUTDIR}/CopyRatios/Km/${base_name}.denoisedCR.tsv \
+    --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+    --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+     --point-size-copy-ratio 1 \
+      --output-prefix ${base_name} \
+     -O ${OUTDIR}/PlotModelSegments
+  done
