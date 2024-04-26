@@ -302,7 +302,7 @@ source config.txt
 #  done
 
 ml GATK
-OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
+OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles"
 #
 
 # # # Iterate over all BAM files in the directory
