@@ -403,6 +403,7 @@ source config.txt
   # try allelic counts into model segments into plotmodel segments
 
   #KmAlellicCounts="/scratch/ry00555/McEachern/KmAllelicCounts"
+KmModelSegments="/scratch/ry00555/McEachern/ModelSegments"
 
 
 # gatk CollectAlelicCounts \
@@ -412,10 +413,10 @@ source config.txt
 # -O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
 # done
 
-for copy_ratios in ${OUTDIR}/ModelSegments/*_output.hets.tsv
+for Msegments in ${KmModelSegments}/ModelSegments/*_output.hets.tsv
   do
 #   # # #
-  base_name=$(basename "$copy_ratios" _output.hets.tsv)
+  base_name=$(basename "$Msegments" _output.hets.tsv)
 #   # # #
 #   gatk ModelSegments \
 # --allelic-counts ${copy_ratios} \
@@ -423,11 +424,10 @@ for copy_ratios in ${OUTDIR}/ModelSegments/*_output.hets.tsv
 #     -O ${OUTDIR}/ModelSegments
 #   #
 gatk PlotModeledSegments \
---allelic-counts "${copy_ratios}" \
---segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+--allelic-counts $Msegments \
+--segments ${KmModelSegments}/${base_name}.modelFinal.seg \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
 --point-size-copy-ratio 1 \
---minimum-total-allele-count-case 0 \
---output-prefix ${base_name} \
-      -O ${OUTDIR}/PlotModelSegments
+--output-prefix * \
+      -O /scratch/ry00555/McEachern/PlotModelSegments
    done
