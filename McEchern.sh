@@ -301,7 +301,7 @@ source config.txt
 #    bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #  done
 
-ml GATK
+#ml GATK
 #OUTPUTBAM="/scratch/ry00555/McEachern/KmSortedBamFiles/*_output.bam"
 #
 
@@ -417,10 +417,10 @@ for copy_ratios in ${KmAlellicCounts}/*.allelicCounts.tsv
 #   # # #
   base_name=$(basename "$copy_ratios" .allelicCounts.tsv)
 #   # # #
-  gatk ModelSegments \
---allelic-counts ${copy_ratios} \
-  --output-prefix ${base_name} \
-    -O ${OUTDIR}/ModelSegments
+#   gatk ModelSegments \
+# --allelic-counts ${copy_ratios} \
+#   --output-prefix ${base_name} \
+#     -O ${OUTDIR}/ModelSegments
 #   #
      gatk PlotModeledSegments \
      --allelic-counts ${copy_ratios} \
