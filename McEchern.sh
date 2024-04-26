@@ -412,10 +412,10 @@ source config.txt
 # -O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
 # done
 
-for copy_ratios in ${KmAlellicCounts}/*.allelicCounts.tsv
+for copy_ratios in ${KmAlellicCounts}/*.hets.tsv
   do
 #   # # #
-  base_name=$(basename "$copy_ratios" .allelicCounts.tsv)
+  base_name=$(basename "$copy_ratios" .hets.tsv)
 #   # # #
 #   gatk ModelSegments \
 # --allelic-counts ${copy_ratios} \
