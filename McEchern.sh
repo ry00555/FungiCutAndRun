@@ -413,7 +413,7 @@ KmModelSegments="/scratch/ry00555/McEachern/ModelSegments"
 # -O ${KmAlellicCounts}/${base_name}.allelicCounts.tsv
 # done
 
-for Msegments in ${KmModelSegments}/ModelSegments/*_output.hets.tsv
+for Msegments in ${KmModelSegments}/*_output.hets.tsv
   do
 #   # # #
   base_name=$(basename "$Msegments" _output.hets.tsv)
@@ -428,6 +428,15 @@ gatk PlotModeledSegments \
 --segments ${KmModelSegments}/${base_name}.modelFinal.seg \
 --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
 --point-size-copy-ratio 1 \
---output-prefix * \
+--output-prefix ${base_name} \
       -O /scratch/ry00555/McEachern/PlotModelSegments
    done
+
+
+   # gatk PlotModeledSegments \
+   # --allelic-counts *_output.hets.tsv \
+   # --segments *_output.modelFinal.seg \
+   # --sequence-dictionary /scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.dict \
+   # --point-size-copy-ratio 1 \
+   # --output-prefix * \
+   #       -O /scratch/ry00555/McEachern/PlotModelSegments
