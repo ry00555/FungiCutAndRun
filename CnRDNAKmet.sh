@@ -19,7 +19,7 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # #in line commands
 # trim_galore --paired --length 20 --fastqc --gzip -o TrimmedReads *fastq\.gz
 
-FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1.fq.gz" #Don't forget the *
 
 #mkdir "$OUTDIR/ref"
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ref/ecoli_refseq.fa
