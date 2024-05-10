@@ -19,7 +19,7 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # #in line commands
 # trim_galore --paired --length 20 --fastqc --gzip -o TrimmedReads *fastq\.gz
 
-FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1.fq.gz" #Don't forget the *
+FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
 
 #mkdir "$OUTDIR/ref"
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ref/ecoli_refseq.fa
@@ -42,28 +42,31 @@ module load Bowtie2
 
 for f in $FILES
   do
- file=${f##*/}
+base=$(basename "${f}" _R1_001_val_1.fq.gz)
+
+ #file=${f##*/}
 # # 	#remove ending from file name to create shorter names for bam files and other downstream output
- name=${file/*_R1_001_val_1.fq.gz/}
+ #name=${file/*_R1_001_val_1.fq.gz/}
 # #
 # # #
 # # # 	# File Vars
 # # # 	#use sed to get the name of the second read matching the input file
- read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
+ #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 # #mkdir $OUTDIR/sam_files
-bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}.sam"
+bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}.sam"
 #
 # #bowtie2-build -f ${OUTDIR}/ref/ecoli_refseq.fa $OUTDIR/ref/ecoli_ref
- bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}_Ecoli.sam"
+ bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}_Ecoli.sam"
 #
 module load SAMtools
 # #mkdir "$OUTDIR/bam_files"
-samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam"
-samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${name}_Ecoli.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}_Ecoli.bam"
+samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}.bam"
+samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}_Ecoli.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}_Ecoli.bam"
 #
 # #mkdir "$OUTDIR/SortedBamFiles"
-samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam"
-samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${name}_Ecoli.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam"
+samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${base}.sorted.bam"
+samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}_Ecoli.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${base}_Ecoli.sorted.bam"
 #
 done
 #no need to samtools merge at the moment because I only have one of each sample
