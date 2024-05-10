@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=50gb
+#SBATCH --mem=190gb
 #SBATCH --time=48:00:00
 #SBATCH --output=../MapCutAndRun132.%j.out
 #SBATCH --error=../MapCutAndRun132.%j.err
@@ -17,7 +17,7 @@ OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 # #mkdir "$OUTDIR/TrimmedReads"
 # trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/*fastq\.gz
 # #in line commands
-# trim_galore --paired --length 20 --fastqc --gzip -o TrimmedReads *fastq\.gz
+ #trim_galore --paired --length 20 --fastqc --gzip -o TrimmedReads *fastq\.gz
 
 FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
 
@@ -44,10 +44,7 @@ for f in $FILES
   do
 base=$(basename "${f}" _R1_001_val_1.fq.gz)
 
- #file=${f##*/}
-# # 	#remove ending from file name to create shorter names for bam files and other downstream output
- #name=${file/*_R1_001_val_1.fq.gz/}
-# #
+
 # # #
 # # # 	# File Vars
 # # # 	#use sed to get the name of the second read matching the input file
@@ -72,40 +69,38 @@ done
 #no need to samtools merge at the moment because I only have one of each sample
 ##turning sorted bam files into bed graphs for DNA spike in
 #mkdir $OUTDIR/bed_files
-#for f in $FILES
-  #do
- #file=${f##*/}
-# # 	#remove ending from file name to create shorter names for bam files and other downstream output
- #name=${file/*_R1_001_val_1.fq.gz/}
+for f in $FILES
+do
+name=$(basename "${f}" _R1_001_val_1.fq.gz)
 #
- #ml BEDTools
-#bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
-#bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
+ml BEDTools
+bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
+bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
 #
 # #DNA-spike in normalization
 # #mkdir $OUTDIR/bedgraphs
-#sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
-#done
+sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
+done
 #sort bga files from  DNA spike in
- # ml ucsc
- # for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
- #  do
- #    base=$(basename ${infile} .norm.bga)
- #    bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
- # done
+  ml ucsc
+  for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
+   do
+     base=$(basename ${infile} .norm.bga)
+     bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
+  done
 
-#module load Homer
+module load Homer
  #calling peaks
  # mkdir $OUTDIR/Peaks
-#   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
-#     do base=$(basename ${infile} .norm_sort.bga)
-# cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
-#  done
+   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
+     do base=$(basename ${infile} .norm_sort.bga)
+ cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
+  done
 #
-#   for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
-#    do base=$(basename ${infile} .bgato.bed)
-#     makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
-#  done
+   for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
+  do base=$(basename ${infile} .bgato.bed)
+     makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
+  done
 
 #!/bin/bash
 
