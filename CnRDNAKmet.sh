@@ -28,7 +28,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*R1_001_val_1\.fq\.g
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > ref/ecoli_refseq.fa
 # curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > ref/Ncrassa_refseq.fa
 
-#module load Bowtie2
+module load Bowtie2
 # bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
 # #in line commands
 # bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
@@ -237,3 +237,17 @@ done
  #  base=$(basename ${infile} .tagdir)
  # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
  # done
+
+ # PEAKDIR="${OUTDIR}/Peaks"
+ #
+ # ml Perl
+ # ##annotating peak files with masked reference (use HOMER module)
+ # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
+ #  annotatePeaks.pl ${PEAKDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${PEAKDIR}/${base}_ann.txt
+ #
+ # #now filtering for only peaks that are w/i 1000bps of their annotation:
+ #  for infile in ${PEAKDIR}/${base}_ann.txt
+ #  do
+ #    base=$(basename ${infile} _masked_ann.txt)
+ #    awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${PEAKDIR}/${base}.1000bp_ann.txt
+ #  done
