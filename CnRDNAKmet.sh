@@ -79,23 +79,23 @@ bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${na
 #
 # #DNA-spike in normalization
 # #mkdir $OUTDIR/bedgraphs
-sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
+sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
 done
 #sort bga files from  DNA spike in
-#   ml ucsc
-#   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
-#    do
-#      base=$(basename ${infile} .norm.bga)
-#      bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
-#   done
+   ml ucsc
+   for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
+    do
+      base=$(basename ${infile} .norm.bga)
+      bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
+   done
 #
-# module load Homer
+ module load Homer
 #  #calling peaks
-#  # mkdir $OUTDIR/Peaks
-#    for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
-#      do base=$(basename ${infile} .norm_sort.bga)
-#  cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
-#   done
+  # mkdir $OUTDIR/Peaks
+    for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
+      do base=$(basename ${infile} .norm_sort.bga)
+  cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
+   done
 # #
 #    for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
 #   do base=$(basename ${infile} .bgato.bed)
