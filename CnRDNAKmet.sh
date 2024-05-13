@@ -108,35 +108,35 @@ do base=$(basename ${infile} .bgato.bed)
 # # this code works where I have to type in strain  so do it for the rest change rtt109 to WT , set-7, ncu00423, ncu006787, ncu06788
 #
 # ##using IgG as input
-for infile in $OUTDIR/TagDirectories/*WT*.tagdir
+for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
  do
-   base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+   base=$(basename ${infile} .BtB.tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1_S1.BtB.tagdir-F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
  done
 #
 # ##using IgG as input
- for infile in $OUTDIR/TagDirectories/*set-7*.tagdir
+ for infile in $OUTDIR/TagDirectories/*set-7*.BtB.tagdir
  do
-   base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6_R1_001_val_1.fq.gz.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+   base=$(basename ${infile} .BtB.tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
  done
 # ##using IgG as input
- for infile in $OUTDIR/TagDirectories/*ncu00423*.tagdir
+ for infile in $OUTDIR/TagDirectories/*ncu00423*.BtB.tagdir
  do
-   base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+   base=$(basename ${infile} .BtB.tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
  done
 # ##using IgG as input
- for infile in $OUTDIR/TagDirectories/*ncu06787*.tagdir
+ for infile in $OUTDIR/TagDirectories/*ncu06787*.BtB.tagdir
  do
-   base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+   base=$(basename ${infile} .BtB.tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
  done
 # ##using IgG as input
- for infile in $OUTDIR/TagDirectories/*ncu06788*.tagdir
+ for infile in $OUTDIR/TagDirectories/*ncu06788*.BtB.tagdir
  do
-   base=$(basename ${infile} .tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+   base=$(basename ${infile} .BtB.tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
  done
 
 #changing peak txt files to bed files to input into chipr
