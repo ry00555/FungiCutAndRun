@@ -157,12 +157,12 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 # # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
  #done
 
- ml ucsc
- for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
-  do
- base=$(basename ${infile} .norm_sort.bga)
- bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
- done
+ #ml ucsc
+ #for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+#  do
+# base=$(basename ${infile} .norm_sort.bga)
+# bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+# done
 #ml deepTools
 #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
 ## command line
@@ -179,14 +179,15 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 #
 #kmet spike in for both reg sorted and ecoli sorted
 #The issue is the base name for all the files do not match
-for file in $OUTDIR/SortedBamFiles/*sorted.bam
-  do
-     base=$(basename "${file}" .sorted.bam)
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
- $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
- done
+# for file in $OUTDIR/SortedBamFiles/*sorted.bam
+#   do
+#      base=$(basename "${file}" .sorted.bam)
+#  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
+#  $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+#  done
 
 # the below loop will rewrite the E coli sorted bamfiles
+for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
 
   do
      base=$(basename "${file}" _Ecoli.sorted.bam)
