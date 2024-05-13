@@ -108,58 +108,58 @@ do base=$(basename ${infile} .bgato.bed)
 # # this code works where I have to type in strain  so do it for the rest change rtt109 to WT , set-7, ncu00423, ncu006787, ncu06788
 #
 # ##using IgG as input
-#for infile in $OUTDIR/TagDirectories/*WT*.tagdir
-# do
-#   base=$(basename ${infile} .tagdir)
-# findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-# done
+for infile in $OUTDIR/TagDirectories/*WT*.tagdir
+ do
+   base=$(basename ${infile} .tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ done
 #
 # ##using IgG as input
-# for infile in $OUTDIR/TagDirectories/*set-7*.tagdir
-# do
-#   base=$(basename ${infile} .tagdir)
-# findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6_R1_001_val_1.fq.gz.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-# done
+ for infile in $OUTDIR/TagDirectories/*set-7*.tagdir
+ do
+   base=$(basename ${infile} .tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6_R1_001_val_1.fq.gz.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ done
 # ##using IgG as input
-# for infile in $OUTDIR/TagDirectories/*ncu00423*.tagdir
-# do
-#   base=$(basename ${infile} .tagdir)
-# findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-# done
+ for infile in $OUTDIR/TagDirectories/*ncu00423*.tagdir
+ do
+   base=$(basename ${infile} .tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ done
 # ##using IgG as input
-# for infile in $OUTDIR/TagDirectories/*ncu06787*.tagdir
-# do
-#   base=$(basename ${infile} .tagdir)
-# findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-# done
+ for infile in $OUTDIR/TagDirectories/*ncu06787*.tagdir
+ do
+   base=$(basename ${infile} .tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ done
 # ##using IgG as input
-# for infile in $OUTDIR/TagDirectories/*ncu06788*.tagdir
-# do
-#   base=$(basename ${infile} .tagdir)
-# findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-# done
+ for infile in $OUTDIR/TagDirectories/*ncu06788*.tagdir
+ do
+   base=$(basename ${infile} .tagdir)
+ findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ done
 
 #changing peak txt files to bed files to input into chipr
-# for infile in $OUTDIR/Peaks/*_IgGNorm.txt
-# do
-# base=$(basename ${infile} _IgGNorm.txt)
-# sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
-#  done
+ for infile in $OUTDIR/Peaks/*_IgGNorm.txt
+ do
+ base=$(basename ${infile} _IgGNorm.txt)
+ sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
+  done
 
  # don't need ChipR right now since I don't have replicates as of 4/10/24
 
  ##annotating peak files with masked reference (use HOMER module)
-#  ml Perl
-#  for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
-#  do
-#    base=$(basename ${infile} .peaks_IgGNorm.bed)
-# annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
+  ml Perl
+  for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
+  do
+    base=$(basename ${infile} .peaks_IgGNorm.bed)
+ annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
 # # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
-# done
+ done
 
-# ml ucsc
-# for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
-# do
+ #ml ucsc
+ #for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+ # do
 # base=$(basename ${infile} .norm_sort.bga)
 # bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
 # done
