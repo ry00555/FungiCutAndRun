@@ -107,6 +107,8 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 # Set the directory containing the tag directories
 # # this code works where I have to type in strain  so do it for the rest change rtt109 to WT , set-7, ncu00423, ncu006787, ncu06788
 #
+module load Homer
+
 # ##using IgG as input
 for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
  do
@@ -282,3 +284,19 @@ for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*WT*.BtB.tagdir
  #    base=$(basename ${infile} _masked_ann.txt)
  #    awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${PEAKDIR}/${base}.1000bp_ann.txt
  #  done
+
+ #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
+ #DNA spike in
+ # ml ucsc
+ # for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+ # do
+ #  base=$(basename ${infile} .norm_sort.bga)
+ # bedGraphToBigWig $infile $OUTDIR/ref/chrNameLength.txt $OUTDIR/bigwigs/${base}.bw
+ # done
+ #Kmet spike in
+ ml deepTools
+ # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
+ # do
+ #  base=$(basename ${infile} .kmet_sort.bga)
+ # bedGraphToBigWig $infile $OUTDIR/ref/genome/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.bw
+ # done
