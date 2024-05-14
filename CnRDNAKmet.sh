@@ -187,36 +187,57 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 #  done
 
 # the below loop will rewrite the E coli sorted bamfiles
-for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
-
-  do
-     base=$(basename "${file}" _Ecoli.sorted.bam)
-  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
- $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
- done
+# for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
 #
-
+#   do
+#      base=$(basename "${file}" _Ecoli.sorted.bam)
+#   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
+#  $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+#  done
+#
 # #sort bga files from spike in
   ml ucsc
- for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+ for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet.bga
   do
   base=$(basename ${infile} _kmet.bga)
-      bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+      bedSort $infile $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/${base}.kmet_sort.bga
     done
 
 #mkdir $OUTDIR/KmetSpikeIn/Peaks
-  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
+  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet_sort.bga
    do base=$(basename ${infile} .kmet_sort.bga)
-   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.Ecoli.bgato.bed
   done
 
  module load Homer
 # mkdir $OUTDIR/KmetSpikeIn/TagDirectories
-  for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+  for infile in $OUTDIR/KmetSpikeIn/Peaks/*.Ecoli.bgato.bed
   do
  base=$(basename ${infile} .bgato.bed)
  makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
  done
+
+# #sort bga files from spike in
+#   ml ucsc
+#  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+#   do
+#   base=$(basename ${infile} _kmet.bga)
+#       bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+#     done
+#
+# #mkdir $OUTDIR/KmetSpikeIn/Peaks
+#   for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
+#    do base=$(basename ${infile} .kmet_sort.bga)
+#    cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+#   done
+#
+#  module load Homer
+# # mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+#   for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+#   do
+#  base=$(basename ${infile} .bgato.bed)
+#  makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+#  done
 
 # Do the same IgG analysis above for the KmetSpikeIn normalized for each strain at a time, then skip Chip-R and go straight to annotating peaks with input bed files use the same command as above and make sure to ml Perl then make bigwigs from the bga files with the end .kmet.sort.bga
 ##using IgG as input
