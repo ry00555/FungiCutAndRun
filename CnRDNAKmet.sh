@@ -216,13 +216,13 @@ for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
 #  done
 
 # the below loop will rewrite the E coli sorted bamfiles
-# for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
+for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
 #
-#   do
-#      base=$(basename "${file}" _Ecoli.sorted.bam)
-#   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
-#  $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-#  done
+   do
+      base=$(basename "${file}" _Ecoli.sorted.bam)
+   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
+  $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+  done
 #
 # #sort bga files from spike in
 #   ml ucsc
@@ -286,17 +286,11 @@ for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*WT*.BtB.tagdir
  #  done
 
  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
- #DNA spike in
- # ml ucsc
- # for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
- # do
- #  base=$(basename ${infile} .norm_sort.bga)
- # bedGraphToBigWig $infile $OUTDIR/ref/chrNameLength.txt $OUTDIR/bigwigs/${base}.bw
- # done
+
  #Kmet spike in
  ml deepTools
- # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
- # do
- #  base=$(basename ${infile} .kmet_sort.bga)
- # bedGraphToBigWig $infile $OUTDIR/ref/genome/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.bw
- # done
+ for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
+ do
+   base=$(basename ${infile} .kmet_sort.bga)
+  bedGraphToBigWig $infile $OUTDIR/ref/genome/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+  done
