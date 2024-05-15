@@ -10,15 +10,20 @@
 #SBATCH --output=../HeatMapPeaks.%j.out
 #SBATCH --error=../HeatMapPeaks.%j.err
 
-OUTDIR="/scratch/ry00555/HeatMapPeaks"
-
+OUTDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/BigWigs"
+MATRICESDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/Matrices"
+HEATMAPDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/Heatmaps"
 module load deepTools/3.5.1-intel-2020b-Python-3.8.6
 
 #conda install -c bioconda deeptools
 
-computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S $OUTDIR/124_1_ChIP_WT_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw $OUTDIR/124_2_ChIP_cac_1_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw $OUTDIR/124_3_ChIP_cac_2_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw $OUTDIR/124_4_ChIP_cac_3_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw $OUTDIR/124_5_ChIP_set_7_K4me2_Rep1_4901.bin_25.smooth_50_BPM.bw -R heatmapPRC2genes.bed --skipZeros -o matrix_PRC2.gz
+computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o $MATRICESDIR/matrix_PRC2Genes.gz
 
-plotHeatmap -m matrix_PRC2.gz -out cacheatmap_H3K4me2_Run124_hclust.png --samplesLabel WT cac-1 cac-2 cac-3 set-7 --hclust 1 --colorMap Reds
+plotHeatmap -m $MATRICESDIR/matrix_PRC2Genes.gz -out $HEATMAPDIR/ZLRun137CutandRunWTset7Only_Prc2Genes.png --samplesLabel WT-22Bulk WT-22Mnase WT2-Bulk WT2-Mnase set7-25Bulk set7-25MNase set7-7Bulk set7-7MNase --hclust 1 --colorMap Reds
+
+computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw -R /scratch/ry00555/WT_H3K27me3peaks.bed --skipZeros -o $MATRICESDIR/matrix_PRC2Domains.gz
+
+plotHeatmap -m $MATRICESDIR/matrix_PRC2Domains.gz -out $HEATMAPDIR/ZLRun137CutandRunWTset7Only_Prc2Domains.png --samplesLabel WT-22Bulk WT-22Mnase WT2-Bulk WT2-Mnase set7-25Bulk set7-25MNase set7-7Bulk set7-7MNase --hclust 1 --colorMap Reds
 
 
 #133-23_ChIP_WT_H3K9me3_Rep2.bin_25.smooth_75.bw
