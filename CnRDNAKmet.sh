@@ -71,26 +71,26 @@ done
 #no need to samtools merge at the moment because I only have one of each sample
 #turning sorted bam files into bed graphs for DNA spike in
  #mkdir $OUTDIR/bed_files
- for f in $FILES
- do
- name=$(basename "${f}" _R1_001_val_1.fq.gz)
- ml BEDTools
-bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
- bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
+#  for f in $FILES
+#  do
+#  name=$(basename "${f}" _R1_001_val_1.fq.gz)
+#  ml BEDTools
+# bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
+#  bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
 
 #  DNA-spike in normalization
 #  mkdir $OUTDIR/bedgraphs
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
- done
+ #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
+ #done
  #sort bga files from  DNA spike in
-    ml ucsc
-    for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
-     do
-       base=$(basename ${infile} .norm.bga)
-       bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
-    done
+  #  ml ucsc
+  #  for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
+  #   do
+  #     base=$(basename ${infile} .norm.bga)
+  #     bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
+  #  done
 
-module load Homer
+#module load Homer
   # calling peaks
   #  mkdir $OUTDIR/Peaks
     # for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
@@ -123,29 +123,29 @@ module load Homer
 #  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
 #  done
 
- for infile in $OUTDIR/TagDirectories/*set-7*.BtB.tagdir
- do
-   base=$(basename ${infile} .BtB.tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
- done
-
- for infile in $OUTDIR/TagDirectories/*ncu00423*.BtB.tagdir
- do
-   base=$(basename ${infile} .BtB.tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
- done
-
- for infile in $OUTDIR/TagDirectories/*ncu06787*.BtB.tagdir
- do
-   base=$(basename ${infile} .BtB.tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
- done
-
- for infile in $OUTDIR/TagDirectories/*ncu06788*.BtB.tagdir
- do
-   base=$(basename ${infile} .BtB.tagdir)
- findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
- done
+ # for infile in $OUTDIR/TagDirectories/*set-7*.BtB.tagdir
+ # do
+ #   base=$(basename ${infile} .BtB.tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ # done
+ #
+ # for infile in $OUTDIR/TagDirectories/*ncu00423*.BtB.tagdir
+ # do
+ #   base=$(basename ${infile} .BtB.tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ # done
+ #
+ # for infile in $OUTDIR/TagDirectories/*ncu06787*.BtB.tagdir
+ # do
+ #   base=$(basename ${infile} .BtB.tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ # done
+ #
+ # for infile in $OUTDIR/TagDirectories/*ncu06788*.BtB.tagdir
+ # do
+ #   base=$(basename ${infile} .BtB.tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+ # done
 
 #changing peak txt files to bed files to input into chipr
   for infile in $OUTDIR/Peaks/*_IgGNorm.txt
@@ -161,7 +161,7 @@ module load Homer
    for infile in $OUTDIR/Peaks/*.peaks_IgGNorm.bed
    do
      base=$(basename ${infile} .peaks_IgGNorm.bed)
-  annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
+  annotatePeaks.pl $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fna -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/Peaks/${base}.peaks_IgGNorm_ann.txt
   # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
   done
 
@@ -174,39 +174,48 @@ module load Homer
 
 #kmet spike in for both reg sorted and ecoli sorted
 #The issue is the base name for all the files do not match
- for file in $OUTDIR/SortedBamFiles/*sorted.bam
-   do
-      base=$(basename "${file}" .sorted.bam)
-  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
-  $OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-  done
+ #for file in $OUTDIR/SortedBamFiles/*sorted.bam
+  # do
+  #    base=$(basename "${file}" .sorted.bam)
+  #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
+  #$OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+  #done
+
+  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R1_001.fastq.gz \
+$OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R2_001.fastq.gz 137-5_CUTANDRUN_WT_IgG_Rep1_S5 bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+ml ucsc
+bedSort $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5_kmet.bga $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga
+cat $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed
+module load Homer
+makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_S5.BtB.tagdir 137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed -format bed
+
  #sort bga files from spike in
-   ml ucsc
-  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
-   do
-   base=$(basename ${infile} _kmet.bga)
-       bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
-     done
+  #  ml ucsc
+  # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+  #  do
+  #  base=$(basename ${infile} _kmet.bga)
+  #      bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+  #    done
 
- mkdir $OUTDIR/KmetSpikeIn/Peaks
-   for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
-    do base=$(basename ${infile} .kmet_sort.bga)
-    cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
-   done
+ #mkdir $OUTDIR/KmetSpikeIn/Peaks
+   # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
+   #  do base=$(basename ${infile} .kmet_sort.bga)
+   #  cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+   # done
 
-  module load Homer
-#  mkdir $OUTDIR/KmetSpikeIn/TagDirectories
-   for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
-   do
-  base=$(basename ${infile} .bgato.bed)
-  makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
-  done
+#   module load Homer
+# #  mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+#    for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+#    do
+#   base=$(basename ${infile} .bgato.bed)
+#   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+#   done
 
  #the below loop will rewrite the E coli sorted bamfiles
 for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
    do
       base=$(basename "${file}" _Ecoli.sorted.bam)
-   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
+   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base.Ecoli $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
   $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
   done
 
