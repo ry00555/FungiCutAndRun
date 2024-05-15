@@ -13,7 +13,7 @@
 OUTDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/BigWigs"
 MATRICESDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/Matrices"
 HEATMAPDIR="/scratch/ry00555/OutputRun137/Neurospora_Output/Heatmaps"
-ml deepTools/3.5.1-intel-2020b-Python-3.8.6
+ml deepTools
 
 #conda install -c bioconda deeptools
 
