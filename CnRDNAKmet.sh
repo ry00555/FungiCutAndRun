@@ -11,7 +11,6 @@
 #SBATCH --error=../MapCutAndRun132.%j.err
 cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
-$FASTQ="/scratch/ry00555/OutputRun137/CutandRun"
 
 # ml Trim_Galore
 # mkdir "$OUTDIR/TrimmedReads"
@@ -66,7 +65,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 do
 name=$(basename "${file}" .sorted.bam)
  #using --nolambda paramenter to call peaks without control
-  macs3 callpeak -t "${file}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/MACSPeaks" --min-length 800 --max-gap 500 --nolambda
+  macs3 callpeak -t "${name}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/MACSPeaks" --min-length 800 --max-gap 500 --nolambda
 done
 
 #no need to samtools merge at the moment because I only have one of each sample
@@ -302,7 +301,7 @@ for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
    for infile in $OUTDIR/KmetSpikeIn/Peaks/*.peaks_IgGNorm.bed
     do
       base=$(basename ${infile} .peaks_IgGNorm.bed)
-   annotatePeaks.pl $OUTDIR/KmetSpikeIn/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fa -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/KmetSpikeIn/Peaks/${base}.peaks_IgGNorm_ann.txt
+   annotatePeaks.pl $OUTDIR/KmetSpikeIn/Peaks/${base}.peaks_IgGNorm.bed /scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_refseq.fna -gtf /scratch/ry00555/Ncrassa.gtf > $OUTDIR/KmetSpikeIn/Peaks/${base}.peaks_IgGNorm_ann.txt
   #  you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
    done
 
