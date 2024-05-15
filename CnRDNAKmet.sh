@@ -320,9 +320,14 @@ makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_
    for infile in $OUTDIR/KmetSpikeIn/Peaks/${base}_ann.txt
  do
      base=$(basename ${infile} _masked_ann.txt)
-     awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${PEAKDIR}/${base}.1000bp_ann.txt
+     awk -F'\t' 'sqrt($10*$10) <=1000' $infile > $OUTDIR/KmetSpikeIn/Peaks/${base}.1000bp_ann.txt
    done
-
+   # #converting into bed file for intersection with TPM Calc output
+for infile in $OUTDIR/KmetSpikeIn/Peaks/*.1000bp_ann.txt
+do
+base=$(basename ${infile} .txt)
+awk '{print $2 "\t" $3 "\t" $4 }' $infile | tail -n +2 > $OUTDIR/KmetSpikeIn/Peaks/${base}.bed
+ done
  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
 
  #Kmet spike in
@@ -330,7 +335,7 @@ makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_
  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
  do
    base=$(basename ${infile} .kmet_sort.bga)
-  bedGraphToBigWig $infile $OUTDIR/ref/genome/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+  bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
   done
 
   #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
@@ -342,7 +347,7 @@ makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_
 #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ../BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_DNASpikeinNorm.bw ../BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw -R "/scratch/ry00555/MyceliaK27me3_peaks.bed" --skipZeros -o matrix_CnR_H3K27me3.gz
 
 
-  plotHeatmap -m "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz" -out ${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT2 WT22 set-72 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
+  #plotHeatmap -m "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz" -out ${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT2 WT22 set-72 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
   #command line below to launch in Heatmaps directory
 #  plotHeatmap -m ../Matrices/matrix_CnR_H3K27me3.gz -out CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT set-7 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
 
