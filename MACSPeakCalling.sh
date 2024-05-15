@@ -71,7 +71,7 @@ module load MACS3
 for infile in $OUTDIR/SortedBamFiles/TagDirectories/*rtt109*.sorted.bam
  do
   base=$(basename ${infile} .sorted.bam)
-  base2=$(basename ${infile} .EColi.sorted.bam
+  base2=$(basename ${infile} .EColi.sorted.bam)
 macs3 callpeak -t $infile -f BAMPE -n $base -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 macs3 callpeak -t $infile -f BAMPE -n $base2 -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
-  done
+done
