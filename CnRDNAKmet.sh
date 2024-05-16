@@ -30,7 +30,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 module load Bowtie2
  #bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
  #ZL Genome
- bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic $OUTDIR/ref/Ncrassa_ref
+ bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna $OUTDIR/ref/Ncrassa_ref
 
  #in line commands
  #bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
