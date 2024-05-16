@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=CUTandRun137
+#SBATCH --job-name=MacsPeakCalling
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
