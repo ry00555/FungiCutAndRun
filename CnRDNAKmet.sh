@@ -87,8 +87,8 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
        bedSort $infile $OUTDIR/bedgraphs/${base}.norm_sort.bga
     done
 
-#module load Homer
-calling peaks
+module load Homer
+#calling peaks
   #  mkdir $OUTDIR/Peaks
      for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
        do base=$(basename ${infile} .norm_sort.bga)
@@ -98,7 +98,7 @@ calling peaks
 for infile in $OUTDIR/Peaks/*bgato.bed
 do
 base=$(basename ${infile} .bgato.bed)
- makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
+ makeTagDirectory $OUTDIR/TagDirectories/${base}.BtB.tagdir $infile -format bed
    done
 
 
@@ -166,7 +166,7 @@ base=$(basename ${infile} .bgato.bed)
   for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
     do
    base=$(basename ${infile} .norm_sort.bga)
-   bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_refseq/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+   bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
    done
 
 #kmet spike in for both reg sorted and ecoli sorted
