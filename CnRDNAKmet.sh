@@ -43,8 +43,8 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
  #command line
  #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeFastaFiles Ncrassa_refseq.fa
 
- #for f in $FILES
-#  do
+ for f in $FILES
+  do
 # base=$(basename "${f}" _R1_001_val_1.fq.gz)
 # read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
 #  mkdir $OUTDIR/sam_files
@@ -68,12 +68,12 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 #no need to samtools merge at the moment because I only have one of each sample
 #turning sorted bam files into bed graphs for DNA spike in
  #mkdir $OUTDIR/bed_files
- for f in $FILES
-  do
-  name=$(basename "${f}" _R1_001_val_1.fq.gz)
-  ml BEDTools
- bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
-  bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
+ # for f in $FILES
+ #  do
+ #  name=$(basename "${f}" _R1_001_val_1.fq.gz)
+ #  ml BEDTools
+ # bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
+ #  bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
 
 #  DNA-spike in normalization
 #  mkdir $OUTDIR/bedgraphs
@@ -166,7 +166,7 @@ base=$(basename ${infile} .bgato.bed)
   for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
     do
    base=$(basename ${infile} .norm_sort.bga)
-   bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+   bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_refseq/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
    done
 
 #kmet spike in for both reg sorted and ecoli sorted
@@ -204,7 +204,7 @@ base=$(basename ${infile} .bgato.bed)
 for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
     do
    base=$(basename ${infile} .bgato.bed)
-   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirecleactories/${base}.BtB.tagdir $infile -format bed
    done
 
  #the below loop will rewrite the E coli sorted bamfiles
@@ -324,7 +324,14 @@ for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
 # awk '{print $2 "\t" $3 "\t" $4 }' $infile | tail -n +2 > $OUTDIR/KmetSpikeIn/Peaks/${base}.bed
 #  done
 #  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
-#
+##  #Kmet spike in
+#  ml deepTools
+#  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
+#  do
+#    base=$(basename ${infile} .kmet_sort.bga)
+#   bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+#   done
+
 #  #Kmet spike in
 #  ml deepTools
 #  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
