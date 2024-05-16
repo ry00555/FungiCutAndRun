@@ -10,7 +10,7 @@
 #SBATCH --output=../MapCutAndRun132.%j.out
 #SBATCH --error=../MapCutAndRun132.%j.err
 cd $SLURM_SUBMIT_DIR
-OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
+OUTDIR="/scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun"
 
 # ml Trim_Galore
 # mkdir "$OUTDIR/TrimmedReads"
@@ -27,15 +27,18 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
  #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > ref/ecoli_refseq.fa
  #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > ref/Ncrassa_refseq.fa
 
-#module load Bowtie2
+module load Bowtie2
  #bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
+ #ZL Genome
+ bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic $OUTDIR/ref/Ncrassa_ref
+
  #in line commands
  #bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
  #bowtie2-build -f ref/ecoli_refseq.fa ref/Ecoli_ref
 
 #Use STAR to create chrNameLength.txt files
- #ml STAR
- #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles $OUTDIR/ref/Ncrassa_refseq.fa
+ ml STAR
+ STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles $OUTDIR/ref/Ncrassa_refseq.fa
  #command line
  #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeFastaFiles Ncrassa_refseq.fa
 
@@ -108,7 +111,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 # Set the directory containing the tag directories
 #  this code works where I have to type in strain  so do it for the rest change rtt109 to WT , set-7, ncu00423, ncu006787, ncu06788
 
-module load Homer
+#module load Homer
 
  #using IgG as input
  #for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
@@ -148,11 +151,11 @@ module load Homer
  # done
 
 #changing peak txt files to bed files to input into chipr
-  for infile in $OUTDIR/Peaks/*_IgGNorm.txt
-  do
-  base=$(basename ${infile} _IgGNorm.txt)
-  sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
-   done
+  # for infile in $OUTDIR/Peaks/*_IgGNorm.txt
+  # do
+  # base=$(basename ${infile} _IgGNorm.txt)
+  # sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
+  #  done
 
   #don't need ChipR right now since I don't have replicates as of 4/10/24
 
@@ -181,13 +184,13 @@ module load Homer
   #$OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
   #done
 
-  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R1_001.fastq.gz \
-$OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R2_001.fastq.gz 137-5_CUTANDRUN_WT_IgG_Rep1_S5 bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-ml ucsc
-bedSort $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5_kmet.bga $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga
-cat $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed
-module load Homer
-makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_S5.BtB.tagdir 137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed -format bed
+#   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R1_001.fastq.gz \
+# $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R2_001.fastq.gz 137-5_CUTANDRUN_WT_IgG_Rep1_S5 bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
+# ml ucsc
+# bedSort $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5_kmet.bga $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga
+# cat $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed
+# module load Homer
+# makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_S5.BtB.tagdir 137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed -format bed
 
  #sort bga files from spike in
   #  ml ucsc
@@ -317,26 +320,26 @@ makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_
   #annotating peak files with masked reference (use HOMER module)
 #  curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
 #  now filtering for only peaks that are w/i 1000bps of their annotation:
-   for infile in $OUTDIR/KmetSpikeIn/Peaks/${base}_ann.txt
- do
-     base=$(basename ${infile} _masked_ann.txt)
-     awk -F'\t' 'sqrt($10*$10) <=1000' $infile > $OUTDIR/KmetSpikeIn/Peaks/${base}.1000bp_ann.txt
-   done
-   # #converting into bed file for intersection with TPM Calc output
-for infile in $OUTDIR/KmetSpikeIn/Peaks/*.1000bp_ann.txt
-do
-base=$(basename ${infile} .txt)
-awk '{print $2 "\t" $3 "\t" $4 }' $infile | tail -n +2 > $OUTDIR/KmetSpikeIn/Peaks/${base}.bed
- done
- #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
-
- #Kmet spike in
- ml deepTools
- for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
- do
-   base=$(basename ${infile} .kmet_sort.bga)
-  bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
-  done
+#    for infile in $OUTDIR/KmetSpikeIn/Peaks/${base}_ann.txt
+#  do
+#      base=$(basename ${infile} _masked_ann.txt)
+#      awk -F'\t' 'sqrt($10*$10) <=1000' $infile > $OUTDIR/KmetSpikeIn/Peaks/${base}.1000bp_ann.txt
+#    done
+#    # #converting into bed file for intersection with TPM Calc output
+# for infile in $OUTDIR/KmetSpikeIn/Peaks/*.1000bp_ann.txt
+# do
+# base=$(basename ${infile} .txt)
+# awk '{print $2 "\t" $3 "\t" $4 }' $infile | tail -n +2 > $OUTDIR/KmetSpikeIn/Peaks/${base}.bed
+#  done
+#  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
+#
+#  #Kmet spike in
+#  ml deepTools
+#  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
+#  do
+#    base=$(basename ${infile} .kmet_sort.bga)
+#   bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+#   done
 
   #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
   # option for command line
