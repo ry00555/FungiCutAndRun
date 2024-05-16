@@ -63,15 +63,64 @@ cd $SLURM_SUBMIT_DIR
 # 137-26_CUTANDRUN_set-7_H3K36me3_Rep1_S26.sorted.bam           _Ecoli.sorted.bam
 # 137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18_Ecoli.sorted.bam
 # 137-26_CUTANDRUN_set-7_H3K36me3_Rep1_S26_Ecoli.sorted.bam
-
+OUTDIR="/scratch/ry00555/OutputRun137/CutandRun"
 module load MACS3
 #command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
-for infile in $OUTDIR/SortedBamFiles/TagDirectories/*rtt109*.sorted.bam
+for infile in $OUTDIR/SortedBamFiles/*rtt109*.sorted.bam
  do
   base=$(basename ${infile} .sorted.bam)
   base2=$(basename ${infile} .EColi.sorted.bam)
 macs3 callpeak -t $infile -f BAMPE -n $base -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 macs3 callpeak -t $infile -f BAMPE -n $base2 -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+for infile in $OUTDIR/SortedBamFiles/*WT*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-1_CUTANDRUN_WT_IgG_Rep1_S1.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-1_CUTANDRUN_WT_IgG_Rep1_S1_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+
+for infile in $OUTDIR/SortedBamFiles/*set-7*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-6_CUTANDRUN_set-7_IgG_Rep1_S6.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-6_CUTANDRUN_set-7_IgG_Rep1_S6_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+for infile in $OUTDIR/SortedBamFiles/*set-7*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-6_CUTANDRUN_set-7_IgG_Rep1_S6.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-6_CUTANDRUN_set-7_IgG_Rep1_S6_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+for infile in $OUTDIR/SortedBamFiles/*ncu06787*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+for infile in $OUTDIR/SortedBamFiles/*ncu06788*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+done
+
+for infile in $OUTDIR/SortedBamFiles/*ncu00423*.sorted.bam
+ do
+  base=$(basename ${infile} .sorted.bam)
+  base2=$(basename ${infile} .EColi.sorted.bam)
+macs3 callpeak -t $infile -f BAMPE -n $base -c 137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t $infile -f BAMPE -n $base2.Ecoli -c 137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 done
