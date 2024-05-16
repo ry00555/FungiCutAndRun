@@ -30,7 +30,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 module load Bowtie2
  #bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
  #ZL Genome
- bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna $OUTDIR/ref/Ncrassa_ref
+ #bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna $OUTDIR/ref/Ncrassa_ref
 
  #in line commands
  #bowtie2-build -f ref/Ncrassa_refseq.fa ref/Ncrassa_ref
@@ -38,53 +38,46 @@ module load Bowtie2
 
 #Use STAR to create chrNameLength.txt files
  ml STAR
- STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
+ STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna
  #command line
  #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeFastaFiles Ncrassa_refseq.fa
 
- #for f in $FILES
-#   do
-# base=$(basename "${f}" _R1_001_val_1.fq.gz)
-# read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
-#  mkdir $OUTDIR/sam_files
-# bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ncrassa_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}.sam"
+ for f in $FILES
+  do
+ base=$(basename "${f}" _R1_001_val_1.fq.gz)
+ read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
+  mkdir $OUTDIR/sam_files
+bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "$OUTDIR/ref/Ncrassa_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}.sam"
 
 #  bowtie2-build -f ${OUTDIR}/ref/ecoli_refseq.fa $OUTDIR/ref/ecoli_ref
-#  bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}_Ecoli.sam"
+bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}_Ecoli.sam"
 
- #module load SAMtools
+ module load SAMtools
 #  mkdir "$OUTDIR/bam_files"
- #samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}.bam"
- #samtools view -bS -h "/scratch/ry00555/OutputRun137/CutandRun/sam_files/${base}_Ecoli.sam" > "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}_Ecoli.bam"
+ samtools view -bS -h "$OUTDIR/sam_files/${base}.sam" > "$OUTDIR/bam_files/${base}.bam"
+ samtools view -bS -h "$OUTDIR/sam_files/${base}_Ecoli.sam" > "$OUTDIR/bam_files/${base}_Ecoli.bam"
 
 #  mkdir "$OUTDIR/SortedBamFiles"
- #samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${base}.sorted.bam"
- #samtools sort "/scratch/ry00555/OutputRun137/CutandRun/bam_files/${base}_Ecoli.bam" -o "/scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${base}_Ecoli.sorted.bam"
+ samtools sort "$OUTDIR/bam_files/${base}.bam" -o "$OUTDIR/SortedBamFiles/${base}.sorted.bam"
+ samtools sort "$OUTDIR/bam_files/${base}_Ecoli.bam" -o "$OUTDIR/SortedBamFiles/${base}_Ecoli.sorted.bam"
 
- #done
+ done
 
-#  module load MACS3
-#  for file in $OUTDIR/SortedBamFiles
-# do
-# name=$(basename "${file}" .sorted.bam)
-#  #using --nolambda paramenter to call peaks without control
-#   macs3 callpeak -t "${name}" -f BAMPE -n "${name}" --broad -g 41037538 --broad-cutoff 0.1 --outdir "${OUTDIR}/MACSPeaks" --min-length 800 --max-gap 500 --nolambda
-# done
 
 #no need to samtools merge at the moment because I only have one of each sample
 #turning sorted bam files into bed graphs for DNA spike in
  #mkdir $OUTDIR/bed_files
-#  for f in $FILES
-#  do
-#  name=$(basename "${f}" _R1_001_val_1.fq.gz)
-#  ml BEDTools
-# bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed
-#  bedtools bamtobed -i /scratch/ry00555/OutputRun137/CutandRun/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed
+ for f in $FILES
+  do
+  name=$(basename "${f}" _R1_001_val_1.fq.gz)
+  ml BEDTools
+ bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}.btb.bed
+  bedtools bamtobed -i $OUTDIR/SortedBamFiles/${name}_Ecoli.sorted.bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${name}_Ecoli.btb.bed
 
 #  DNA-spike in normalization
 #  mkdir $OUTDIR/bedgraphs
- #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}.btb.bed /scratch/ry00555/OutputRun137/CutandRun/bed_files/${name}_Ecoli.btb.bed 100000 bga "/scratch/ry00555/OutputRun137/CutandRun/ref/GenomeDir/chrNameLength.txt" 1 1000 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
- #done
+ sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/GenomeDir/chrNameLength.txt" 1 550 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
+ done
  #sort bga files from  DNA spike in
   #  ml ucsc
   #  for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga

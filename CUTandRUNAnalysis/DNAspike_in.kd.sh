@@ -85,8 +85,10 @@ else
 fi
 
 #Select fragments within the length range, assumes fragment length is in column 6 of the bed file
+#1000 for 5 nucleosomes
+#550 for 3 nucleosomes
 echo "Generating Fragment Lengths"
-cat $genome_bed | awk -v min=10 -v max=1000 '$7 >= min &&  $7 <= max {print $0}' > frag_length.temp.bed
+cat $genome_bed | awk -v min=10 -v max=550 '$7 >= min &&  $7 <= max {print $0}' > frag_length.temp.bed
 
 #Use genomecov to compute spike-in calibrated genome coverage
 #see http://bedtools.readthedocs.io/en/latest/content/tools/genomecov.html
