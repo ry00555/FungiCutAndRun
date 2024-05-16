@@ -11,6 +11,7 @@
 #SBATCH --error=../MapCutAndRun132.%j.err
 cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun"
+OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 
 # ml Trim_Galore
 # mkdir "$OUTDIR/TrimmedReads"
@@ -27,7 +28,7 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
  #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > ref/ecoli_refseq.fa
  #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > ref/Ncrassa_refseq.fa
 
-module load Bowtie2
+#module load Bowtie2
  #bowtie2-build -f $OUTDIR/ref/Ncrassa_refseq.fa $OUTDIR/ref/Ncrassa_ref
  #ZL Genome
  #bowtie2-build -f /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna $OUTDIR/ref/Ncrassa_ref
@@ -37,31 +38,31 @@ module load Bowtie2
  #bowtie2-build -f ref/ecoli_refseq.fa ref/Ecoli_ref
 
 #Use STAR to create chrNameLength.txt files
- ml STAR
- STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna
+# ml STAR
+# STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna
  #command line
  #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeFastaFiles Ncrassa_refseq.fa
 
- for f in $FILES
-  do
- base=$(basename "${f}" _R1_001_val_1.fq.gz)
- read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
-  mkdir $OUTDIR/sam_files
-bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "$OUTDIR/ref/Ncrassa_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}.sam"
+ #for f in $FILES
+#  do
+# base=$(basename "${f}" _R1_001_val_1.fq.gz)
+# read2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
+#  mkdir $OUTDIR/sam_files
+#bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "$OUTDIR/ref/Ncrassa_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}.sam"
 
 #  bowtie2-build -f ${OUTDIR}/ref/ecoli_refseq.fa $OUTDIR/ref/ecoli_ref
-bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}_Ecoli.sam"
+#bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry00555/OutputRun137/CutandRun/ref/Ecoli_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}_Ecoli.sam"
 
- module load SAMtools
+ #module load SAMtools
 #  mkdir "$OUTDIR/bam_files"
- samtools view -bS -h "$OUTDIR/sam_files/${base}.sam" > "$OUTDIR/bam_files/${base}.bam"
- samtools view -bS -h "$OUTDIR/sam_files/${base}_Ecoli.sam" > "$OUTDIR/bam_files/${base}_Ecoli.bam"
+ #samtools view -bS -h "$OUTDIR/sam_files/${base}.sam" > "$OUTDIR/bam_files/${base}.bam"
+ #samtools view -bS -h "$OUTDIR/sam_files/${base}_Ecoli.sam" > "$OUTDIR/bam_files/${base}_Ecoli.bam"
 
 #  mkdir "$OUTDIR/SortedBamFiles"
- samtools sort "$OUTDIR/bam_files/${base}.bam" -o "$OUTDIR/SortedBamFiles/${base}.sorted.bam"
- samtools sort "$OUTDIR/bam_files/${base}_Ecoli.bam" -o "$OUTDIR/SortedBamFiles/${base}_Ecoli.sorted.bam"
+ #samtools sort "$OUTDIR/bam_files/${base}.bam" -o "$OUTDIR/SortedBamFiles/${base}.sorted.bam"
+ #samtools sort "$OUTDIR/bam_files/${base}_Ecoli.bam" -o "$OUTDIR/SortedBamFiles/${base}_Ecoli.sorted.bam"
 
- done
+ #done
 
 
 #no need to samtools merge at the moment because I only have one of each sample
@@ -76,29 +77,29 @@ bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry
 
 #  DNA-spike in normalization
 #  mkdir $OUTDIR/bedgraphs
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/GenomeDir/chrNameLength.txt" 1 550 /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${name}.norm.bga
+ sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.norm.bga
  done
  #sort bga files from  DNA spike in
-  #  ml ucsc
-  #  for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*norm.bga
-  #   do
-  #     base=$(basename ${infile} .norm.bga)
-  #     bedSort $infile /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/${base}.norm_sort.bga
-  #  done
+   ml ucsc
+    for infile in $OUTDIR/bedgraphs/*norm.bga
+     do
+   base=$(basename ${infile} .norm.bga)
+       bedSort $infile $OUTDIR/bedgraphs/${base}.norm_sort.bga
+    done
 
 #module load Homer
-  # calling peaks
+calling peaks
   #  mkdir $OUTDIR/Peaks
-    # for infile in /scratch/ry00555/OutputRun137/CutandRun/bedgraphs/*.norm_sort.bga
-    #   do base=$(basename ${infile} .norm_sort.bga)
-   #cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > /scratch/ry00555/OutputRun137/CutandRun/Peaks/${base}.bgato.bed
-    #done
+     for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+       do base=$(basename ${infile} .norm_sort.bga)
+   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/Peaks/${base}.bgato.bed
+    done
 
-#for infile in /scratch/ry00555/OutputRun137/CutandRun/Peaks/*bgato.bed
-#do
-#base=$(basename ${infile} .bgato.bed)
-# makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
-#   done
+for infile in $OUTDIR/Peaks/*bgato.bed
+do
+base=$(basename ${infile} .bgato.bed)
+ makeTagDirectory /scratch/ry00555/OutputRun137/CutandRun/TagDirectories/${base}.BtB.tagdir $infile -format bed
+   done
 
 
 # Set the directory containing the tag directories
@@ -161,23 +162,22 @@ bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry
   # # you can analyze the peaks in excel now lets turn this into big wigs so we can make meta plots
   # done
 
-  # ml ucsc
-  # for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
-  #  do
-  # base=$(basename ${infile} .norm_sort.bga)
-  # bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
-  # done
+   ml ucsc
+  for infile in $OUTDIR/bedgraphs/*.norm_sort.bga
+    do
+   base=$(basename ${infile} .norm_sort.bga)
+   bedGraphToBigWig $infile $OUTDIR/ref/GenomeDir/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+   done
 
 #kmet spike in for both reg sorted and ecoli sorted
 #The issue is the base name for all the files do not match
- #for file in $OUTDIR/SortedBamFiles/*sorted.bam
-  # do
-  #    base=$(basename "${file}" .sorted.bam)
-  #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*R1_001_val_1.fq.gz \
-  #$OUTDIR/TrimmedReads/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-  #done
-
-#   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R1_001.fastq.gz \
+ for file in $OUTDIR/SortedBamFiles/*sorted.bam
+   do
+      base=$(basename "${file}" .sorted.bam)
+  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR2/${base}*R1_001_val_1.fq.gz \ $OUTDIR2/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+  done
+#WT file number 5 was never read in OG CutandRun with my annotated genome
+# sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R1_001.fastq.gz \
 # $OUTDIR/TrimmedReads/137-5_CUTANDRUN_WT_IgG_Rep1_S5_R2_001.fastq.gz 137-5_CUTANDRUN_WT_IgG_Rep1_S5 bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
 # ml ucsc
 # bedSort $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5_kmet.bga $OUTDIR/KmetSpikeIn/bedgraphs/137-5_CUTANDRUN_WT_IgG_Rep1_S5.kmet_sort.bga
@@ -186,34 +186,33 @@ bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "/scratch/ry
 # makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/137-5_CUTANDRUN_WT_IgG_Rep1_S5.BtB.tagdir 137-5_CUTANDRUN_WT_IgG_Rep1_S5.bgato.bed -format bed
 
  #sort bga files from spike in
-  #  ml ucsc
-  # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
-  #  do
-  #  base=$(basename ${infile} _kmet.bga)
-  #      bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
-  #    done
+ ml ucsc
+  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet.bga
+    do
+    base=$(basename ${infile} _kmet.bga)
+        bedSort $infile $OUTDIR/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga
+      done
 
  #mkdir $OUTDIR/KmetSpikeIn/Peaks
-   # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
-   #  do base=$(basename ${infile} .kmet_sort.bga)
-   #  cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
-   # done
+   for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*kmet_sort.bga
+     do base=$(basename ${infile} .kmet_sort.bga)
+     cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+    done
 
-#   module load Homer
+ module load Homer
 # #  mkdir $OUTDIR/KmetSpikeIn/TagDirectories
-#    for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
-#    do
-#   base=$(basename ${infile} .bgato.bed)
-#   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
-#   done
+for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+    do
+   base=$(basename ${infile} .bgato.bed)
+   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+   done
 
  #the below loop will rewrite the E coli sorted bamfiles
-# for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
-#    do
-#       base=$(basename "${file}" _Ecoli.sorted.bam)
-#    sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base.Ecoli $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \
-#   $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/GenomeDir/chrNameLength.txt
-#   done
+ for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
+    do
+       base=$(basename "${file}" _Ecoli.sorted.bam)
+    sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base.Ecoli $OUTDIR2/${base}*_R1_001_val_1.fq.gz $OUTDIR2/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+ done
 
 # sort bga files from spike in
 #   ml ucsc
