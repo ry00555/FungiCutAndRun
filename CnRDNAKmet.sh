@@ -1,14 +1,14 @@
-# !/bin/bash
-# SBATCH --job-name=CUTandRun137
-# SBATCH --partition=batch
-# SBATCH --mail-type=ALL
-# SBATCH --mail-user=ry00555@uga.edu
-# SBATCH --ntasks=1
-# SBATCH --cpus-per-task=24
-# SBATCH --mem=90gb
-# SBATCH --time=48:00:00
-# SBATCH --output=../MapCutAndRun132.%j.out
-# SBATCH --error=../MapCutAndRun132.%j.err
+#!/bin/bash
+#SBATCH --job-name=CUTandRun137
+#SBATCH --partition=batch
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=90gb
+#SBATCH --time=48:00:00
+#SBATCH --output=../MapCutAndRun132.%j.out
+#SBATCH --error=../MapCutAndRun132.%j.err
 cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun"
 OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
