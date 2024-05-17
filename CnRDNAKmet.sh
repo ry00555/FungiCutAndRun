@@ -254,7 +254,7 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
   #   base2=$(basename ${infile} .EColi.BtB.tagdir)
   #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
   #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
-       done
+       #done
  #
  #
        # for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*set-7*.BtB.tagdir
