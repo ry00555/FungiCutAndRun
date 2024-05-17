@@ -331,12 +331,22 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
   #  done
 
 #  #Kmet spike in on Ecoli normalized bedgraph files
-ml ucsc
+#this won't work because you have reads for both genomes E coli and N crassa. Lets try combining
+
+#Use STAR to create chrNameLength.txt files
+# ml STAR
+ #command line
+ #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeDir EColi_ref --genomeFastaFiles ecoli_refseq.fa
+#Direct paths to files
+#/scratch/ry00555/OutputRun137/CutandRun/ref/EColi_ref
+#/scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/ref/Ncrassa_ref
+#cat /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/ref/Ncrassa_ref/chrNameLength.txt /scratch/ry00555/OutputRun137/CutandRun/ref/EColi_ref/chrNameLength.txt > CombinedNCrassaEColi_chrNameLength.txt
+
 ml deepTools
  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
  do
    base=$(basename ${infile} .kmet_sort.bga)
-  bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+  bedGraphToBigWig $infile $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
   done
 
   #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
