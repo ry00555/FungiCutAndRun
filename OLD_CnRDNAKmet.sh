@@ -45,6 +45,7 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
  #STAR --runThreadN 20 --genomeSAindexNbases 8 --runMode genomeGenerate --genomeFastaFiles Ncrassa_refseq.fa
 
 #################################### Start DNA Spike In Normalization Here ############################################
+#FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
 #  for f in $FILES
 #   do
 #  base=$(basename "${f}" _R1_001_val_1.fq.gz)
