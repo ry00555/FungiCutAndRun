@@ -113,7 +113,7 @@ echo "... loading TrimGalore"
 module load Trim_Galore
 echo "...starting trimming"
 #Our lab command
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/*fastq\.gz
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #Goll lab
 #trim_galore --fastqc -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
@@ -222,7 +222,7 @@ do
   base=$(basename ${file} Aligned.sortedByCoord.out.bam)
   #Our lab
   samtools view -bhSu -q 30 $file | samtools sort - > $OUTDIR/SortedBamFiles/"$base"_q30.bam
-  #GOll lab 
+  #GOll lab
 #  samtools view -bS -h -bq1 $file | samtools sort - > $OUTDIR/bams/"$base"_q1.bam
 done
 echo "... quality filtering done"
