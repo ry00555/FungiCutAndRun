@@ -171,11 +171,11 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
           #   done
 
 #################################### Kmet Spike In Normalization on N crassa aligned BAM files  ############################################
-# for file in $OUTDIR/SortedBamFiles/*sorted.bam
-#   do
-#      base=$(basename "${file}" .sorted.bam)
-#  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR2/${base}*R1_001_val_1.fq.gz \ $OUTDIR2/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
-#  done
+for file in $OUTDIR/SortedBamFiles/*sorted.bam
+   do
+      base=$(basename "${file}" .sorted.bam)
+  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR2/${base}*R1_001_val_1.fq.gz \ $OUTDIR2/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+  done
 
 # sort bga files from spike in
   # ml ucsc
@@ -202,34 +202,6 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 
 
     #################################### Kmet Spike In Normalization on E Coli aligned BAM files  ############################################
-#     for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
-#        do
-#           base=$(basename "${file}" _Ecoli.sorted.bam)
-#        sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base.Ecoli $OUTDIR2/${base}*_R1_001_val_1.fq.gz $OUTDIR2/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
-#     done
-#
-#
-# sort bga files from spike in
-#    ml ucsc
-#    for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet.bga
-#     do
-#     base=$(basename ${infile} _kmet.bga)
-#         bedSort $infile $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/${base}.kmet_sort.bga
-#  done
-#
-#  mkdir $OUTDIR/KmetSpikeIn/Peaks
-#     for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet_sort.bga
-#     do base=$(basename ${infile} .kmet_sort.bga)
-#      cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
-#   done
-#
-#   module load Homer
-#     mkdir $OUTDIR/KmetSpikeIn/TagDirectories
-#     for infile in $OUTDIR/KmetSpikeIn/Peaks/*.Ecoli.bgato.bed
-#      do
-#     base=$(basename ${infile} .bgato.bed)
-#     makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
-#   done
 
 #  Kmet spike in on Ecoli normalized bedgraph files
 #this won't work because you have reads for both genomes E coli and N crassa. Lets try combining genomes
@@ -244,38 +216,59 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 #cat /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/ref/Ncrassa_ref/chrNameLength.txt /scratch/ry00555/OutputRun137/CutandRun/ref/EColi_ref/chrNameLength.txt > CombinedNCrassaEColi_chrNameLength.txt
 
 
-# ml ucsc
-# ml deepTools
-# for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
-# do
-#  base=$(basename ${infile} .kmet_sort.bga)
-# bedGraphToBigWig $infile $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
-# done
-
 # command line
-for file in $OUTDIR/bedgraphs/*.norm_sort.bga
-do
-base=$(basename ${file} .norm_sort.bga)
-cat $file | awk '{print $1 "\t" $2 "\t" $3 "\t" $3}' > $OUTDIR/Norm_bed_files/${base}.bed
-done
+#for file in $OUTDIR/bedgraphs/*.norm_sort.bga
+#do
+#base=$(basename ${file} .norm_sort.bga)
+#cat $file | awk '{print $1 "\t" $2 "\t" $3 "\t" $3}' > $OUTDIR/Norm_bed_files/${base}.bed
+#done
 
-ml BEDTools
+#ml BEDTools
 #need a bed4 format chr start end name
 #bedToBam [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> > <BAM>
-for f in $OUTDIR/Norm_bed_files/*.bed
-do
-bedtools bedtobam -i $f -g $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt > $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
-done
+#for f in $OUTDIR/Norm_bed_files/*.bed
+#do
+#bedtools bedtobam -i $f -g $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt > $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
+#done
 
-ml SAMtools
-samtools sort "$OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam" -o "$OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.sorted.bam"
+#ml SAMtools
+#samtools sort "$OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam" -o "$OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.sorted.bam"
 
 
 for file in $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/*sorted.bam
   do
      base=$(basename "${file}" .sorted.bam)
- sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR2/${base}*R1_001_val_1.fq.gz \ $OUTDIR2/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+ sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.sh $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs $base $OUTDIR2/${base}*R1_001_val_1.fq.gz \ $OUTDIR2/${base}*R2_001_val_2.fq.gz $file bga $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt
  done
+
+ # sort bga files from spike in
+  ml ucsc
+     for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet.bga
+      do
+      base=$(basename ${infile} _kmet.bga)
+         bedSort $infile $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/${base}.kmet_sort.bga
+   done
+
+    for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
+  do
+        base=$(basename ${infile} .kmet_sort.bga)
+           bedGraphToBigWig $infile $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.DNAnKmetSpikeIn.bw
+  done
+
+  #mkdir $OUTDIR/KmetSpikeIn/Peaks
+       for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet_sort.bga
+       do base=$(basename ${infile} .kmet_sort.bga)
+        cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
+     done
+  #
+     module load Homer
+  #     mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+       for infile in $OUTDIR/KmetSpikeIn/Peaks/*.Ecoli.bgato.bed
+        do
+       base=$(basename ${infile} .bgato.bed)
+       makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+     done
+
     #################################### Use Homer to Call Peaks on Kmet Spike In Normalized Files  ############################################
 #mkdir $OUTDIR/KmetSpikeIn/TagDirectories
 #     for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
