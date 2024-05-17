@@ -253,17 +253,17 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 # done
 
 # command line
-for file in $OUTDIR/bedgraphs/*.norm_sort.bga
-do
-base=$(basename ${file} .norm_sort.bga)
-cat $file | awk '{print $1 "\t" $2 "\t" $3}' > $OUTDIR/Norm_bed_files/${base}.bed
-done
+#for file in $OUTDIR/bedgraphs/*.norm_sort.bga
+#do
+#base=$(basename ${file} .norm_sort.bga)
+#cat $file | awk '{print $1 "\t" $2 "\t" $3}' > $OUTDIR/Norm_bed_files/${base}.bed
+#done
 
 ml BEDTools
 #bedToBam [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> > <BAM>
 for f in $OUTDIR/Norm_bed_files/*.bed
 do
-bedToBam -i $f -g ref/Ncrassa_ref - $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
+bedToBam -i $f -g $OUTDIR/ref/Ncrassa_ref - $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
 done
 
 ml SAMtools
