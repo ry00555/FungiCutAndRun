@@ -19,7 +19,7 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
  #in line commands
  #trim_galore --paired --length 20 --fastqc --gzip -o TrimmedReads *fastq\.gz
 
-FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
+#FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
 
 #mkdir "$OUTDIR/ref"
  #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ref/ecoli_refseq.fa
@@ -199,13 +199,13 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
    #   cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
    #  done
 
- module load Homer
-# #  mkdir $OUTDIR/KmetSpikeIn/TagDirectories
-for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
-    do
-   base=$(basename ${infile} .bgato.bed)
-   makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
-   done
+#  module load Homer
+# # #  mkdir $OUTDIR/KmetSpikeIn/TagDirectories
+# for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
+#     do
+#    base=$(basename ${infile} .bgato.bed)
+#    makeTagDirectory $OUTDIR/KmetSpikeIn/TagDirectories/${base}.BtB.tagdir $infile -format bed
+#    done
 
  #the below loop will rewrite the E coli sorted bamfiles
  #for file in $OUTDIR/SortedBamFiles/*_Ecoli.sorted.bam
@@ -248,48 +248,48 @@ for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
 #     done
  #   #using IgG as input
  #
-   for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*rtt109*.BtB.tagdir
-    do
-     base=$(basename ${infile} .BtB.tagdir)
-     base2=$(basename ${infile} .EColi.BtB.tagdir)
-     findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+  # for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*rtt109*.BtB.tagdir
+  #  do
+  #   base=$(basename ${infile} .BtB.tagdir)
+  #   base2=$(basename ${infile} .EColi.BtB.tagdir)
+  #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
   #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
        done
  #
  #
-       for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*set-7*.BtB.tagdir
-        do
-        base=$(basename ${infile} .BtB.tagdir)
-         base2=$(basename ${infile} .EColi.BtB.tagdir)
-         findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+       # for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*set-7*.BtB.tagdir
+       #  do
+       #  base=$(basename ${infile} .BtB.tagdir)
+       #   base2=$(basename ${infile} .EColi.BtB.tagdir)
+       #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
     #    findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
  #
-         done
+    #     done
  #
  #
-           for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu00423*.BtB.tagdir
-           do
-           base=$(basename ${infile} .BtB.tagdir)
-  base2=$(basename ${infile} .EColi.BtB.tagdir)
- findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+ #           for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu00423*.BtB.tagdir
+ #           do
+ #           base=$(basename ${infile} .BtB.tagdir)
+ #  base2=$(basename ${infile} .EColi.BtB.tagdir)
+ # findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
 #findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
-done
+#done
  #
-for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06787*.BtB.tagdir
-  do
-                 base=$(basename ${infile} .BtB.tagdir)
-   base2=$(basename ${infile} .EColi.BtB.tagdir)
-       findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+# for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06787*.BtB.tagdir
+#   do
+#                  base=$(basename ${infile} .BtB.tagdir)
+#    base2=$(basename ${infile} .EColi.BtB.tagdir)
+#        findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
          #findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
-     done
-                 for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06788*.BtB.tagdir
-           do
-                   base=$(basename ${infile} .BtB.tagdir)
-                   base2=$(basename ${infile} .EColi.BtB.tagdir)
-                   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
-                #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
+#     done
+           #       for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06788*.BtB.tagdir
+           # do
+           #         base=$(basename ${infile} .BtB.tagdir)
+           #         base2=$(basename ${infile} .EColi.BtB.tagdir)
+           #         findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base}_IgGNorm.txt
+           #      #   findPeaks $infile -style histone -minDist 1000 -region -size 150 -i $OUTDIR/KmetSpikeIn/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.Ecoli.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/KmetSpikeIn/Peaks/${base2}.Ecoli_IgGNorm.txt
  #
-                   done
+    #               done
 
   for infile in $OUTDIR/KmetSpikeIn/Peaks/*_IgGNorm.txt
    do
@@ -323,7 +323,7 @@ for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06787*.BtB.tagdir
 
 #  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
 ##  #Kmet spike in
-  # ml deepTools
+  #ml ucsc
   # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
   # do
   #   base=$(basename ${infile} .kmet_sort.bga)
@@ -331,7 +331,7 @@ for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06787*.BtB.tagdir
   #  done
 
 #  #Kmet spike in on Ecoli normalized bedgraph files
-ml deepTools
+ml ucsc
  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
  do
    base=$(basename ${infile} .kmet_sort.bga)
