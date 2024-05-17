@@ -1,5 +1,4 @@
 #!/bin/bash
-#old script don't use this 5/20/24!!!!
 ####incorporating kmet spike-in panel from epicypher
 ####to the our version of the Henikoff spike-in normaliation
 ###original spike-in script from henikoff lab:
@@ -100,7 +99,7 @@ echo "KMET counts being saved in $OUTDIR/kmet_stats.txt"
 echo
 echo "Extracting aligned reads for normalization"
 echo "Loading BEDTools"
-module load BEDTools
+module load BEDTools/2.29.2-GCC-8.3.0
 
 bedtools bamtobed -i $bam | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/$base.btb.bed
 genome_bed=`echo $OUTDIR/"$base".btb.bed`
@@ -133,10 +132,10 @@ if [ -s $genome_bed ] ; then
         echo "Read count is $read_count"
         MPR=`echo "1000000/$read_count" | bc -l`
         echo "MPR is $MPR"
-        kmet_scale=`echo "1000000 / $kmet_total" | bc -l`
+        kmet_scale=`echo "1000000000 / $kmet_total" | bc -l`
         echo "KMET scale is $kmet_scale"
         echo "Multiplying MPR by KMET scale"
-        scale_factor=`echo "$MPR * $kmet_scale" | bc -l`
+        scale_factor=`echo "$MPR * $kmet_total" | bc -l`
         echo "Scale Factor is $scale_factor"
 else
               echo "No Genome File given"
@@ -147,7 +146,7 @@ fi
 #Select fragments within the length range, assumes fragment length is in column 6 of the bed file
 echo
 echo "Generating Fragment Lengths"
-cat $genome_bed | awk -v min=10 -v max=550 '$7 >= min &&  $7 <= max {print $0}' > $OUTDIR/frag_length.temp.bed
+cat $genome_bed | awk -v min=10 -v max=1000 '$7 >= min &&  $7 <= max {print $0}' > $OUTDIR/frag_length.temp.bed
 
 echo "Generating Genome Coverage"
 bedtools genomecov -${report} -scale ${scale_factor} -i $OUTDIR/frag_length.temp.bed -g ${genome_len} > ${OUTDIR}/${base}_kmet.${report}

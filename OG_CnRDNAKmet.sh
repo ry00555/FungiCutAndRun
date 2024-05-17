@@ -349,19 +349,22 @@ ml deepTools
   bedGraphToBigWig $infile $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
   done
 
-  #computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ${OUTDIR}/BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_DNASpikeinNorm.bw ${OUTDIR}/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz"
-  # option for command line
-
-#computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_S10_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_S19_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_S13_DNASpikeinNorm.bw /scratch/ry00555/OutputRun137/CutandRun/BigWigs/137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_S16_DNASpikeinNorm.bw -R "/scratch/ry00555/neurospora.bed" --skipZeros -o $OUTDIR/Matrices/matrix_CnR_H3K27me3.gz
-#computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S 137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_DNASpikeinNorm.bw 137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw 137-25_CUTANDRUN_set-7_H3K27me3_Rep1_DNASpikeinNorm.bw 137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_DNASpikeinNorm.bw 137-10_CUTANDRUN_rtt109_H3K27me3_Rep1_S10_DNASpikeinNorm.bw 137-19_CUTANDRUN_ncu00423_H3K27me3_Rep1_S19_DNASpikeinNorm.bw 137-13_CUTANDRUN_ncu06787_H3K27me3_Rep1_S13_DNASpikeinNorm.bw 137-16_CUTANDRUN_ncu06788_H3K27me3_Rep1_S16_DNASpikeinNorm.bw -R /scratch/ry00555/WT_H3K27me3peaks.bed --skipZeros -o matrix_CnR_H3K27me3.gz
-
-#computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S ../BigWigs/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_DNASpikeinNorm.bw ../BigWigs/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_DNASpikeinNorm.bw -R "/scratch/ry00555/MyceliaK27me3_peaks.bed" --skipZeros -o matrix_CnR_H3K27me3.gz
+  # error becomes End coordinate 2147483647 bigger than NC_000913.3 size of 4641652 line 30867 of /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/KmetSpikeIn/Ecolisortedbedgraphs/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.Ecoli.kmet_sort.bga
+End coordinate 2147483647 bigger than NC_000913.3 size of 4641652 line 80535 of /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/KmetSpikeIn/Ecolisortedbedgraphs/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7.Ecoli.kmet_sort.bga
+End coordinate 2147483647 bigger than NC_000913.3 size of 4641652 line 24441 of /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/KmetSpikeIn/Ecolisortedbedgraphs/137-8_CUTANDRUN_set-7_H3K36me3_Rep1_S8.Ecoli.kmet_sort.bga
+End coordinate 2147483647 bigger than NC_000913.3 size of 4641652 line 20866 of /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/KmetSpikeIn/Ecolisortedbedgraphs/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.Ecoli.kmet_sort.bga
 
 
-  #plotHeatmap -m "${OUTDIR}/Matrices/matrix_CnR_H3K27me3.gz" -out ${OUTDIR}/Heatmaps/CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT2 WT22 set-72 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
-  #command line below to launch in Heatmaps directory
-#  plotHeatmap -m ../Matrices/matrix_CnR_H3K27me3.gz -out CnR_H3K27me3_wholegenome_hclust.png --samplesLabel WT set-7 rtt109 ncu00423 ncu06787 ncu06788 --hclust 2 --colorMap Reds
+#think about it Ecolibga do not have anything maybe we norm to Kmet then Ecoli
 
-#  scp -r ry00555@xfer.gacrc.uga.edu:CnR_H3K27me3_wholegenome_hclust.png /Users/ry00555/Desktop/
-
-#   computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S "${file_path}" -R "/scratch/ry00555/neurospora.bed" --skipZeros -o "${OUTDIR}/Matrices/matrix_CnR_H3K36me3.gz"
+#  DNA-spike in normalization
+#  mkdir $OUTDIR/bedgraphs
+ #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.norm.bga
+ #done
+ #sort bga files from  DNA spike in
+  # ml ucsc
+  #  for infile in $OUTDIR/bedgraphs/*norm.bga
+  #   do
+   #base=$(basename ${infile} .norm.bga)
+    #   bedSort $infile $OUTDIR/bedgraphs/${base}.norm_sort.bga
+    #done
