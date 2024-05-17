@@ -291,11 +291,11 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
  #
     #               done
 
-  for infile in $OUTDIR/KmetSpikeIn/Peaks/*_IgGNorm.txt
-   do
-   base=$(basename ${infile} _IgGNorm.txt)
-   sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
-    done
+  # for infile in $OUTDIR/KmetSpikeIn/Peaks/*_IgGNorm.txt
+  #  do
+  #  base=$(basename ${infile} _IgGNorm.txt)
+  #  sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
+  #   done
  #
  #    ml Perl
  #   for infile in $OUTDIR/KmetSpikeIn/Peaks/*.peaks_IgGNorm.bed
@@ -332,6 +332,7 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 
 #  #Kmet spike in on Ecoli normalized bedgraph files
 ml ucsc
+ml deepTools
  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
  do
    base=$(basename ${infile} .kmet_sort.bga)
