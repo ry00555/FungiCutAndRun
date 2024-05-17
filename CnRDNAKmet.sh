@@ -105,51 +105,51 @@ FILES="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/*_R1_001_val_1.fq.gz
 # Set the directory containing the tag directories
 #  this code works where I have to type in strain  so do it for the rest change rtt109 to WT , set-7, ncu00423, ncu006787, ncu06788
 
-module load Homer
+#module load Homer
 
  #using IgG as input
- for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
- do
-    base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1_S1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
-
-for infile in $OUTDIR/TagDirectories/*rtt109*.BtB.tagdir
-  do
-     base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
-
-  for infile in $OUTDIR/TagDirectories/*set-7*.BtB.tagdir
-  do
-    base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
-
- for infile in $OUTDIR/TagDirectories/*ncu00423*.BtB.tagdir
-  do
-    base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
- #
-  for infile in $OUTDIR/TagDirectories/*ncu06787*.BtB.tagdir
-  do
-    base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
- #
-  for infile in $OUTDIR/TagDirectories/*ncu06788*.BtB.tagdir
-  do
-    base=$(basename ${infile} .BtB.tagdir)
-  findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
-  done
-
-#changing peak txt files to bed files to input into chipr
-  for infile in $OUTDIR/Peaks/*_IgGNorm.txt
-   do
-   base=$(basename ${infile} _IgGNorm.txt)
-   sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
-    done
+#  for infile in $OUTDIR/TagDirectories/*WT*.BtB.tagdir
+#  do
+#     base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-1_CUTANDRUN_WT_IgG_Rep1_S1.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#
+# for infile in $OUTDIR/TagDirectories/*rtt109*.BtB.tagdir
+#   do
+#      base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-9_CUTANDRUN_rtt109_IgG_Rep1_S9.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#
+#   for infile in $OUTDIR/TagDirectories/*set-7*.BtB.tagdir
+#   do
+#     base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-6_CUTANDRUN_set-7_IgG_Rep1_S6.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#
+#  for infile in $OUTDIR/TagDirectories/*ncu00423*.BtB.tagdir
+#   do
+#     base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-18_CUTANDRUN_ncu00423_IgG_Rep1_S18.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#  #
+#   for infile in $OUTDIR/TagDirectories/*ncu06787*.BtB.tagdir
+#   do
+#     base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-12_CUTANDRUN_ncu06787_IgG_Rep1_S12.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#  #
+#   for infile in $OUTDIR/TagDirectories/*ncu06788*.BtB.tagdir
+#   do
+#     base=$(basename ${infile} .BtB.tagdir)
+#   findPeaks $infile -style histone -minDist 1000 -i $OUTDIR/TagDirectories/137-15_CUTANDRUN_ncu06788_IgG_Rep1_S15.BtB.tagdir -F 4 -gsize 4.5e7 -o $OUTDIR/Peaks/${base}_IgGNorm.txt
+#   done
+#
+# #changing peak txt files to bed files to input into chipr
+#   for infile in $OUTDIR/Peaks/*_IgGNorm.txt
+#    do
+#    base=$(basename ${infile} _IgGNorm.txt)
+#    sed '/^/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > $OUTDIR/Peaks/${base}.peaks_IgGNorm.bed
+#     done
 
   #don't need ChipR right now since I don't have replicates as of 4/10/24
 
@@ -215,17 +215,17 @@ for infile in $OUTDIR/KmetSpikeIn/Peaks/*bgato.bed
  #done
 
 #sort bga files from spike in
-  ml ucsc
-  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet.bga
-   do
-   base=$(basename ${infile} _kmet.bga)
-       bedSort $infile $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/${base}.kmet_sort.bga
-done
+#   ml ucsc
+#   for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet.bga
+#    do
+#    base=$(basename ${infile} _kmet.bga)
+#        bedSort $infile $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/${base}.kmet_sort.bga
+# done
 
  #mkdir $OUTDIR/KmetSpikeIn/Peaks
    for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*kmet_sort.bga
    do base=$(basename ${infile} .kmet_sort.bga)
-    cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.Ecoli.bgato.bed
+    cat $infile | awk '{print $1 "\t" $2 "\t" $3 "\t" "+" "\t" "+" "\t" "+"}' > $OUTDIR/KmetSpikeIn/Peaks/${base}.bgato.bed
  done
 
    module load Homer
@@ -323,14 +323,14 @@ for infile in $OUTDIR/KmetSpikeIn/TagDirectories/*ncu06787*.BtB.tagdir
 
 #  #turning bedgraphs (normalized bga files) into bigwigs (bigwig files are for creating pictures)
 ##  #Kmet spike in
-  ml deepTools
-  for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
-  do
-    base=$(basename ${infile} .kmet_sort.bga)
-   bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
-   done
+  # ml deepTools
+  # for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
+  # do
+  #   base=$(basename ${infile} .kmet_sort.bga)
+  #  bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+  #  done
 
-#  #Kmet spike in
+#  #Kmet spike in pon Ecoli normalized bedgraph files
   ml deepTools
   for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
   do
