@@ -341,7 +341,7 @@ OUTDIR2="/scratch/ry00555/OutputRun137/CutandRun/TrimmedReads/"
 #/scratch/ry00555/OutputRun137/CutandRun/ref/EColi_ref
 #/scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/ref/Ncrassa_ref
 #cat /scratch/ry00555/OutputRun137/ZLNcrassaGenomeCutandRun/ref/Ncrassa_ref/chrNameLength.txt /scratch/ry00555/OutputRun137/CutandRun/ref/EColi_ref/chrNameLength.txt > CombinedNCrassaEColi_chrNameLength.txt
-
+ml ucsc
 ml deepTools
  for infile in $OUTDIR/KmetSpikeIn/Ecolisortedbedgraphs/*.kmet_sort.bga
  do
