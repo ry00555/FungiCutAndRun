@@ -263,7 +263,7 @@ ml BEDTools
 #bedToBam [OPTIONS] -i <BED/GFF/VCF> -g <GENOME> > <BAM>
 for f in $OUTDIR/Norm_bed_files/*.bed
 do
-bedToBam -i $f -g $OUTDIR/ref/Ncrassa_ref > $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
+bedtools bedToBam -i $f -g $OUTDIR/ref/CombinedNCrassaEColi_chrNameLength.txt > $OUTDIR/DNASpikeIn_Norm_SortedBamFiles/${base}.bam
 done
 
 ml SAMtools
