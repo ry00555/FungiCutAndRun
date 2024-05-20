@@ -108,43 +108,43 @@ else
   mkdir $OUTDIR/TrimmedReads
 fi
 
-echo "Trimmed reads and fastQC files going into $OUTDIR/Ecoli_Aligned/TrimmedReads"
+echo "TrimmedReads reads and fastQC files going into $OUTDIR/TrimmedReads"
 echo "... loading TrimGalore"
 module load Trim_Galore
 echo "...starting trimming"
-#adapted between our old lab and Goll lab
-trim_galore --paired --length 20 --fastqc --length 20 --gzip -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
+
+trim_galore --fastqc -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
 echo "... trimming complete"
 echo "...loading MultiQC"
-###need to edit this to only happen when the # of trimmed files = the number of input files?
+###need to edit this to only happen when the # of TrimmedReads files = the number of input files?
 module load MultiQC
 echo "... running MultiQC"
 multiqc -o $OUTDIR/TrimmedReads -f $OUTDIR/TrimmedReads
 echo "... QC analysis complete"
 
 echo
-echo "... counting trimmed reads"
+echo "... counting TrimmedReads reads"
 for infile in $OUTDIR/TrimmedReads/"$outname"*R1*val*.fq.gz
 do
   base=$(basename ${infile} _val_1.fq.gz)
-  echo $base >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
-  echo $(zcat $infile |wc -l)/4|bc >> $OUTDIR/TrimmedReads/trimmed_read_stats_ecoli.txt
+  echo $base >> $OUTDIR/TrimmedReads/TrimmedReads_read_stats.txt
+  echo $(zcat $infile |wc -l)/4|bc >> $OUTDIR/TrimmedReads/TrimmedReads_read_stats_ecoli.txt
 done
-echo "... trimmed reads counted and reported in $OUTDIR/TrimmedReads/trimmed_read_stats"
+echo "... TrimmedReads reads counted and reported in $OUTDIR/TrimmedReads/TrimmedReads_read_stats"
 echo
 
 if [ -f "$genome" ]; then
   echo "genome file provided by user"
   echo "genome file is $genome"
-elif [ -f "$OUTDIR/ref/ecoli_refseq.fa" ]; then
+elif [ -f "$OUTDIR/ecoli_refseq.fa" ]; then
   echo "genome already downloaded"
   genome=$OUTDIR/ref/ecoli_refseq.fa
   echo "genome file is $genome"
 else
   echo "no genome file supplied"
   echo "downloading ecoli genome"
-  curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ref/ecoli_refseq.fa
+  curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz | gunzip -c > $OUTDIR/ecoli_refseq.fa
   genome=$OUTDIR/ref/ecoli_refseq.fa
   echo "genome file is $genome"
 fi
@@ -160,7 +160,7 @@ echo "Alignment files going into $OUTDIR/SortedBamFiles"
 echo "... loading STAR"
 module load STAR
 
-if [ -f "$OUTDIR/ref/Genome" ]
+if [ -f "$OUTDIR/genome/Genome" ]
 then
     echo "Reference genome index exists."
 else
@@ -176,20 +176,20 @@ for file in $OUTDIR/TrimmedReads/"$outname"*_val_*.fq.gz;
 do
   if [[ $prefix ]]; then
     if [ $analysis_mode == 'NONE' ] ; then
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname" \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outFilterMultimapNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'ONE' ] ; then
 
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname" \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outSAMmultNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'RANDOM'] ; then
-    STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
+    STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname" \
     --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
     --outMultimapperOrder Random --outSAMmultNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'ALL' ] ; then
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname" \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outSAMprimaryFlag AllBestScore --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     fi
@@ -206,7 +206,7 @@ rm $OUTDIR/SortedBamFiles/"$outname"*SJ.out.tab
 if [ -d "$OUTDIR/SortedBamFiles/logs" ]
 then
     mv $OUTDIR/SortedBamFiles/*Log* $OUTDIR/SortedBamFiles/logs
-    echo "Log files moved to $OUTDIR/Ecoli_Aligned/SortedBamFiles/logs"
+    echo "Log files moved to $OUTDIR/SortedBamFiles/logs"
 else
   mkdir $OUTDIR/SortedBamFiles/logs
   mv $OUTDIR/SortedBamFiles/*Log* $OUTDIR/SortedBamFiles/logs
@@ -220,20 +220,16 @@ echo "... performing a MAPQ filter of 1"
 for file in $OUTDIR/SortedBamFiles/"$outname"*sortedByCoord.out.bam
 do
   base=$(basename ${file} Aligned.sortedByCoord.out.bam)
-  #Our lab
-  samtools view -bhSu -q 30 $file | samtools sort - > $OUTDIR/SortedBamFiles/"$base"ecoli_q30.bam
-
-#Goll lab
-  #samtools view -bq1 $file | samtools sort - > $OUTDIR/bams/"$base"_ecoli_q1.bam
+  samtools view -bq1 $file | samtools sort - > $OUTDIR/SortedBamFiles/"$base"_ecoli_q1.bam
 done
 echo "... quality filtering done"
 echo
 
 echo "... counting aligned reads"
 
-for infile in $OUTDIR/SortedBamFiles/"$outname"*ecoli_q30.bam
+for infile in $OUTDIR/SortedBamFiles/"$outname"*_ecoli_q1.bam
 do
-  base=$(basename ${infile} ecoli_q30.bam)
+  base=$(basename ${infile} _q1.bam)
   echo "$base total aligned reads -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
   samtools view -@ 24 -F 0x4 $OUTDIR/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
   echo "  $base total aligned reads (unique mappers) -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
