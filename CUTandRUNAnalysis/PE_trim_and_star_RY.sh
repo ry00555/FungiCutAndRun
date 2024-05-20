@@ -127,7 +127,7 @@ echo "... QC analysis complete"
 
 echo
 echo "... counting trimmed reads"
-for infile in $OUTDIR/TrimmedReads/"$outname"_R1_001_val_1.fq.gz
+for infile in $OUTDIR/TrimmedReads/"$outname"
 do
   base=$(basename ${infile} _R1_001_val_1.fq.gz)
   echo $base >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
@@ -173,7 +173,7 @@ else
   echo "... aligning reads to "$genome" genome"
 fi
 
-for file in $OUTDIR/TrimmedReads/"$outname"_R1_001_val_1.fq.gz;
+for file in $OUTDIR/TrimmedReads/"$outname";
 do
   if [[ $prefix ]]; then
     if [ $analysis_mode == 'NONE' ] ; then
