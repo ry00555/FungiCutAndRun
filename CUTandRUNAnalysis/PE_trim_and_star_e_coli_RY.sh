@@ -101,11 +101,11 @@ echo "All data input checks complete."
 echo
 echo "Starting Analysis"
 
-if [ -d "$OUTDIR/Ecoli_Aligned/TrimmedReads" ]
+if [ -d "$OUTDIR/TrimmedReads" ]
 then
-    echo "Directory $OUTDIR/Ecoli_Aligned/TrimmedReads exists."
+    echo "Directory $OUTDIR/TrimmedReads exists."
 else
-  mkdir $OUTDIR/Ecoli_Aligned/TrimmedReads
+  mkdir $OUTDIR/TrimmedReads
 fi
 
 echo "Trimmed reads and fastQC files going into $OUTDIR/Ecoli_Aligned/TrimmedReads"
@@ -113,25 +113,25 @@ echo "... loading TrimGalore"
 module load Trim_Galore
 echo "...starting trimming"
 #adapted between our old lab and Goll lab
-trim_galore --paired --length 20 --fastqc --length 20 --gzip -j 24 --output_dir $OUTDIR/Ecoli_Aligned/TrimmedReads --paired $read_file1 $read_file2
+trim_galore --paired --length 20 --fastqc --length 20 --gzip -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
 echo "... trimming complete"
 echo "...loading MultiQC"
 ###need to edit this to only happen when the # of trimmed files = the number of input files?
 module load MultiQC
 echo "... running MultiQC"
-multiqc -o $OUTDIR/Ecoli_Aligned/TrimmedReads -f $OUTDIR/Ecoli_Aligned/TrimmedReads
+multiqc -o $OUTDIR/TrimmedReads -f $OUTDIR/TrimmedReads
 echo "... QC analysis complete"
 
 echo
 echo "... counting trimmed reads"
-for infile in $OUTDIR/Ecoli_Aligned/TrimmedReads/"$outname"*R1*val*.fq.gz
+for infile in $OUTDIR/TrimmedReads/"$outname"*R1*val*.fq.gz
 do
   base=$(basename ${infile} _val_1.fq.gz)
-  echo $base >> $OUTDIR/Ecoli_Aligned/TrimmedReads/trimmed_read_stats.txt
-  echo $(zcat $infile |wc -l)/4|bc >> $OUTDIR/Ecoli_Aligned/TrimmedReads/trimmed_read_stats_ecoli.txt
+  echo $base >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
+  echo $(zcat $infile |wc -l)/4|bc >> $OUTDIR/TrimmedReads/trimmed_read_stats_ecoli.txt
 done
-echo "... trimmed reads counted and reported in $OUTDIR/Ecoli_Aligned/TrimmedReads/trimmed_read_stats"
+echo "... trimmed reads counted and reported in $OUTDIR/TrimmedReads/trimmed_read_stats"
 echo
 
 if [ -f "$genome" ]; then
@@ -149,11 +149,11 @@ else
   echo "genome file is $genome"
 fi
 
-if [ -d "$OUTDIR/Ecoli_Aligned/SortedBamFiles" ]
+if [ -d "$OUTDIR/SortedBamFiles" ]
 then
-    echo "Directory $OUTDIR/Ecoli_Aligned/SortedBamFiles exists."
+    echo "Directory $OUTDIR/SortedBamFiles exists."
 else
-  mkdir $OUTDIR/Ecoli_Aligned/SortedBamFiles
+  mkdir $OUTDIR/SortedBamFiles
 fi
 
 echo "Alignment files going into $OUTDIR/SortedBamFiles"
@@ -172,24 +172,24 @@ else
 fi
 
 
-for file in $OUTDIR/Ecoli_Aligned/TrimmedReads/"$outname"*_val_*.fq.gz;
+for file in $OUTDIR/TrimmedReads/"$outname"*_val_*.fq.gz;
 do
   if [[ $prefix ]]; then
     if [ $analysis_mode == 'NONE' ] ; then
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outFilterMultimapNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'ONE' ] ; then
 
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outSAMmultNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'RANDOM'] ; then
-    STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname".Ecoli \
+    STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
     --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
     --outMultimapperOrder Random --outSAMmultNmax 1 --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     elif [ $analysis_mode == 'ALL' ] ; then
-      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname".Ecoli \
+      STAR --runThreadN 24 --genomeDir $OUTDIR/ref/ecoli_genome --outFileNamePrefix $OUTDIR/SortedBamFiles/"$outname".Ecoli \
       --readFilesCommand zcat --readFilesIn "$first" "$file" --outSAMtype BAM SortedByCoordinate \
       --outSAMprimaryFlag AllBestScore --alignEndsType EndToEnd --alignIntronMax 1 --alignMatesGapMax 2000
     fi
@@ -201,27 +201,27 @@ do
   fi
 done
 
-rm $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname"*SJ.out.tab
+rm $OUTDIR/SortedBamFiles/"$outname"*SJ.out.tab
 
-if [ -d "$OUTDIR/Ecoli_Aligned/SortedBamFiles/logs" ]
+if [ -d "$OUTDIR/SortedBamFiles/logs" ]
 then
-    mv $OUTDIR/Ecoli_Aligned/SortedBamFiles/*Log* $OUTDIR/Ecoli_Aligned/SortedBamFiles/logs
+    mv $OUTDIR/SortedBamFiles/*Log* $OUTDIR/SortedBamFiles/logs
     echo "Log files moved to $OUTDIR/Ecoli_Aligned/SortedBamFiles/logs"
 else
-  mkdir $OUTDIR/Ecoli_Aligned/SortedBamFiles/logs
-  mv $OUTDIR/Ecoli_Aligned/SortedBamFiles/*Log* $OUTDIR/SortedBamFiles/logs
-  echo "Log files moved to $OUTDIR/Ecoli_Aligned/SortedBamFiles/logs"
+  mkdir $OUTDIR/SortedBamFiles/logs
+  mv $OUTDIR/SortedBamFiles/*Log* $OUTDIR/SortedBamFiles/logs
+  echo "Log files moved to $OUTDIR/SortedBamFiles/logs"
 fi
 
 echo "... loading SAMtools"
 module load SAMtools
 echo "... performing a MAPQ filter of 1"
 
-for file in $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname"*sortedByCoord.out.bam
+for file in $OUTDIR/SortedBamFiles/"$outname"*sortedByCoord.out.bam
 do
   base=$(basename ${file} Aligned.sortedByCoord.out.bam)
   #Our lab
-  samtools view -bhSu -q 30 $file | samtools sort - > $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$base"ecoli_q30.bam
+  samtools view -bhSu -q 30 $file | samtools sort - > $OUTDIR/SortedBamFiles/"$base"ecoli_q30.bam
 
 #Goll lab
   #samtools view -bq1 $file | samtools sort - > $OUTDIR/bams/"$base"_ecoli_q1.bam
@@ -231,24 +231,24 @@ echo
 
 echo "... counting aligned reads"
 
-for infile in $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$outname"*ecoli_q30.bam
+for infile in $OUTDIR/SortedBamFiles/"$outname"*ecoli_q30.bam
 do
   base=$(basename ${infile} ecoli_q30.bam)
-  echo "$base total aligned reads -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  echo "  $base total aligned reads (unique mappers) -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | grep "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  echo "  $base total aligned reads (multi mappers) -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $OUTDIR/Ecoli_Aligned/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | grep -v "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  echo "$base q1 aligned reads -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $infile | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  echo "  $base q1 aligned reads (unique mappers) -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $infile | grep "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  echo "  $base q1 aligned reads (multi mappers) -" >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
-  samtools view -@ 24 -F 0x4 $infile | grep -v "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats.txt
+  echo "$base total aligned reads -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $OUTDIR/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  echo "  $base total aligned reads (unique mappers) -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $OUTDIR/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | grep "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  echo "  $base total aligned reads (multi mappers) -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $OUTDIR/SortedBamFiles/"$base"Aligned.sortedByCoord.out.bam | grep -v "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  echo "$base q1 aligned reads -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $infile | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  echo "  $base q1 aligned reads (unique mappers) -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $infile | grep "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  echo "  $base q1 aligned reads (multi mappers) -" >> $OUTDIR/SortedBamFiles/bam_stats.txt
+  samtools view -@ 24 -F 0x4 $infile | grep -v "NH:i:1" | cut -f 1 | sort | uniq | wc -l >> $OUTDIR/SortedBamFiles/bam_stats.txt
 done
 
-echo "... aligned reads counted and reported in $OUTDIR/Ecoli_Aligned/SortedBamFiles/bam_stats"
+echo "... aligned reads counted and reported in $OUTDIR/SortedBamFiles/bam_stats"
 echo
 
 echo "$0 is complete"
