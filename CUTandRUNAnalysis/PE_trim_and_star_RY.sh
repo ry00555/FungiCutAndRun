@@ -108,12 +108,12 @@ else
   mkdir $OUTDIR/TrimmedReads
 fi
 
-echo "Trimmed reads and fastQC files going into $OUTDIR/trimmed"
+echo "Trimmed reads and fastQC files going into $OUTDIR/TrimmedReads"
 echo "... loading TrimGalore"
 module load Trim_Galore
 echo "...starting trimming"
 #Our lab command
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+trim_galore --paired --length 20 -j 24 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #Goll lab
 #trim_galore --fastqc -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
@@ -133,7 +133,7 @@ do
   echo $base >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
   echo $(zcat $infile |wc -l)/4|bc >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
 done
-echo "... trimmed reads counted and reported in $OUTDIR/trimmed/trimmed_read_stats"
+echo "... trimmed reads counted and reported in $OUTDIR/TrimmedReads/trimmed_read_stats"
 echo
 
 if [ -f "$genome" ]; then
@@ -215,7 +215,7 @@ fi
 
 echo "... loading SAMtools"
 module load SAMtools
-echo "... performing a MAPQ filter of 40"
+echo "... performing a MAPQ filter of 30"
 
 for file in $OUTDIR/SortedBamFiles/"$outname"*sortedByCoord.out.bam
 do
