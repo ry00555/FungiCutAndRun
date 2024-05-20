@@ -113,7 +113,7 @@ echo "... loading TrimGalore"
 module load Trim_Galore
 echo "...starting trimming"
 #Our lab command
-trim_galore --paired --length 20 -j 24 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+trim_galore --paired --length 20 -j 24 --fastqc --gzip -o ${OUTDIR}/TrimmedReads $read_file1 $read_file2
 #Goll lab
 #trim_galore --fastqc -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
