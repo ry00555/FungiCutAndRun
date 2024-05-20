@@ -20,7 +20,7 @@ ml STAR
  do
    if [[ $prefix ]]; then
          base=$(basename ${first} _R1_001_val_1.fq.gz)
-         sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/PE_trim_and_star_RY.sh -o $OUTDIR -n $base -m one $first $file
+         sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/PE_trim_and_star_RY.sh -o $OUTDIR -n $base -m ONE $first $file
          prefix=
      else
          first=$file

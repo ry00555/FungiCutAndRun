@@ -72,7 +72,7 @@ do
 done
 
 if [ -z "$outname" ]; then
-  outname=$(basename $read_file1)
+  outname=$(basename $read_file1 _R1_001.fastq.gz)
   echo "output name is $outname"
 else
   echo "output name is $outname"
@@ -110,10 +110,10 @@ fi
 
 echo "Trimmed reads and fastQC files going into $OUTDIR/TrimmedReads"
 echo "... loading TrimGalore"
-module load Trim_Galore
+#module load Trim_Galore
 echo "...starting trimming"
 #Our lab command
-trim_galore --paired --length 20 -j 24 --fastqc --gzip -o ${OUTDIR}/TrimmedReads $read_file1 $read_file2
+#trim_galore --paired --length 20 -j 24 --fastqc --gzip -o ${OUTDIR}/TrimmedReads $read_file1 $read_file2
 #Goll lab
 #trim_galore --fastqc -j 24 --output_dir $OUTDIR/TrimmedReads --paired $read_file1 $read_file2
 
@@ -127,7 +127,7 @@ echo "... QC analysis complete"
 
 echo
 echo "... counting trimmed reads"
-for infile in $OUTDIR/TrimmedReads/"$outname"*_R1_001_val_1.fq.gz
+for infile in $OUTDIR/TrimmedReads/"$outname"_R1_001_val_1.fq.gz
 do
   base=$(basename ${infile} _R1_001_val_1.fq.gz)
   echo $base >> $OUTDIR/TrimmedReads/trimmed_read_stats.txt
@@ -162,18 +162,18 @@ echo "Alignment files going into $OUTDIR/SortedBamFiles"
 echo "... loading STAR"
 module load STAR
 
-if [ -f "$OUTDIR/ref/Ncrassa_ref" ]
+if [ -f "$OUTDIR/ref" ]
 then
     echo "Reference genome index exists."
 else
   echo "... building reference genome index"
-  mkdir $OUTDIR/ref
-  STAR --runThreadN 20 --runMode genomeGenerate \
-  --genomeDir $OUTDIR/ref --genomeFastaFiles $genome
+#  mkdir $OUTDIR/ref
+#  STAR --runThreadN 20 --runMode genomeGenerate \
+#  --genomeDir $OUTDIR/ref --genomeFastaFiles $genome
   echo "... aligning reads to "$genome" genome"
 fi
 
-for file in $OUTDIR/TrimmedReads/"$outname"*_R1_001_val_1.fq.gz;
+for file in $OUTDIR/TrimmedReads/"$outname"_R1_001_val_1.fq.gz;
 do
   if [[ $prefix ]]; then
     if [ $analysis_mode == 'NONE' ] ; then
@@ -197,7 +197,7 @@ do
     prefix=
   else
     first=$file
-    prefix=${file%%_*}
+    prefix=${file%%_*_R1_001_val_1.fq.gz}
   fi
 done
 
@@ -219,9 +219,9 @@ echo "... performing a MAPQ filter of 30"
 
 for file in $OUTDIR/SortedBamFiles/"$outname"*sortedByCoord.out.bam
 do
-  base=$(basename ${file} Aligned.sortedByCoord.out.bam)
+  base=$(basename ${file} .sortedByCoord.out.bam)
   #Our lab
-  samtools view -bhSu -q 30 $file | samtools sort - > $OUTDIR/SortedBamFiles/"$base"_q30.bam
+  samtools view -bhSu -q 30 $file | samtools -@ 12 sort - > $OUTDIR/SortedBamFiles/"$base"_q30.bam
   #GOll lab
 #  samtools view -bS -h -bq1 $file | samtools sort - > $OUTDIR/bams/"$base"_q1.bam
 done
