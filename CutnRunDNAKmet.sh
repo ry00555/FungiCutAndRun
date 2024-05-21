@@ -74,14 +74,14 @@ ml BEDTools
     #    done
 
 ############## Take fastq files and align to Ecoli genome to make sorted bam files
-#run second line with the outdir beind the EColi_Aligned directory direct path 
+#run second line with the outdir beind the EColi_Aligned directory direct path
  ml STAR
   for file in $FASTQ/*fastq\.gz;
   do
     if [[ $prefix ]]; then
           base=$(basename ${first} _R1_001.fq.gz)
 #          sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/PE_trim_and_star_e_coli_RY.sh -o $OUTDIR/Ecoli_Aligned -n $base -m one $first $file
-          sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/PE_trim_and_star_e_coli_RY.sh -o $OUTDIR -n $base -m one $first $file
+          sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/PE_trim_and_star_e_coli.sh -o $OUTDIR -n $base -m one $first $file
 
           prefix=
       else
