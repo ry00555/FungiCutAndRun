@@ -68,7 +68,7 @@ for file in $OUTDIR/bams/*nodups.bam
         for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet_sort.bga
         do
          base=$(basename ${infile} .kmet_sort.bga)
-        bedGraphToBigWig $infile $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
+        bedGraphToBigWig $infile $OUTDIR/genome/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw
         done
 
 ############## Take fastq files and align to Ecoli genome to make sorted bam files
