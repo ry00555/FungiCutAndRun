@@ -179,7 +179,7 @@ then
     echo "Reference genome index exists."
 else
   echo "... building reference genome index"
-  mkdir $OUTDIR/genome
+  mkdir $OUTDIR/ref
   STAR --runThreadN 20 --runMode genomeGenerate \
   --genomeDir $OUTDIR/ref/Ncrassa_ref --genomeFastaFiles $genome
   STAR --runThreadN 20 --runMode genomeGenerate \
@@ -196,7 +196,7 @@ FILES="$OUTDIR/TrimmedReads/*_R1_001_val_1.fq.gz" #Don't forget the *
 for f in $FILES
  do
 base=$(basename "${f}" _R1_001_val_1.fq.gz)
-read2="$OUTDIR/${base}*_R2_001_val_2.fq.gz"
+read2="$OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
  mkdir $OUTDIR/sam_files
  mkdir "$OUTDIR/EColi_Aligned/sam_files"
 
