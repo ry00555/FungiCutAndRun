@@ -174,7 +174,7 @@ fi
 echo "Alignment files going into $OUTDIR/SortedBamFiles"
 echo "... loading STAR"
 module load STAR
-if [ -f "$OUTDIR/genome/Genome" ]
+if [ -f "$OUTDIR/ref/Ncrassa_ref/Genome" ]
 then
     echo "Reference genome index exists."
 else
