@@ -10,13 +10,24 @@
 #SBATCH --output=../MapQual137.%j.out
 #SBATCH --error=../MapQual137.%j.err
 cd $SLURM_SUBMIT_DIR
-#OUTDIR="/scratch/ry00555/test"
-OUTDIR="/scratch/ry00555/test/Ecoli_Aligned"
+OUTDIR="/scratch/ry00555/Run137CutandRun"
 
-#NCTRIMMED="/scratch/ry00555/OutputRun137/MapQual_CutNRun/TrimmedReads/"
-FILES="/scratch/ry00555/test/trimmed/*_R1_001_val_1.fq.gz" #Don't forget the *
+#FILES="/scratch/ry00555/test/trimmed/*_R1_001_val_1.fq.gz" #Don't forget the *
 
-FASTQ="/scratch/ry00555/OutputRun137/CutandRun"
+FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
+#test --- this ended up working
+   ml STAR
+ for file in $FASTQ/*fastq\.gz;
+   do
+     if [[ $prefix ]]; then
+           base=$(basename ${first} _R1_001.fastq.gz)
+           sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/FastQtoBed.sh -o $OUTDIR -n $base -m one $first $file
+           prefix=
+       else
+          first=$file
+           prefix=${file%%_*}
+       fi
+   done
 
 ############## Take fastq files and align to Ncrassa genome to make sorted bam files
 #test --- this ended up working
