@@ -218,14 +218,15 @@ module load SAMtools
  samtools flagstat $OUTDIR/SortedBamFiles/${base}.sorted_q30.bam >> ${OUTDIR}/SortedBamFiles/${base}_flagstat.txt
  samtools flagstat $OUTDIR/EColi_Aligned/SortedBamFiles/${base}_Ecoli.sorted_q30.bam >> ${OUTDIR}/EColi_Aligned/SortedBamFiles/${base}_flagstat.txt
 
-ml deepTools
 bam="${OUTDIR}/bam_files/${base}.bam"
 mkdir ${OUTDIR}/BigWigs
 mkdir ${OUTDIR}/EColi_Aligned/BigWigs
 
  	bigwig="${OUTDIR}/BigWigs/${base}"
   ECbigwig="${OUTDIR}/EColi_Aligned/BigWigs/${base}"
-
+  samtools index "$bam"
+samtools index $OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam
+ml deepTools
 bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b "$bam" -o "${bigwig}.bin12.smooth25.Bulk.bw"
 bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b $OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam -o "${ECbigwig}.bin12.smooth25.Bulk.bw"
 
