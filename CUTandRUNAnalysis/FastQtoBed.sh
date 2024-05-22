@@ -254,7 +254,7 @@ module load SAMtools
     base=$(basename ${infile} .sorted_q30.bam)
     java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/bams/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
     ml BEDTools
-    mkdir $OUTDIRbed_files
+    mkdir $OUTDIR/bed_files
     bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/$base.btb.bed
 done
 #
