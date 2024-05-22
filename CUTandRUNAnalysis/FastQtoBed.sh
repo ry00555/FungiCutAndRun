@@ -226,8 +226,8 @@ mkdir ${OUTDIR}/EColi_Aligned/BigWigs
  	bigwig="${OUTDIR}/BigWigs/${base}"
   ECbigwig="${OUTDIR}/EColi_Aligned/BigWigs/${base}"
 
-bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b $OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam -o "${ECbigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b "$bam" -o "${bigwig}.bin12.smooth25.Bulk.bw"
+bamCoverage -p 12 -bs 25 --normalizeUsing BPM --smoothLength 50 -of bigwig -b $OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam -o "${ECbigwig}.bin12.smooth25.Bulk.bw"
 
 done
 
