@@ -197,20 +197,20 @@ for f in $FILES
  do
 base=$(basename "${f}" _R1_001_val_1.fq.gz)
 read2="$OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz"
- mkdir $OUTDIR/sam_files
- mkdir "$OUTDIR/EColi_Aligned/sam_files"
-
+ #mkdir $OUTDIR/sam_files
+ #mkdir "$OUTDIR/EColi_Aligned/sam_files"
+ ml Bowtie2
 bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "$OUTDIR/ref/Ncrassa_ref" -1 $f -2 $read2 -S "$OUTDIR/sam_files/${base}.sam"
 bowtie2 --local --very-sensitive-local --phred33 --no-unal -p 24 -x "$OUTDIR/ref/ecoli_ref" -1 $f -2 $read2 -S "$OUTDIR/EColi_Aligned/sam_files/${base}_Ecoli.sam"
 module load SAMtools
-  mkdir "$OUTDIR/bam_files"
-  mkdir "$OUTDIR/EColi_Aligned/bam_files"
+#  mkdir "$OUTDIR/bam_files"
+#  mkdir "$OUTDIR/EColi_Aligned/bam_files"
 
  samtools view -bS -h -bq 30 "$OUTDIR/sam_files/${base}.sam" > "$OUTDIR/bam_files/${base}.bam"
  samtools view -bS -h -bq 30 "$OUTDIR/EColi_Aligned/sam_files/${base}_Ecoli.sam" > "$OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam"
 
-  mkdir "$OUTDIR/SortedBamFiles"
-  mkdir "$OUTDIR/EColi_Aligned/SortedBamFiles"
+#  mkdir "$OUTDIR/SortedBamFiles"
+#  mkdir "$OUTDIR/EColi_Aligned/SortedBamFiles"
 
  samtools sort "$OUTDIR/bam_files/${base}.bam" -o "$OUTDIR/SortedBamFiles/${base}.sorted_q30.bam"
  samtools sort "$OUTDIR/EColi_Aligned/bam_files/${base}_Ecoli.bam" -o "$OUTDIR/EColi_Aligned/SortedBamFiles/${base}_Ecoli.sorted_q30.bam"
@@ -219,8 +219,8 @@ module load SAMtools
  samtools flagstat $OUTDIR/EColi_Aligned/SortedBamFiles/${base}_Ecoli.sorted_q30.bam >> ${OUTDIR}/EColi_Aligned/SortedBamFiles/${base}_flagstat.txt
 
 bam="${OUTDIR}/bam_files/${base}.bam"
-mkdir ${OUTDIR}/BigWigs
-mkdir ${OUTDIR}/EColi_Aligned/BigWigs
+#mkdir ${OUTDIR}/BigWigs
+#mkdir ${OUTDIR}/EColi_Aligned/BigWigs
 
  	bigwig="${OUTDIR}/BigWigs/${base}"
   ECbigwig="${OUTDIR}/EColi_Aligned/BigWigs/${base}"
@@ -255,11 +255,10 @@ module load SAMtools
     base=$(basename ${infile} .sorted_q30.bam)
     java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/bams/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
     ml BEDTools
-    mkdir $OUTDIR/bed_files
+#    mkdir $OUTDIR/bed_files
     bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/$base.btb.bed
 done
 #
-#ml BEDTools
 # #Ncrassa nodups.bam conversion to bed files to call peaks and then pass through KMetSpikeIn Script
 ml picard
 module load SAMtools
@@ -268,7 +267,7 @@ module load SAMtools
     base=$(basename ${infile} .sorted_q30.bam)
     java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/EColi_Aligned/SortedBamFiles/"$base"_dupmetrics.txt -O $OUTDIR/EColi_Aligned/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
     ml BEDTools
-    mkdir $OUTDIR/EColi_Aligned/bed_files
+#    mkdir $OUTDIR/EColi_Aligned/bed_files
     bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/EColi_Aligned/bed_files/$base.btb.bed
 done
 
