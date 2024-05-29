@@ -60,7 +60,7 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
      sorted_bga="${OUTDIR}/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga"
      bigwig="${OUTDIR}/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw"
      ml ucsc
-     bedSort "${infile}" /dev/stdout | tee "${sorted_bga}" | bedGraphToBigWig /dev/stdin "${GENOME_FILE}" "${bigwig}"
+     bedSort "${infile}" "${sorted_bga}" | bedGraphToBigWig "${GENOME_FILE}" "${bigwig}"
    done
 
 
