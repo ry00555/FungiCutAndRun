@@ -52,16 +52,16 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
      # Take the kmet normalized bedgraphs and turn them into bigwigs
 
    # Define the directory and genome file path variables
-   GENOME_FILE="$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt"
+  # GENOME_FILE="$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt"
 
    # Combine sorting and conversion to bigwig in a single pipeline
-   for infile in "$OUTDIR/KmetSpikeIn/bedgraphs/"*_kmet.bga; do
-     base=$(basename "${infile}" _kmet.bga)
-     sorted_bga="${OUTDIR}/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga"
-     bigwig="${OUTDIR}/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw"
-     ml ucsc
-     bedSort "${infile}" "${sorted_bga}" | bedGraphToBigWig "${GENOME_FILE}" "${bigwig}"
-   done
+   # for infile in "$OUTDIR/KmetSpikeIn/bedgraphs/"*_kmet.bga; do
+   #   base=$(basename "${infile}" _kmet.bga)
+   #   sorted_bga="${OUTDIR}/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga"
+   #   bigwig="${OUTDIR}/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw"
+   #   ml ucsc
+   #   bedSort "${infile}" "${sorted_bga}" | bedGraphToBigWig "${GENOME_FILE}" "${bigwig}"
+   # done
 
 
 ############## Take fastq files and align to Ncrassa genome to make sorted bam files
