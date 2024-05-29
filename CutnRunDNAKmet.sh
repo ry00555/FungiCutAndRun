@@ -16,23 +16,34 @@ OUTDIR="/scratch/ry00555/Run137CutandRun"
 
 FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
 #test on 5/22/24
-   ml STAR
- for file in $FASTQ/*fastq\.gz;
-   do
-     if [[ $prefix ]]; then
-           base=$(basename ${first} _R1_001.fastq.gz)
-           sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/FastQtoBed.sh -o $OUTDIR -n $base -m one $first $file
-           prefix=
-       else
-          first=$file
-           prefix=${file%%_*}
-       fi
-   done
+ #   ml STAR
+ # for file in $FASTQ/*fastq\.gz;
+ #   do
+ #     if [[ $prefix ]]; then
+ #           base=$(basename ${first} _R1_001.fastq.gz)
+ #           sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/FastQtoBed.sh -o $OUTDIR -n $base -m one $first $file
+ #           prefix=
+ #       else
+ #          first=$file
+ #           prefix=${file%%_*}
+ #       fi
+ #   done
+
+
+    #ml BEDTools
+    # #Ecoli nodups.bam
+   #Feeding output of no duplicates to DNA Spike In normalization by taking the bam to convert to the bed and get a bedgraph
+   #for infile in $OUTDIR/Ecoli_Aligned/*_ecoli_nodups.bam
+   #do
+   # base=$(basename ${infile} _ecoli_nodups.bam)
+    #bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}_ecoli.btb.bed
+   #  done
+
 # goal of the above script is to take fastQ files, trim using trim galore, prep genome files using STAR and bowtie, then align the trimmed fastq reads in a SAM and BAM format. In the sam format add a mapping quality filter of 30 from here we will make Bams and then do bamcoverage via deeptools to make bigwigs (this is our labs method) but we will also turn bams filtered out to have no duplicates via Picard tools (should already be filtered out) into bed files (the first 4 columns) and these will be turned into bigwigs using ucsc - this step happens after the script is done
 #*note that Im thinking on runnign flagstat for the non mapq files in sam_files
 #taking N crassa aligned beds into Kmet spike in script to make bedgraphs
 
-   for file in $OUTDIR/SortedBamFiles/*nodups.bam
+   for file in $OUTDIR/Ecoli_Aligned/SortedBamFiles/*nodups.bam
       do
          base=$(basename "${file}" _nodups.bam)
      sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}*_R1_001_val_1.fq.gz \ $OUTDIR/TrimmedReads/${base}*_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
