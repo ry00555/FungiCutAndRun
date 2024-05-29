@@ -39,9 +39,9 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
     #bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}_ecoli.btb.bed
    #  done
    #mkdir $OUTDIR/bed_files
-    for f in $OUTDIR/EColi_Aligned/bed_files
+    for f in $OUTDIR/EColi_Aligned/bed_files/*_Ecoli.btb.bed
      do
-     name=$(basename "${f}" _Ecoli.btb.bed)
+     name=$(basename ${f} _Ecoli.btb.bed)
 
    sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/EColi_Aligned/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.DNASpikeInnorm.bga
    done
