@@ -38,30 +38,47 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
    # base=$(basename ${infile} _ecoli_nodups.bam)
     #bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}_ecoli.btb.bed
    #  done
+   #mkdir $OUTDIR/bed_files
+    for f in $OUTDIR/EColi_Aligned/bed_files
+     do
+     name=$(basename "${f}" _Ecoli.btb.bed)
+
+   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/EColi_Aligned/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.DNASpikeInnorm.bga
+   done
+   #sort bga files from  DNA spike in and make bigwig
+     ml ucsc
+      for infile in $OUTDIR/bedgraphs/*DNASpikeInnorm.bga
+       do
+     base=$(basename ${infile} .DNASpikeInnorm.bga)
+         bedSort $infile $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga
+         bedGraphToBigWig $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+
+      done
+
 
 # goal of the above script is to take fastQ files, trim using trim galore, prep genome files using STAR and bowtie, then align the trimmed fastq reads in a SAM and BAM format. In the sam format add a mapping quality filter of 30 from here we will make Bams and then do bamcoverage via deeptools to make bigwigs (this is our labs method) but we will also turn bams filtered out to have no duplicates via Picard tools (should already be filtered out) into bed files (the first 4 columns) and these will be turned into bigwigs using ucsc - this step happens after the script is done
 #*note that Im thinking on runnign flagstat for the non mapq files in sam_files
 #taking N crassa aligned beds into Kmet spike in script to make bedgraphs
 
-   for file in $OUTDIR/EColi_Aligned/SortedBamFiles/*nodups.bam
-      do
-         base=$(basename "${file}" _Ecoli_nodups.bam)
-     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz \ $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
-     done
+  # for file in $OUTDIR/EColi_Aligned/SortedBamFiles/*nodups.bam
+  #    do
+  #       base=$(basename "${file}" _Ecoli_nodups.bam)
+  #   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz \ $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+  #   done
 
      # Take the kmet normalized bedgraphs and turn them into bigwigs
 
    # Define the directory and genome file path variables
-  # GENOME_FILE="$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt"
+  GENOME_FILE="$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt"
 
    # Combine sorting and conversion to bigwig in a single pipeline
-   # for infile in "$OUTDIR/KmetSpikeIn/bedgraphs/"*_kmet.bga; do
-   #   base=$(basename "${infile}" _kmet.bga)
-   #   sorted_bga="${OUTDIR}/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga"
-   #   bigwig="${OUTDIR}/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw"
-   #   ml ucsc
-   #   bedSort "${infile}" "${sorted_bga}" | bedGraphToBigWig "${GENOME_FILE}" "${bigwig}"
-   # done
+    for infile in "$OUTDIR/KmetSpikeIn/bedgraphs/"*_kmet.bga; do
+      base=$(basename "${infile}" _kmet.bga)
+      sorted_bga="${OUTDIR}/KmetSpikeIn/bedgraphs/${base}.kmet_sort.bga"
+      bigwig="${OUTDIR}/KmetSpikeIn/BigWigs/${base}.KmetSpikeIn.bw"
+      ml ucsc
+      bedSort "${infile}" "${sorted_bga}" | bedGraphToBigWig "${GENOME_FILE}" "${bigwig}"
+    done
 
 
 ############## Take fastq files and align to Ncrassa genome to make sorted bam files
