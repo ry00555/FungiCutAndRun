@@ -1,14 +1,14 @@
-# !/bin/bash
-# SBATCH --job-name=CUTandRun137
-# SBATCH --partition=batch
-# SBATCH --mail-type=ALL
-# SBATCH --mail-user=ry00555@uga.edu
-# SBATCH --ntasks=1
-# SBATCH --cpus-per-task=24
-# SBATCH --mem=200gb
-# SBATCH --time=48:00:00
-# SBATCH --output=../MapQual137.%j.out
-# SBATCH --error=../MapQual137.%j.err
+#!/bin/bash
+#SBATCH --job-name=CUTandRun137
+#SBATCH --partition=batch
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=200gb
+#SBATCH --time=48:00:00
+#SBATCH --output=../MapQual137.%j.out
+#SBATCH --error=../MapQual137.%j.err
 cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/Run137CutandRun"
 
