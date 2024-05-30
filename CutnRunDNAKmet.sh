@@ -75,18 +75,18 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
 #  bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}.btb.bed
 #   done
 
-  for file in $OUTDIR/SortedBamFiles/*_nodups.bam
-      do
-         base=$(basename "${file}" _nodups.bam)
-     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
-     done
+#  for file in $OUTDIR/SortedBamFiles/*_nodups.bam
+      #do
+      #   base=$(basename "${file}" _nodups.bam)
+     #sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+    # done
 
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
 
   #  Combine sorting and conversion to bigwig in a single pipeline
-    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet.bga
+    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga
      do
-      base=$(basename "${infile}" .kmet.bga)
+      base=$(basename "${infile}" _kmet.bga)
          bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
          bedGraphToBigWig $OUTDIR/bedgraphs/${base}.kmet_sort.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}_KmetSpikeinNorm.bw
 
