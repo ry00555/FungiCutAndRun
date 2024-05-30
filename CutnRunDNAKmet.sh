@@ -60,33 +60,33 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
 #*note that Im thinking on runnign flagstat for the non mapq files in sam_files
 #taking N crassa aligned beds into Kmet spike in script to make bedgraphs
 
-ml picard
-module load SAMtools
-  for infile in $OUTDIR/SortedBamFiles/*.sorted_q30.bam
-  do
-    base=$(basename ${infile} .sorted_q30.bam)
-    java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/SortedBamFiles/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
-done
+# ml picard
+# module load SAMtools
+#   for infile in $OUTDIR/SortedBamFiles/*.sorted_q30.bam
+#   do
+#     base=$(basename ${infile} .sorted_q30.bam)
+#     java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/SortedBamFiles/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
+# done
 
-ml BEDTools
-for infile in $OUTDIR/SortedBamFiles/*_nodups.bam
-do
- base=$(basename ${infile} _nodups.bam)
- bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}.btb.bed
-  done
+# ml BEDTools
+# for infile in $OUTDIR/SortedBamFiles/*_nodups.bam
+# do
+#  base=$(basename ${infile} _nodups.bam)
+#  bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}.btb.bed
+#   done
 
-  for file in $OUTDIR/SortedBamFiles/*nodups.bam
+  for file in $OUTDIR/SortedBamFiles/*_nodups.bam
       do
-         base=$(basename "${file}" nodups.bam)
-     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+         base=$(basename "${file}" _nodups.bam)
+     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base.kmet.bga $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
      done
 
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
 
   #  Combine sorting and conversion to bigwig in a single pipeline
-    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga
+    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*.kmet.bga
      do
-      base=$(basename "${infile}" _kmet.bga)
+      base=$(basename "${infile}" .kmet.bga)
          bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
          bedGraphToBigWig $OUTDIR/bedgraphs/${base}.kmet_sort.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KMetSpikeIn/BigWigs/${base}_KmetSpikeinNorm.bw
 
