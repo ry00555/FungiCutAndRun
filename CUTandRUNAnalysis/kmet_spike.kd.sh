@@ -146,7 +146,7 @@ fi
 #Select fragments within the length range, assumes fragment length is in column 6 of the bed file
 echo
 echo "Generating Fragment Lengths"
-cat $genome_bed | awk -v min=10 -v max=1000 '$7 >= min &&  $7 <= max {print $0}' > $OUTDIR/frag_length.temp.bed
+cat $genome_bed | awk -v min=10 -v max=550 '$7 >= min &&  $7 <= max {print $0}' > $OUTDIR/frag_length.temp.bed
 
 echo "Generating Genome Coverage"
 bedtools genomecov -${report} -scale ${scale_factor} -i $OUTDIR/frag_length.temp.bed -g ${genome_len} > ${OUTDIR}/${base}_kmet.${report}

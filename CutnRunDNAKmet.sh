@@ -88,7 +88,7 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
      do
       base=$(basename "${infile}" .kmet.bga)
          bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
-         bedGraphToBigWig $OUTDIR/bedgraphs/${base}.kmet_sort.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KMetSpikeIn/BigWigs/${base}_KmetSpikeinNorm.bw
+         bedGraphToBigWig $OUTDIR/bedgraphs/${base}.kmet_sort.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KmetSpikeIn/BigWigs/${base}_KmetSpikeinNorm.bw
 
       done
 
