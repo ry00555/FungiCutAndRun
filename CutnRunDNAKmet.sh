@@ -78,7 +78,7 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
   for file in $OUTDIR/SortedBamFiles/*_nodups.bam
       do
          base=$(basename "${file}" _nodups.bam)
-     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base.kmet.bga $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
+     sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/kmet_spike.kd.sh $OUTDIR/KmetSpikeIn/bedgraphs $base $OUTDIR/TrimmedReads/${base}_R1_001_val_1.fq.gz $OUTDIR/TrimmedReads/${base}_R2_001_val_2.fq.gz $file bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt
      done
 
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
