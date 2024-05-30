@@ -65,7 +65,7 @@ module load SAMtools
   for infile in $OUTDIR/SortedBamFiles/*.sorted_q30.bam
   do
     base=$(basename ${infile} .sorted_q30.bam)
-    java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/bams/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
+    java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/SortedBamFiles/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
 done
 
 ml BEDTools
