@@ -1,59 +1,59 @@
-!/bin/bash
-SBATCH --job-name=CUTandRun137
-SBATCH --partition=batch
-SBATCH --mail-type=ALL
-SBATCH --mail-user=ry00555@uga.edu
-SBATCH --ntasks=1
-SBATCH --cpus-per-task=24
-SBATCH --mem=200gb
-SBATCH --time=48:00:00
-SBATCH --output=../MapQual137.%j.out
-SBATCH --error=../MapQual137.%j.err
+# !/bin/bash
+# SBATCH --job-name=CUTandRun137
+# SBATCH --partition=batch
+# SBATCH --mail-type=ALL
+# SBATCH --mail-user=ry00555@uga.edu
+# SBATCH --ntasks=1
+# SBATCH --cpus-per-task=24
+# SBATCH --mem=200gb
+# SBATCH --time=48:00:00
+# SBATCH --output=../MapQual137.%j.out
+# SBATCH --error=../MapQual137.%j.err
 cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/Run137CutandRun"
 
 FILES="/scratch/ry00555/test/trimmed/*_R1_001_val_1.fq.gz" #Don't forget the *
 
-FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
-#test on 5/22/24
-    ml STAR
-  for file in $FASTQ/*fastq\.gz;
-    do
-      if [[ $prefix ]]; then
-            base=$(basename ${first} _R1_001.fastq.gz)
-            sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/FastQtoBed.sh -o $OUTDIR -n $base -m one $first $file
-            prefix=
-        else
-           first=$file
-            prefix=${file%%_*}
-        fi
-    done
+# FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
+# #test on 5/22/24
+#     ml STAR
+#   for file in $FASTQ/*fastq\.gz;
+#     do
+#       if [[ $prefix ]]; then
+#             base=$(basename ${first} _R1_001.fastq.gz)
+#             sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/FastQtoBed.sh -o $OUTDIR -n $base -m one $first $file
+#             prefix=
+#         else
+#            first=$file
+#             prefix=${file%%_*}
+#         fi
+#     done
 
 
-    ml BEDTools
+  #  ml BEDTools
     # Ecoli nodups.bam
   # Feeding output of no duplicates to DNA Spike In normalization by taking the bam to convert to the bed and get a bedgraph
-   for infile in $OUTDIR/Ecoli_Aligned/*_ecoli_nodups.bam
-   do
-    base=$(basename ${infile} _ecoli_nodups.bam)
-    bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}_ecoli.btb.bed
-     done
-  # mkdir $OUTDIR/bed_files
-    for f in $OUTDIR/EColi_Aligned/bed_files/*_Ecoli.btb.bed
-     do
-       ml BEDTools
-     name=$(basename ${f} _Ecoli.btb.bed)
-   sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/EColi_Aligned/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.DNASpikeInnorm.bga
-   done
-  # sort bga files from  DNA spike in and make bigwig
-     ml ucsc
-      for infile in $OUTDIR/bedgraphs/*DNASpikeInnorm.bga
-       do
-     base=$(basename ${infile} .DNASpikeInnorm.bga)
-         bedSort $infile $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga
-         bedGraphToBigWig $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
-
-      done
+  #  for infile in $OUTDIR/Ecoli_Aligned/*_ecoli_nodups.bam
+  #  do
+  #   base=$(basename ${infile} _ecoli_nodups.bam)
+  #   bedtools bamtobed -i $infile | awk -v OFS='\t' '{len = $3 - $2; print $0, len }' > $OUTDIR/bed_files/${base}_ecoli.btb.bed
+  #    done
+  # # mkdir $OUTDIR/bed_files
+  #   for f in $OUTDIR/EColi_Aligned/bed_files/*_Ecoli.btb.bed
+  #    do
+  #      ml BEDTools
+  #    name=$(basename ${f} _Ecoli.btb.bed)
+  #  sh /home/ry00555/Research/FungiCutAndRun/CUTandRUNAnalysis/DNAspike_in.kd.sh $OUTDIR/bed_files/${name}.btb.bed $OUTDIR/EColi_Aligned/bed_files/${name}_Ecoli.btb.bed 100000 bga "$OUTDIR/ref/Ncrassa_ref/chrNameLength.txt" 1 550 $OUTDIR/bedgraphs/${name}.DNASpikeInnorm.bga
+  #  done
+  # # sort bga files from  DNA spike in and make bigwig
+  #    ml ucsc
+  #     for infile in $OUTDIR/bedgraphs/*DNASpikeInnorm.bga
+  #      do
+  #    base=$(basename ${infile} .DNASpikeInnorm.bga)
+  #        bedSort $infile $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga
+  #        bedGraphToBigWig $OUTDIR/bedgraphs/${base}.DNASpikeInnorm.sorted.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/BigWigs/${base}_DNASpikeinNorm.bw
+  #
+  #     done
 
 
  #goal of the above script is to take fastQ files, trim using trim galore, prep genome files using STAR and bowtie, then align the trimmed fastq reads in a SAM and BAM format. In the sam format add a mapping quality filter of 30 from here we will make Bams and then do bamcoverage via deeptools to make bigwigs (this is our labs method) but we will also turn bams filtered out to have no duplicates via Picard tools (should already be filtered out) into bed files (the first 4 columns) and these #will be turned into bigwigs using ucsc - this step happens after the script is done
@@ -67,7 +67,7 @@ module load SAMtools
     base=$(basename ${infile} .sorted_q30.bam)
     java -jar $EBROOTPICARD/picard.jar MarkDuplicates -I $infile -M $OUTDIR/bams/"$base"_dupmetrics.txt -O $OUTDIR/SortedBamFiles/"$base"_nodups.bam --REMOVE_DUPLICATES true
 done
-
+ml BEDTools
 for infile in $OUTDIR/SortedBamFiles/*_nodups.bam
 do
  base=$(basename ${infile} _nodups.bam)
@@ -82,7 +82,7 @@ do
 
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
 
-    Combine sorting and conversion to bigwig in a single pipeline
+  #  Combine sorting and conversion to bigwig in a single pipeline
     for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga; do
       base=$(basename "${infile}" _kmet.bga)
          bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
