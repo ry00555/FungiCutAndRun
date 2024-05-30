@@ -14,7 +14,7 @@ OUTDIR="/scratch/ry00555/Run137CutandRun"
 
 FILES="/scratch/ry00555/test/trimmed/*_R1_001_val_1.fq.gz" #Don't forget the *
 
-# FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
+FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
 # #test on 5/22/24
 #     ml STAR
 #   for file in $FASTQ/*fastq\.gz;
@@ -84,7 +84,8 @@ do
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
 
   #  Combine sorting and conversion to bigwig in a single pipeline
-    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga; do
+    for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga
+     do
       base=$(basename "${infile}" _kmet.bga)
          bedSort $infile $OUTDIR/bedgraphs/${base}.kmet_sort.bga
          bedGraphToBigWig $OUTDIR/bedgraphs/${base}.kmet_sort.bga $OUTDIR/ref/Ncrassa_ref/chrNameLength.txt $OUTDIR/KMetSpikeIn/BigWigs/${base}_KmetSpikeinNorm.bw
