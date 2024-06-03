@@ -84,6 +84,7 @@ FASTQ="/scratch/ry00555/Run137CutandRun/FastQ"
     #  Take the kmet normalized bedgraphs and turn them into bigwigs
 
   #  Combine sorting and conversion to bigwig in a single pipeline
+  ml ucsc
     for infile in $OUTDIR/KmetSpikeIn/bedgraphs/*_kmet.bga
      do
       base=$(basename "${infile}" _kmet.bga)
