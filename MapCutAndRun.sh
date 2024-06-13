@@ -85,22 +85,22 @@ BEDDIR="${OUTDIR}/Beds"
 #mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
- module load MACS3
+ #module load MACS3
  #command line
  #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
- for infile in $BAMDIR/*__Q30.bam
-  do
-   base=$(basename ${infile} __Q30.bam)
-   Input="$BAMDIR/*Input__Q30.bam"
- macs3 callpeak -t $infile -f BAMPE -n $base -c $Input --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
- done
+ #for infile in $BAMDIR/*__Q30.bam
+#do
+  # base=$(basename ${infile} __Q30.bam)
+   #Input="$BAMDIR/*Input__Q30.bam"
+ #macs3 callpeak -t $infile -f BAMPE -n $base -c $Input --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ #done
 
 
  ml Homer
 ml Perl
-# ml SAMtools
-# ml BEDTools
+ml SAMtools
+ ml BEDTools
  for bam_file in "${BAMDIR}"/*__Q30.bam; do
 #   # Get the sample ID from the BAM file name
    sample_id=$(basename "${bam_file}" __Q30.bam)
@@ -108,7 +108,7 @@ ml Perl
 #   sample_id="${sample_id%%_Rep_1*}"
 #
 #
- makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 # #
 # #   # Call peaks
 # #
