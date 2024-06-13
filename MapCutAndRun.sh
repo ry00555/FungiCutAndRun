@@ -19,103 +19,102 @@ source config.txt
 OUTDIR="/scratch/ry00555/OutputRun139"
 
 
-  mkdir "${OUTDIR}/TrimmedReads"
-  mkdir "${OUTDIR}/BigWigs"
-  mkdir "${OUTDIR}/Peaks"
-  mkdir "$OUTDIR/HomerTagDirectories"
-mkdir "$OUTDIR/TdfFiles"
-mkdir "$OUTDIR/SortedBamFiles"
+#   mkdir "${OUTDIR}/TrimmedReads"
+#   mkdir "${OUTDIR}/BigWigs"
+#   mkdir "$OUTDIR/HomerTagDirectories"
+# mkdir "$OUTDIR/TdfFiles"
+# mkdir "$OUTDIR/SortedBamFiles"
 #
 #
-PEAKDIR="${OUTDIR}/Peaks"
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
 # #
-  ml Trim_Galore
-  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#  ml Trim_Galore
+#  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
- FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
+# FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
 #
 # #
 # #Iterate over the files
-for f in $FILES
- do
+#for f in $FILES
+ #do
 # #
 # # 	#Examples to Get Different parts of the file name
 # # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 # 		#${string//substring/replacement}
 # # 		#dir=${f%/*}
 #
- 	file=${f##*/}
+# 	file=${f##*/}
 # 	#remove ending from file name to create shorter names for bam files and other downstream output
- 	name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+ 	#name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
 #
 # #
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
- 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+ #	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 # 	#variable for naming bam file
-bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+#bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
- 	bigwig="${OUTDIR}/BigWigs/${name}"
-QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+ #	bigwig="${OUTDIR}/BigWigs/${name}"
+#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 # #
 #
-ml SAMtools
-ml BWA
+#ml SAMtools
+#ml BWA
 # #
- bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
- samtools index "$bam"
+ #bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+ #samtools index "$bam"
 #
-samtools view -b -q 30 $bam > "$QualityBam"
-samtools index "$QualityBam"
+#samtools view -b -q 30 $bam > "$QualityBam"
+#samtools index "$QualityBam"
 #
 # ############################
 # # # #deeptools
 #
- ml deepTools
+# ml deepTools
 # #Plot all reads
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
  #plot mononucleosomes
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
-done
-mkdir $OUTDIR/MACSPeaks
+ #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
+#done
+#mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
  module load MACS3
  #command line
  #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
- for infile in $QualityBam
+ for infile in $BAMDIR/*__Q30.bam
   do
-   base=$(basename ${infile} _Q30.bam)
- macs3 callpeak -t $infile -f BAMPE -n $base -c $QualityBam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+   base=$(basename ${infile} __Q30.bam)
+   Input="$BAMDIR/*Input__Q30.bam"
+ macs3 callpeak -t $infile -f BAMPE -n $base -c $Input --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  done
 
 
-# ml Homer
-# ml Perl
+ ml Homer
+ml Perl
 # ml SAMtools
 # ml BEDTools
-# for bam_file in "${BAMDIR}"/*.bam; do
+ for bam_file in "${BAMDIR}"/*__Q30.bam; do
 #   # Get the sample ID from the BAM file name
-#   sample_id=$(basename "${bam_file}" .bam)
+   sample_id=$(basename "${bam_file}" __Q30.bam)
 #   # Remove everything after "Rep_1" in the sample ID
 #   sample_id="${sample_id%%_Rep_1*}"
 #
 #
-# #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 # #
 # #   # Call peaks
 # #
-# findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_peaks.txt"
+findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_Homerpeaks.txt"
 # #
-# done
+ done
 # #changing peak txt files to bed files to input into chipr
 # ml ChIP-R
 #  for infile in ${PEAKDIR}/${sample_id}_peaks.txt
