@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=j_GATK
+#SBATCH --job-name=AlphaFold
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -13,37 +13,28 @@
 
 #!/bin/bash
 
-# Define paths
-INPUT_LIST="/scratch/ry00555/AlphaFold/Rtt109_FilteredHits_Accessions.txt"
-OUTPUT_DIR="/scratch/ry00555/AlphaFold/Rtt109_Accessions_Fastas"
+accession_file="/scratch/ry00555/AlphaFold/Rtt109_FilteredHits_Accessions.txt"
+output_dir="/scratch/ry00555/AlphaFold/Rtt109_Accessions_Fastas"
 
-# Check if the output directory exists, if not, create it
-[ ! -d "$OUTPUT_DIR" ] && mkdir -p "$OUTPUT_DIR"
+# Load the BLAST+ module
+module load BLAST+/2.7.1-foss-2016b-Python-2.7.14
 
-# Loop through each accession in the list
-while IFS= read -r ACCESSION
-do
-    # Construct the output file path based on the accession
-    OUTPUT_FILE="$OUTPUT_DIR/$ACCESSION.fa"
+# Check if the accession file exists
+if [ ! -f "$accession_file" ]; then
+  echo "Accession file not found: $accession_file"
+  exit 1
+fi
 
-    # Fetch sequence from NCBI and write to the output file
-    efetch -db protein -id "$ACCESSION" -format fasta > "$OUTPUT_FILE"
+# Create output directory if it doesn't exist
+mkdir -p "$output_dir"
 
-    # Check if sequence retrieval was successful
-    if [ -s "$OUTPUT_FILE" ]; then
-        echo "Sequence fetched for accession $ACCESSION and saved to $OUTPUT_FILE"
-    else
-        echo "WARNING: Sequence not found for accession $ACCESSION"
-    fi
+# Loop through each accession and extract amino acid sequence to a separate FASTA file
+while read -r accession; do
+  output_file="$output_dir/$accession.fa"
+  blastdbcmd -db nr -entry "$accession" -dbtype prot -out "$output_file"
+done < "$accession_file"
 
-    # Break the loop after fetching the first sequence (for rtt109)
-    if [ "$ACCESSION" = "NCU09825-t26_1-p1" ]; then
-        break
-    fi
-done < "$INPUT_LIST"
-
-
-
+echo "Amino acid sequences extracted and saved to $output_dir"
 # cd $SLURM_SUBMIT_DIR
 # ml purge
 # ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
