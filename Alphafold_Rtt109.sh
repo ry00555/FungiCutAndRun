@@ -18,7 +18,7 @@ output_dir="/scratch/ry00555/AlphaFold/Rtt109_Accessions_Fastas"
 
 for i in $(cat $accession_file)
 do
-wget -O  $output_dir/$i.fa "https://www.uniprot.org/uniprotkb?query=$i"
+  curl -s https://www.uniprot.org/uniprotkb?query=$i.fasta.gz | gunzip -c > $output_dir/$i.fa
 #grep -v study $i.txt - this would remove any line that has the word study - not robust
 #separate tabs by comlumn NR - take only the second row print NF only the last column
 done
