@@ -99,6 +99,7 @@ gatk PlotDenoisedCopyRatios \
 --output PlotDenoisedCopyRatios
 
 scp -r ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/Bioinformatics/GATK/PlotModelSegments /Users/ry00555/Desktop/RochelleLabDesktopData/IGV/mus30xmei3/mus30Samples
+scp -r ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/Bioinformatics/GATK/PlotModelSegments /Users/ry00555/Desktop/RochelleLabDesktopData/IGV/mus30xmei3/mus30Samples
 
 gatk CollectAllelicCounts \
           -I GATK109Bam/109_58_Genomic.bamoutput.bam \
