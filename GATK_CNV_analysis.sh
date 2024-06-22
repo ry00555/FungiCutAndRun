@@ -82,22 +82,21 @@ ml picard
 
 
   ml GATK
-for bam_file in $SORTED_BAM_DIR/139*WGS*.bam
+for bam_file in $SORTED_BAM_DIR
  do
 # Get the base name of the BAM file
       base_name=$(basename "$bam_file" _output.bam)
   # # # # #   # Define the output file path
   ml SAMtools
-samtools index "$SORTED_BAM_DIR/139*WGS*_output.bam"
+samtools index "$SORTED_BAM_DIR/_output.bam"
   # # # # #
 gatk CollectReadCounts \
  -I "$bam_file" \
  -R $genome  \
--L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+-L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
  --interval-merging-rule OVERLAPPING_ONLY \
- -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
+ -O $OUTDIR/CountTSVs/$base_name.counts.tsv
   done
-CountTSVsDIR="$OUTDIR/CountTSVs"
 
 
  #gatk CreateReadCountPanelOfNormals \
