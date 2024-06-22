@@ -15,19 +15,20 @@ SORTED_BAM_DIR="/scratch/ry00555/ParpMus30_Run139/OutputBams"
 BAMDIR="/scratch/ry00555/OutputRun139/SortedBamFiles"
 genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
 
- curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.fasta
-
-module load SAMtools
-samtools faidx $OUTDIR/Genome/Ncrassa.fasta
-
-module load Bowtie2
-faidx --transform bed $OUTDIR/Genome/Ncrassa.fasta > $OUTDIR/Genome/Ncrassa.bed
-
-curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.gtf
-module load BEDOPS
- gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
-awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2.bed
-
+#  curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.fasta
+#
+# module load SAMtools
+# samtools faidx $OUTDIR/Genome/Ncrassa.fasta
+# awk 'BEGIN {FS="\t"}; {print $1 FS "0" FS $2}' $OUTDIR/Genome/Ncrassa.fasta.fai > $OUTDIR/GenomeNcrassa.bed
+# module load Bowtie2
+# faidx --transform bed $OUTDIR/Genome/Ncrassa.fasta > $OUTDIR/Genome/Ncrassa.bed
+#
+# curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.gtf
+# module load BEDOPS
+# gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
+#
+# awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
+#
 
 ml picard
 #
@@ -36,7 +37,7 @@ ml picard
  #       -O $OUTDIR/Genome/Ncrassa.dict
 
   java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
- -I $OUTDIR/Genome/Ncrassa2.bed \
+ -I $OUTDIR/Genome/Ncrassa2_genes.bed \
 -R $genome \
 -SD $OUTDIR/Genome/Ncrassa.dict \
  -O $OUTDIR/Genome/Ncrassa.interval_list
