@@ -1,21 +1,25 @@
 #!/bin/bash
-#SBATCH --job-name=alphaMSAs
+#SBATCH --job-name=alphafold
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32gb
-#SBATCH --time=12:00:00
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --gres=gpu:V100:1
+#SBATCH --time=4:00:00
 #SBATCH --output=%x.%j.out
 #SBATCH --error=%x.%j.err
 #SBATCH --array=1-200
-#Substep1 before running check and stop elements script
+
 cd $SLURM_SUBMIT_DIR
 
 ml purge
+
 ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
 export ALPHAFOLD_DATA_DIR=/apps/db/AlphaFold/2.3.1
+export TF_FORCE_UNIFIED_MEMORY=1
+export XLA_PYTHON_CLIENT_MEM_FRACTION=8
 WORKDIR="/scratch/ry00555/AlphaFold"
 
 file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/input.lst)
@@ -32,6 +36,7 @@ alphafold \
 --obsolete_pdbs_path=$ALPHAFOLD_DATA_DIR/pdb_mmcif/obsolete.dat \
 --uniprot_database_path=$ALPHAFOLD_DATA_DIR/uniprot/uniprot.fasta \
 --model_preset=multimer \
+--use_precomputed_msas=true \
 --num_multimer_predictions_per_model=1 \
 --max_template_date=2023-10-01 \
 --db_preset=full_dbs \
