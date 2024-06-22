@@ -15,8 +15,7 @@ SORTED_BAM_DIR="/scratch/ry00555/ParpMus30_Run139/OutputBams"
 BAMDIR="/scratch/ry00555/OutputRun139/SortedBamFiles"
 genome=/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna
 
- curl -s
-"https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz" | gunzip -c > $OUTDIR/Genome/Ncrassa.fasta
+ curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.fna.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.fasta
 
 module load SAMtools
 samtools faidx $OUTDIR/Genome/Ncrassa.fasta
@@ -60,22 +59,61 @@ ml picard
 --interval-merging-rule OVERLAPPING_ONLY \
  -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
 
- ml picard
- for bam_file in $BAMDIR/139*WGS*.bam
+#  ml picard
+#  for bam_file in $BAMDIR/139*WGS*.bam
+#  do
+#  # # #     # Get the base name of the BAM file
+#    base_name=$(basename "$bam_file" .bam)
+#  # # #
+#  # # #     # Define the output file path
+#   output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+#  # # #
+#  # # #     # Run Picard to add or replace read groups
+#  java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#  -I "$bam_file" \
+#   -O "$output_file" \
+#   -RGID 2 \
+#  -RGLB lib1 \
+# -RGPL illumina \
+# -RGPU S34 \
+# -RGSM "${base_name%.*}"
+#   done
+
+
+  ml GATK
+for bam_file in $SORTED_BAM_DIR/139*WGS*.bam
  do
- # # #     # Get the base name of the BAM file
-   base_name=$(basename "$bam_file" .bam)
- # # #
- # # #     # Define the output file path
-  output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
- # # #
- # # #     # Run Picard to add or replace read groups
- java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+# Get the base name of the BAM file
+      base_name=$(basename "$bam_file" _output.bam)
+  # # # # #   # Define the output file path
+  ml SAMtools
+samtools index "$SORTED_BAM_DIR/139*WGS*_output.bam"
+  # # # # #
+gatk CollectReadCounts \
  -I "$bam_file" \
-  -O "$output_file" \
-  -RGID 2 \
- -RGLB lib1 \
--RGPL illumina \
--RGPU S34 \
--RGSM "${base_name%.*}"
+ -R $genome  \
+-L /scratch/ry00555/McEachern/Genome/klactis_preprocessed1000_intervals.interval_list \
+ --interval-merging-rule OVERLAPPING_ONLY \
+ -O /scratch/ry00555/McEachern/CountTSVs/$base_name.counts.tsv
   done
+CountTSVsDIR="$OUTDIR/CountTSVs"
+
+
+ #gatk CreateReadCountPanelOfNormals \
+# # # -I ${CountTSVsDIR}/113-1-gDNA-CBS2359_merged.counts.tsv \
+# # # -I ${CountTSVsDIR}/113-12-gDNA-7B520_merged.counts.tsv  \
+# # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
+# # #
+#  for count_files in $CountTSVsDIR/113*.counts.tsv
+#   do
+# # # # Get the base name of the counts file
+# base_name=$(basename "$count_files" .counts.tsv)
+# # #    # Define the output file path
+# gatk DenoiseReadCounts \
+#  -I "$count_files" \
+# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
+# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
+# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+# done
