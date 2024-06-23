@@ -82,13 +82,15 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 
 
   ml GATK
-for bam_file in $SORTED_BAM_DIR
+  OUTPUTBAM="$SORTED_BAM_DIR/*_output.bam"
+
+for bam_file in $OUTPUTBAM
  do
 # Get the base name of the BAM file
       base_name=$(basename "$bam_file" _output.bam)
   # # # # #   # Define the output file path
   ml SAMtools
-samtools index "$SORTED_BAM_DIR/_output.bam"
+samtools index "$SORTED_BAM_DIR/*_output.bam"
   # # # # #
 gatk CollectReadCounts \
  -I "$bam_file" \
