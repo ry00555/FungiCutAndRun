@@ -43,16 +43,16 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 #  -O $OUTDIR/Genome/Ncrassa.interval_list
 #
 #
-#  ml GATK
+  ml GATK
 #  #
 #  # #WGS uses 1000 bp bins
-#         gatk PreprocessIntervals \
-#        -R $genome \
-# -L $OUTDIR/Genome/Ncrassa.interval_list \
-#     --interval-merging-rule OVERLAPPING_ONLY \
-#       --bin-length 1000 \
-#       --padding 0 \
-#         -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
+         gatk PreprocessIntervals \
+        -R $genome \
+-L $OUTDIR/Genome/Ncrassa.interval_list \
+     --interval-merging-rule OVERLAPPING_ONLY \
+       --bin-length 1000 \
+       --padding 0 \
+         -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
 #
 #  gatk AnnotateIntervals \
 #  -R $genome  \
@@ -89,7 +89,7 @@ for bam_file in $OUTPUTBAM
 # Get the base name of the BAM file
       base_name=$(basename "$bam_file" Q30_output.bam)
   # # # # #   # Define the output file path
-#  ml SAMtools
+ ml SAMtools
 #samtools index "$SORTED_BAM_DIR/*_output.bam"
   # # # # #
 gatk CollectReadCounts \
