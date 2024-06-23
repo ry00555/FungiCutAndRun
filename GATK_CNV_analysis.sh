@@ -30,17 +30,17 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 # awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
 #
 
-#ml picard
+ml picard
 #
  # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
  #       -R $genome \
  #       -O $OUTDIR/Genome/Ncrassa.dict
 
-#   java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
-#  -I $OUTDIR/Genome/Ncrassa2_genes.bed \
-# -R $genome \
-# -SD $OUTDIR/Genome/Ncrassa.dict \
-#  -O $OUTDIR/Genome/Ncrassa.interval_list
+java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
+  -I $OUTDIR/Genome/Ncrassa2_genes.bed \
+ -R $genome \
+ -SD $OUTDIR/Genome/Ncrassa.dict \
+  -O $OUTDIR/Genome/Ncrassa.interval_list
 #
 #
   ml GATK
