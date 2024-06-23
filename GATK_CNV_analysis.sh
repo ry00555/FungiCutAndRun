@@ -30,35 +30,35 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 # awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
 #
 
-ml picard
+#ml picard
 #
  # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
  #       -R $genome \
  #       -O $OUTDIR/Genome/Ncrassa.dict
 
-  java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
- -I $OUTDIR/Genome/Ncrassa2_genes.bed \
--R $genome \
--SD $OUTDIR/Genome/Ncrassa.dict \
- -O $OUTDIR/Genome/Ncrassa.interval_list
-
-
- ml GATK
- #
- # #WGS uses 1000 bp bins
-        gatk PreprocessIntervals \
-       -R $genome \
-              -L $OUTDIR/Genome/Ncrassa.interval_list \
-    --interval-merging-rule OVERLAPPING_ONLY \
-      --bin-length 1000 \
-      --padding 0 \
-        -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
-
- gatk AnnotateIntervals \
- -R $genome  \
--L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
---interval-merging-rule OVERLAPPING_ONLY \
- -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
+#   java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
+#  -I $OUTDIR/Genome/Ncrassa2_genes.bed \
+# -R $genome \
+# -SD $OUTDIR/Genome/Ncrassa.dict \
+#  -O $OUTDIR/Genome/Ncrassa.interval_list
+#
+#
+#  ml GATK
+#  #
+#  # #WGS uses 1000 bp bins
+#         gatk PreprocessIntervals \
+#        -R $genome \
+# -L $OUTDIR/Genome/Ncrassa.interval_list \
+#     --interval-merging-rule OVERLAPPING_ONLY \
+#       --bin-length 1000 \
+#       --padding 0 \
+#         -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
+#
+#  gatk AnnotateIntervals \
+#  -R $genome  \
+# -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
+# --interval-merging-rule OVERLAPPING_ONLY \
+#  -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
 
 #  ml picard
 #  for bam_file in $BAMDIR/139*WGS*.bam
@@ -95,7 +95,7 @@ gatk CollectReadCounts \
  -R $genome  \
 -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
  --interval-merging-rule OVERLAPPING_ONLY \
- -O $OUTDIR/CountTSVs/$base_name.counts.tsv
+ -O scratch/ry00555/ParpMus30_Run139/CountTSVs/$base_name.counts.tsv
   done
 
 
