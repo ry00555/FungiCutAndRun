@@ -97,24 +97,24 @@ do
  done
 
 
- ml Homer
-ml Perl
-ml SAMtools
- ml BEDTools
- for bam_file in "${BAMDIR}"/*__Q30.bam; do
-#   # Get the sample ID from the BAM file name
-   sample_id=$(basename "${bam_file}" __Q30.bam)
-#   # Remove everything after "Rep_1" in the sample ID
-#   sample_id="${sample_id%%_Rep_1*}"
-#
-#
- makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+#  ml Homer
+# ml Perl
+# ml SAMtools
+#  ml BEDTools
+#  for bam_file in "${BAMDIR}"/*__Q30.bam; do
+# #   # Get the sample ID from the BAM file name
+#    sample_id=$(basename "${bam_file}" __Q30.bam)
+# #   # Remove everything after "Rep_1" in the sample ID
+# #   sample_id="${sample_id%%_Rep_1*}"
 # #
-# #   # Call peaks
 # #
-findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_Homerpeaks.txt"
-# #
- done
+#  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+# # #
+# # #   # Call peaks
+# # #
+# findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_Homerpeaks.txt"
+# # #
+#  done
 # #changing peak txt files to bed files to input into chipr
 # ml ChIP-R
 #  for infile in ${PEAKDIR}/${sample_id}_peaks.txt
