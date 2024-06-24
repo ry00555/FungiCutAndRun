@@ -22,12 +22,12 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 # awk 'BEGIN {FS="\t"}; {print $1 FS "0" FS $2}' $OUTDIR/Genome/Ncrassa.fasta.fai > $OUTDIR/GenomeNcrassa.bed
 # module load Bowtie2
 # faidx --transform bed $OUTDIR/Genome/Ncrassa.fasta > $OUTDIR/Genome/Ncrassa.bed
+#wrong chromosomes
+#curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.gtf
+module load BEDOPS
+ gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
 #
-# curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.gtf
-# module load BEDOPS
-# gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
-#
-# awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
+ awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
 #
 
 ml picard
@@ -54,26 +54,26 @@ java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
        --padding 0 \
          -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
 #
-#  gatk AnnotateIntervals \
-#  -R $genome  \
-# -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
-# --interval-merging-rule OVERLAPPING_ONLY \
-#  -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
+ gatk AnnotateIntervals \
+  -R $genome  \
+ -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
+ --interval-merging-rule OVERLAPPING_ONLY \
+  -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
 
-#  ml picard
-#  for bam_file in $BAMDIR/139*WGS*.bam
-#  do
-#  # # #     # Get the base name of the BAM file
-#    base_name=$(basename "$bam_file" .bam)
-#  # # #
-#  # # #     # Define the output file path
-#   output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
-#  # # #
-#  # # #     # Run Picard to add or replace read groups
-#  java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
-#  -I "$bam_file" \
-#   -O "$output_file" \
-#   -RGID 2 \
+  ml picard
+#   for bam_file in $BAMDIR/139*WGS*.bam
+#   do
+# #  # # #     # Get the base name of the BAM file
+#     base_name=$(basename "$bam_file" .bam)
+# #  # # #
+# #  # # #     # Define the output file path
+#    output_file="${SORTED_BAM_DIR}/${base_name}_output.bam"
+# #  # # #
+# #  # # #     # Run Picard to add or replace read groups
+#   java -jar $EBROOTPICARD/picard.jar AddOrReplaceReadGroups \
+#   -I "$bam_file" \
+#    -O "$output_file" \
+#       -RGID 2 \
 #  -RGLB lib1 \
 # -RGPL illumina \
 # -RGPU S34 \
