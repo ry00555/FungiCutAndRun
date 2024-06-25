@@ -122,7 +122,7 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 ml R/3.6.2-foss-2019b
 ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
 
-COPYDIR="${OUTDIR}/CopyRatios/*.standardizedCR.tsv"
+COPYDIR="$OUTDIR/CopyRatios/*.standardizedCR.tsv"
 
  for copy_ratios in $COPYDIR
  do
@@ -133,28 +133,28 @@ COPYDIR="${OUTDIR}/CopyRatios/*.standardizedCR.tsv"
  # # Define the output file path
    gatk PlotDenoisedCopyRatios \
   --standardized-copy-ratios "$copy_ratios" \
-  --denoised-copy-ratios "${OUTDIR}/CopyRatios/$Denoised" \
+  --denoised-copy-ratios "$OUTDIR/CopyRatios/$Denoised" \
  --sequence-dictionary $OUTDIR/Genome/Ncrassa.dict \
   --point-size-copy-ratio 1 \
   --output-prefix ${base_name} \
-  --output ${OUTDIR}/PlotDenoisedCopyRatios
+  --output $OUTDIR/PlotDenoisedCopyRatios
   done
-
-  for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
+DenoiseDIR="$OUTDIR/CopyRatios/*.denoisedCR.tsv"
+  for copy_ratios in $DenoiseDIR
     do
   # # #
   base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
   # # #
  gatk ModelSegments \
-    --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+    --denoised-copy-ratios $DenoiseDIR/${base_name}.denoisedCR.tsv \
   --output-prefix ${base_name} \
-    -O ${OUTDIR}/ModelSegments
+    -O $OUTDIR/ModelSegments
   #
    gatk PlotModeledSegments \
-  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
- --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+  --denoised-copy-ratios $DenoiseDIR/${base_name}.denoisedCR.tsv \
+ --segments $OUTDIR/ModelSegments/${base_name}.modelFinal.seg \
  --sequence-dictionary $OUTDIR/Genome/Ncrassa.dict \
     --point-size-copy-ratio 1 \
-      --output-prefix ${base_name} \
-     -O ${OUTDIR}/PlotModelSegments
+      --output-prefix $base_name \
+     -O $OUTDIR/PlotModelSegments
      done
