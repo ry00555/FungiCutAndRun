@@ -97,7 +97,7 @@ for bam_file in $OUTPUTBAM
   -R $genome  \
  -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
   --interval-merging-rule OVERLAPPING_ONLY \
-  -O" $OUTDIR/CountTSVs/$base_name.counts.tsv"
+  -O "$OUTDIR/CountTSVs/$base_name.counts.tsv"
    done
 
 
