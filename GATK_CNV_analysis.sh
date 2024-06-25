@@ -106,21 +106,22 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 # --annotated-intervals $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv \
 # -O ${OUTDIR}/PanelofNormals/139-20_WGS_WT___.pon.hdf5
 # # #
-CountTSVsDIR="$OUTDIR/CountTSVs/*.counts.tsv"
-for count_files in $CountTSVsDIR
-   do
-# # # # Get the base name of the counts file
- base_name=$(basename "$count_files" .counts.tsv)
-# # #    # Define the output file path
- gatk DenoiseReadCounts \
-  -I "$count_files" \
-  --annotated-intervals $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv \
- --count-panel-of-normals ${OUTDIR}/PanelofNormals/139-20_WGS_WT___.pon.hdf5 \
- --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
- --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
- done
+#CountTSVsDIR="$OUTDIR/CountTSVs/*.counts.tsv"
+# for count_files in $CountTSVsDIR
+#    do
+# # # # # Get the base name of the counts file
+#  base_name=$(basename "$count_files" .counts.tsv)
+# # # #    # Define the output file path
+#  gatk DenoiseReadCounts \
+#   -I "$count_files" \
+#   --annotated-intervals $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv \
+#  --count-panel-of-normals ${OUTDIR}/PanelofNormals/139-20_WGS_WT___.pon.hdf5 \
+#  --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+#  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+#  done
+COPYDIR="${OUTDIR}/CopyRatios/*.standardizedCR.tsv"
 
- for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
+ for copy_ratios in $COPYDIR
  do
  # # #Get the base name of the counts file
    base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
