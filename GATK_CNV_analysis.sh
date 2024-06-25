@@ -84,21 +84,21 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
   ml GATK
   OUTPUTBAM="$SORTED_BAM_DIR/*Q30_output.bam"
 
-# for bam_file in $OUTPUTBAM
-#  do
+for bam_file in $OUTPUTBAM
+  do
 # # Get the base name of the BAM file
-#       base_name=$(basename "$bam_file" Q30_output.bam)
+       base_name=$(basename "$bam_file" Q30_output.bam)
 #   # # # # #   # Define the output file path
-#  ml SAMtools
-# #samtools index "$SORTED_BAM_DIR/*_output.bam"
+ #ml SAMtools
+ #samtools index "$SORTED_BAM_DIR/*_output.bam"
 #   # # # # #
-# gatk CollectReadCounts \
-#  -I "$bam_file" \
-#  -R $genome  \
-# -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
-#  --interval-merging-rule OVERLAPPING_ONLY \
-#  -O" $OUTDIR/CountTSVs/$base_name.counts.tsv"
-#   done
+ gatk CollectReadCounts \
+  -I "$bam_file" \
+  -R $genome  \
+ -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
+  --interval-merging-rule OVERLAPPING_ONLY \
+  -O" $OUTDIR/CountTSVs/$base_name.counts.tsv"
+   done
 
 
  gatk CreateReadCountPanelOfNormals \
