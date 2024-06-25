@@ -81,7 +81,7 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 #   done
 
 
-#   ml GATK
+  ml GATK
 #   OUTPUTBAM="$SORTED_BAM_DIR/*Q30_output.bam"
 #
 # for bam_file in $OUTPUTBAM
@@ -119,6 +119,9 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 #  --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
 #  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
 #  done
+ml R/3.6.2-foss-2019b
+ml GATK/4.3.0.0-GCCcore-8.3.0-Java-11
+
 COPYDIR="${OUTDIR}/CopyRatios/*.standardizedCR.tsv"
 
  for copy_ratios in $COPYDIR
