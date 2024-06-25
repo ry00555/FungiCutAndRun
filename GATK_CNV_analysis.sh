@@ -24,43 +24,43 @@ genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic
 # faidx --transform bed $OUTDIR/Genome/Ncrassa.fasta > $OUTDIR/Genome/Ncrassa.bed
 #wrong chromosomes
 #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > $OUTDIR/Genome/Ncrassa.gtf
-module load BEDOPS
- gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
+# module load BEDOPS
+#  gtf2bed < $OUTDIR/Genome/Ncrassa.gtf > $OUTDIR/Genome/Ncrassa2.bed --max-mem 10G
+# #
+#  awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
+# #
 #
- awk '$8 == "gene"' $OUTDIR/Genome/Ncrassa2.bed > $OUTDIR/Genome/Ncrassa2_genes.bed
-#
-
-ml picard
+# ml picard
 #
  # java -jar $EBROOTPICARD/picard.jar CreateSequenceDictionary \
  #       -R $genome \
  #       -O $OUTDIR/Genome/Ncrassa.dict
 
-java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
-  -I $OUTDIR/Genome/Ncrassa2_genes.bed \
- -R $genome \
- -SD $OUTDIR/Genome/Ncrassa.dict \
-  -O $OUTDIR/Genome/Ncrassa.interval_list
-#
-#
-  ml GATK
-#  #
-#  # #WGS uses 1000 bp bins
-         gatk PreprocessIntervals \
-        -R $genome \
--L $OUTDIR/Genome/Ncrassa.interval_list \
-     --interval-merging-rule OVERLAPPING_ONLY \
-       --bin-length 1000 \
-       --padding 0 \
-         -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
-#
- gatk AnnotateIntervals \
-  -R $genome  \
- -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
- --interval-merging-rule OVERLAPPING_ONLY \
-  -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
+# java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
+#   -I $OUTDIR/Genome/Ncrassa2_genes.bed \
+#  -R $genome \
+#  -SD $OUTDIR/Genome/Ncrassa.dict \
+#   -O $OUTDIR/Genome/Ncrassa.interval_list
+# #
+# #
+#   ml GATK
+# #  #
+# #  # #WGS uses 1000 bp bins
+#          gatk PreprocessIntervals \
+#         -R $genome \
+# -L $OUTDIR/Genome/Ncrassa.interval_list \
+#      --interval-merging-rule OVERLAPPING_ONLY \
+#        --bin-length 1000 \
+#        --padding 0 \
+#          -O $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list
+# #
+#  gatk AnnotateIntervals \
+#   -R $genome  \
+#  -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
+#  --interval-merging-rule OVERLAPPING_ONLY \
+#   -O $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv
 
-  ml picard
+  #ml picard
 #   for bam_file in $BAMDIR/139*WGS*.bam
 #   do
 # #  # # #     # Get the base name of the BAM file
@@ -84,38 +84,73 @@ java -jar $EBROOTPICARD/picard.jar BedToIntervalList \
   ml GATK
   OUTPUTBAM="$SORTED_BAM_DIR/*Q30_output.bam"
 
-for bam_file in $OUTPUTBAM
+# for bam_file in $OUTPUTBAM
+#  do
+# # Get the base name of the BAM file
+#       base_name=$(basename "$bam_file" Q30_output.bam)
+#   # # # # #   # Define the output file path
+#  ml SAMtools
+# #samtools index "$SORTED_BAM_DIR/*_output.bam"
+#   # # # # #
+# gatk CollectReadCounts \
+#  -I "$bam_file" \
+#  -R $genome  \
+# -L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
+#  --interval-merging-rule OVERLAPPING_ONLY \
+#  -O" $OUTDIR/CountTSVs/$base_name.counts.tsv"
+#   done
+
+
+ gatk CreateReadCountPanelOfNormals \
+-I $OUTDIR/CountTSVs/139-20_WGS_WT___.counts.tsv \
+--annotated-intervals $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv \
+-O ${OUTDIR}/PanelofNormals/139-20_WGS_WT___.pon.hdf5
+# # #
+CountTSVsDIR="$OUTDIR/CountTSVs"
+for count_files in $CountTSVsDIR/*.counts.tsv
+   do
+# # # # Get the base name of the counts file
+ base_name=$(basename "$count_files" .counts.tsv)
+# # #    # Define the output file path
+ gatk DenoiseReadCounts \
+  -I "$count_files" \
+  --annotated-intervals $OUTDIR/Genome/Ncrassa_preprocessed10_annotated_intervals.tsv \
+ --count-panel-of-normals ${OUTDIR}/PanelofNormals/139-20_WGS_WT___.pon.hdf5 \
+ --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
+ --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
+ done
+
+ for copy_ratios in ${OUTDIR}/CopyRatios/*.standardizedCR.tsv
  do
-# Get the base name of the BAM file
-      base_name=$(basename "$bam_file" Q30_output.bam)
-  # # # # #   # Define the output file path
- ml SAMtools
-#samtools index "$SORTED_BAM_DIR/*_output.bam"
-  # # # # #
-gatk CollectReadCounts \
- -I "$bam_file" \
- -R $genome  \
--L $OUTDIR/Genome/Ncrassa_1000_intervals.interval_list \
- --interval-merging-rule OVERLAPPING_ONLY \
- -O scratch/ry00555/ParpMus30_Run139/CountTSVs/$base_name.counts.tsv
+ # # #Get the base name of the counts file
+   base_name=$(basename "$copy_ratios" .standardizedCR.tsv)
+   Denoised=$(echo "$copy_ratios" | sed 's/\.standardizedCR\.tsv/\.denoisedCR\.tsv/g')
+
+ # # Define the output file path
+   gatk PlotDenoisedCopyRatios \
+  --standardized-copy-ratios "$copy_ratios" \
+  --denoised-copy-ratios "${OUTDIR}/CopyRatios/$Denoised" \
+ --sequence-dictionary $OUTDIR/Genome/Ncrassa.dict \
+  --point-size-copy-ratio 1 \
+  --output-prefix ${base_name} \
+  --output ${OUTDIR}/PlotDenoisedCopyRatios
   done
 
-
- #gatk CreateReadCountPanelOfNormals \
-# # # -I ${CountTSVsDIR}/113-1-gDNA-CBS2359_merged.counts.tsv \
-# # # -I ${CountTSVsDIR}/113-12-gDNA-7B520_merged.counts.tsv  \
-# # # --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
-# # # -O ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5
-# # #
-#  for count_files in $CountTSVsDIR/113*.counts.tsv
-#   do
-# # # # Get the base name of the counts file
-# base_name=$(basename "$count_files" .counts.tsv)
-# # #    # Define the output file path
-# gatk DenoiseReadCounts \
-#  -I "$count_files" \
-# --annotated-intervals /scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic_preprocessed10_annotated_intervals.tsv \
-# --count-panel-of-normals ${OUTDIR}/PanelofNormals/K_Samples.pon.hdf5 \
-# --standardized-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.standardizedCR.tsv \
-# --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv
-# done
+  for copy_ratios in ${OUTDIR}/CopyRatios/*.denoisedCR.tsv
+    do
+  # # #
+  base_name=$(basename "$copy_ratios" .denoisedCR.tsv)
+  # # #
+ gatk ModelSegments \
+    --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+  --output-prefix ${base_name} \
+    -O ${OUTDIR}/ModelSegments
+  #
+   gatk PlotModeledSegments \
+  --denoised-copy-ratios ${OUTDIR}/CopyRatios/${base_name}.denoisedCR.tsv \
+ --segments ${OUTDIR}/ModelSegments/${base_name}.modelFinal.seg \
+ --sequence-dictionary $OUTDIR/Genome/Ncrassa.dict \
+    --point-size-copy-ratio 1 \
+      --output-prefix ${base_name} \
+     -O ${OUTDIR}/PlotModelSegments
+     done
