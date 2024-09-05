@@ -32,8 +32,8 @@ BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
 # #
-ml Trim_Galore/0.6.5-GCCcore-8.3.0-Java-11-Python-3.7.4
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ ml Trim_Galore/0.6.7-GCCcore-11.2.0
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
  FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
@@ -50,8 +50,7 @@ for f in $FILES
 #
  	file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
- 	name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
-#
+name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
 # #
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
@@ -63,8 +62,8 @@ bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 # #
 #
-ml SAMtools
-ml BWA
+ml SAMtools/1.16.1-GCC-11.3.0
+ml BWA/0.7.17-GCCcore-11.3.0
 # #
  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
  samtools index "$bam"
@@ -75,17 +74,17 @@ samtools index "$QualityBam"
 # ############################
 # # # #deeptools
 #
- ml deepTools
+ml deepTools/3.5.2-foss-2022a
  #Plot all reads
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
  #plot mononucleosomes
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
+ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
 done
 #mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
- module load MACS3
+module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
  #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
