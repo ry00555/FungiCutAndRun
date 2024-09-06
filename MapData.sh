@@ -32,14 +32,14 @@ source config.txt
 
 #make output file folders
 trimmed="${outdir}/TrimmedReads/${accession}"
-mkdir $trimmed
+#mkdir $trimmed
 
 tmp="${outdir}/tempFile"
 bamdir="${outdir}/SortedBamFiles"
-mkdir "${bamdir}"
+#mkdir "${bamdir}"
 
 bwDir="${outdir}/BigWigs"
-mkdir "${bwDir}"
+#mkdir "${bwDir}"
 
 PeakDir="${outdir}/MACSPeaks/${accession}"
 
@@ -48,7 +48,7 @@ bam="${bamdir}/${accession}.bam"
 bigwig="${bwDir}/${accession}"
 peak="$PeakDir/${accession}"
 
-name=${bam/%_S[1-12]*_L007_R1_001_val_1.fq.gz/}
+name=${bam/%_S[1-150]*_L007_R1_001_val_1.fq.gz/}
 
 
 ############# Read Trimming ##############

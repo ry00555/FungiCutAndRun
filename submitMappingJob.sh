@@ -19,14 +19,14 @@ fi
 fastqPath="/scratch/ry00555/OutputRun142/2024_Run142_FASTQ"
 outdir="/scratch/ry00555/OutputRun142/"
 
-mkdir ${outdir}
-mkdir ${outdir}/logs
+#mkdir ${outdir}
+#mkdir ${outdir}/logs
 
 #make output file folders
-mkdir "${outdir}/TrimmedReads"
-mkdir "${outdir}/SortedBamFiles"
-mkdir "${outdir}/BigWigs"
-mkdir "${outdir}/MACSPeaks"
+#mkdir "${outdir}/TrimmedReads"
+#mkdir "${outdir}/SortedBamFiles"
+#mkdir "${outdir}/BigWigs"
+#mkdir "${outdir}/MACSPeaks"
 
 
 while read -r line
@@ -34,4 +34,4 @@ while read -r line
 	do
 	sleep 10
 	echo "$line mapping job submitted"
-	sbatch --job-name="${line}" --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapData.sh & done <"$1"
+sbatch --job-name="${line}" --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" MapData.sh & done <"$1"
