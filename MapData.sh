@@ -27,8 +27,8 @@ source config.txt
 
 ###################################
 #input file variables
-  read1="${fastqPath}/${accession}*_S[1-150]*_L007_R1_001.fastq.gz"
-  read2="${fastqPath}/${accession}*_S[1-150]*_L007_R2_001.fastq.gz"
+  read1="${fastqPath}/${accession}%_S[1-150]*_L007_R1_001.fastq.gz"
+  read2="${fastqPath}/${accession}%_S[1-150]*_L007_R2_001.fastq.gz"
 
 #make output file folders
 trimmed="${outdir}/TrimmedReads/${accession}"
