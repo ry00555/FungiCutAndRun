@@ -20,11 +20,11 @@ OUTDIR="/scratch/ry00555/OutputRun142/TrichodermaReesi"
 
 
   # mkdir "${OUTDIR}/TrimmedReads"
-   mkdir "${OUTDIR}/BigWigs"
-   mkdir "$OUTDIR/HomerTagDirectories"
- mkdir "$OUTDIR/TdfFiles"
- mkdir "$OUTDIR/SortedBamFiles"
- mkdir "$OUTDIR/MACSPeaks"
+#   mkdir "${OUTDIR}/BigWigs"
+#   mkdir "$OUTDIR/HomerTagDirectories"
+# mkdir "$OUTDIR/TdfFiles"
+# mkdir "$OUTDIR/SortedBamFiles"
+# mkdir "$OUTDIR/MACSPeaks"
 
 #
 #
@@ -103,9 +103,9 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
  ml SAMtools
   ml BEDTools
 
-    for bam_file in ${BAMDIR}/*__Q30.bam; do
+    for bam_file in ${BAMDIR}/*_L007_R1_001_val_1.fq.gz_Q30.bam; do
 # #   # Get the sample ID from the BAM file name
-  sample_id=$(basename "${bam_file}" __Q30.bam)
+  sample_id=$(basename "${bam_file}" _L007_R1_001_val_1.fq.gz_Q30.bam)
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
