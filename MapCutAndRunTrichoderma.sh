@@ -109,7 +109,7 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
   sample_id=$(echo "${base_name}" | sed -e 's/^[^S]*S//; s/_.*//')
 
   # Define HOMERINPUT by matching the control input based on the sample_id
-  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+  #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
   HOMERINPUT="${TAGDIR}/${sample_id} Input*"
  findPeaks "${TAGDIR}/${sample_id}" -style factor  -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
