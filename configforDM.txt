@@ -1,0 +1,26 @@
+#number of CPUs
+THREADS=12
+
+#FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
+
+FASTQ="/scratch/ry00555/OutputRun142/TrichodermaReesi/FASTQ"
+
+#Edit Code to add Q score option
+
+#Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
+
+outdir="/scratch/ry00555/OutputRun142/Trichoderma"
+#GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
+
+GENOME="/home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.fna"
+
+
+
+#SET Deeptools paramenters
+#binsize for windows
+BIN="25"
+
+#smoothlength setting, for smoothing the enrichment curve
+SMOOTH="50"
+
+##removed options for MNase analysis. Now, bulk reads will be plotted using deeptools using the bin and smooth parameters above ('_Bulk.bw'. A seperate MNase file will be generated to plot mononcleosome centers ('_MNase.bw') using a binsize of 1 and a smooth length of 25.

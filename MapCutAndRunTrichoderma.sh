@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Run132ChIP
+#SBATCH --job-name=Trichoderma
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -7,23 +7,25 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../MapCutAndRun132.%j.out
-#SBATCH --error=../MapCutAndRun132.%j.err
+#SBATCH --output=../Trichoderma.%j.out
+#SBATCH --error=../Trichoderma.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source config.txt
+source configforDM.txt
 
-OUTDIR="/scratch/ry00555/OutputRun142"
+OUTDIR="/scratch/ry00555/OutputRun142/TrichodermaReesi"
 
 
   # mkdir "${OUTDIR}/TrimmedReads"
-  # mkdir "${OUTDIR}/BigWigs"
-  # mkdir "$OUTDIR/HomerTagDirectories"
- #mkdir "$OUTDIR/TdfFiles"
- #mkdir "$OUTDIR/SortedBamFiles"
+   mkdir "${OUTDIR}/BigWigs"
+   mkdir "$OUTDIR/HomerTagDirectories"
+ mkdir "$OUTDIR/TdfFiles"
+ mkdir "$OUTDIR/SortedBamFiles"
+ mkdir "$OUTDIR/MACSPeaks"
+
 #
 #
 TAGDIR="${OUTDIR}/HomerTagDirectories"
@@ -32,8 +34,8 @@ BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
 # #
-# ml Trim_Galore/0.6.7-GCCcore-11.2.0
-# trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ #ml Trim_Galore/0.6.7-GCCcore-11.2.0
+ #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
  FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
