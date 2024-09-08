@@ -50,8 +50,8 @@ for f in $FILES
 #
  	file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
-# #
+#name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
+name=${file/%_S[1-150]*_L007_R1_001_val_1.fq.gz/}
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
  	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
