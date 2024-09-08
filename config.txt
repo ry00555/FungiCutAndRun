@@ -9,8 +9,8 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-fastqPath="/scratch/ry00555/OutputRun142/2024_Run142_FASTQ"
-FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
+#fastqPath="/scratch/ry00555/OutputRun142/2024_Run142_FASTQ"
+FASTQ="/scratch/ry00555/OutputRun142/2024_Run142_FASTQ"
 
 #Edit Code to add Q score option
 
