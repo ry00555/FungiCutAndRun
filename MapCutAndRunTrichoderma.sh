@@ -84,7 +84,7 @@ BEDDIR="${OUTDIR}/Beds"
  #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
 #done
 #mkdir $OUTDIR/MACSPeaks
-#PEAKDIR="${OUTDIR}/MACSPeaks"
+PEAKDIR="${OUTDIR}/MACSPeaks"
 
 #module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
@@ -117,11 +117,11 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
   done
 # #changing peak txt files to bed files to input into chipr
  ml ChIP-R
-  for infile in ${PEAKDIR}/*_Homerpeaks.txt
+  for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
  do
    sample_id=$(basename "${infile}" _Homerpeaks.txt)
 
-   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${PEAKDIR}/${sample_id}.peaks.bed
+   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${sample_id}.peaks.bed
  done
 #
  ml Homer
