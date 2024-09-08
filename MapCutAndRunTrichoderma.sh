@@ -103,24 +103,25 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
  ml SAMtools
   ml BEDTools
 
-    for bam_file in ${BAMDIR}/*_L007_R1_001_val_1.fq.gz_Q30.bam; do
-# #   # Get the sample ID from the BAM file name
-  sample_id=$(basename "${bam_file}" _L007_R1_001_val_1.fq.gz_Q30.bam)
+    for bam_file in ${BAMDIR}/*_Q30.bam; do
+ base_name=$(basename "${bam_file}")
+#   sample_id=$(basename "${bam_file}" _Q30.bam)
+  sample_id=$(echo "${base_name}" | sed -e 's/^[^S]*S//; s/_.*//')
+
+  # Define HOMERINPUT by matching the control input based on the sample_id
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
-  HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
-
+  HOMERINPUT="${TAGDIR}/${sample_id} Input*"
  findPeaks "${TAGDIR}/${sample_id}" -style factor  -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
 # # #
   done
 # #changing peak txt files to bed files to input into chipr
  ml ChIP-R
-  for infile in ${PEAKDIR}/${sample_id}_peaks.txt
+  for infile in ${PEAKDIR}/*_Homerpeaks.txt
  do
-   sample_id=$(basename "${bam_file}" __Q30.bam)
+   sample_id=$(basename "${infile}" _Homerpeaks.txt)
 
-   base=$(basename ${infile} .txt)
-   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${PEAKDIR}/${base}.peaks.bed
+   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${PEAKDIR}/${sample_id}.peaks.bed
  done
 #
  ml Homer
