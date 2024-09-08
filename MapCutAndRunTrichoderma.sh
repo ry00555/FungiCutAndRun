@@ -37,7 +37,7 @@ BEDDIR="${OUTDIR}/Beds"
  #ml Trim_Galore/0.6.7-GCCcore-11.2.0
  #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
- FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz" #Don't forget the *
+ FILES="${OUTDIR}/TrimmedReads/*_L007_R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
 #
 # #
@@ -52,7 +52,7 @@ for f in $FILES
 #
  	file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-150]*_L007_R1_001_val_1.fq.gz/}
 # #
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
@@ -90,25 +90,26 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
  #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
- for infile in $BAMDIR/*_Q30.bam
+ for infile in $BAMDIR/*__Q30.bam
 do
-   base=$(basename ${infile} _Q30.bam)
-   Input=$BAMDIR/ ${infile} Input_Q30.bam
+   base=$(basename ${infile} __Q30.bam)
+   Input=$BAMDIR/${infile} Input__Q30.bam
  macs3 callpeak -t $infile -f BAMPE -n $base -c $Input --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  done
 
-
+HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
   ml Homer
  ml Perl
  ml SAMtools
   ml BEDTools
-    for bam_file in "${BAMDIR}"/*__Q30.bam; do
+
+    for bam_file in ${BAMDIR}/*__Q30.bam; do
 # #   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" __Q30.bam)
-
+  HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
- findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${PEAKDIR}/${sample_id}_Homerpeaks.txt"
+ findPeaks "${TAGDIR}/${sample_id}" -style factor  -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
 # # #
   done
 # #changing peak txt files to bed files to input into chipr
@@ -125,11 +126,11 @@ do
  ml Perl
 # ##annotating peak files with masked reference (use HOMER module)
 # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
- annotatePeaks.pl ${PEAKDIR}/${base}.peaks.bed -gff TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gff > ${PEAKDIR}/${base}_ann.txt
+ annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gff TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gff > ${HOMERPEAKSDIR}/${base}_ann.txt
 #
 # #now filtering for only peaks that are w/i 1000bps of their annotation:
-  for infile in ${PEAKDIR}/${base}_ann.txt
+  for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
   do
     base=$(basename ${infile} _masked_ann.txt)
-    awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${PEAKDIR}/${base}.1000bp_ann.txt
+    awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
   done
