@@ -105,12 +105,13 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
 
     for bam_file in ${BAMDIR}/*_L007_R1_001_val_1.fq.gz_Q30.bam; do
   sample_id=$(basename "${bam_file}" _L007_R1_001_val_1.fq.gz_Q30.bam)
+input_id=$(basename "${bam_file}" *Input*_L007_R1_001_val_1.fq.gz_Q30.bam)
 
   # Define HOMERINPUT by matching the control input based on the sample_id
   #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 
-  HOMERINPUT="${TAGDIR}/${sample_id} Input*"
- findPeaks "${TAGDIR}/${sample_id}" -style factor  -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
+  HOMERINPUT="${TAGDIR}/${input_id}"
+ findPeaks "${TAGDIR}/${sample_id}" -style factor -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
 # # #
   done
 # #changing peak txt files to bed files to input into chipr
@@ -126,7 +127,7 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
  ml Perl
 # ##annotating peak files with masked reference (use HOMER module)
 # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
- annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gff TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gff > ${HOMERPEAKSDIR}/${base}_ann.txt
+ annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
 #
 # #now filtering for only peaks that are w/i 1000bps of their annotation:
   for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
