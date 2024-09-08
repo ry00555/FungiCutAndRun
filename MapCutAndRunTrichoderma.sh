@@ -103,10 +103,8 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
  ml SAMtools
   ml BEDTools
 
-    for bam_file in ${BAMDIR}/*_Q30.bam; do
- base_name=$(basename "${bam_file}")
-#   sample_id=$(basename "${bam_file}" _Q30.bam)
-  sample_id=$(echo "${base_name}" | sed -e 's/^[^S]*S//; s/_.*//')
+    for bam_file in ${BAMDIR}/*_L007_R1_001_val_1.fq.gz_Q30.bam; do
+  sample_id=$(basename "${bam_file}" _L007_R1_001_val_1.fq.gz_Q30.bam)
 
   # Define HOMERINPUT by matching the control input based on the sample_id
   #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
