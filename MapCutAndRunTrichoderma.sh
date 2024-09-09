@@ -112,7 +112,7 @@ input_id=$(basename  *Input*_L007_R1_001_val_1.fq.gz_Q30.bam)
 
   HOMERINPUT="${TAGDIR}/${input_id}"
  findPeaks "${TAGDIR}/${sample_id}" -style factor -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
-# # #
+
   done
 # #changing peak txt files to bed files to input into chipr
  ml ChIP-R
@@ -121,14 +121,22 @@ input_id=$(basename  *Input*_L007_R1_001_val_1.fq.gz_Q30.bam)
    sample_id=$(basename "${infile}" _Homerpeaks.txt)
 
    sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${sample_id}.peaks.bed
+   sed '/^#/d' 142-142_ChIP_WT_GFP_Rep1_S142_Homerpeaks.txt | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > 142-142_ChIP_WT_GFP_Rep1_S142_Homerpeaks.bed
+   sed '/^#/d' 142-144_ChIP_cre1-GFP_GFP_Rep1_S144_Homerpeaks.txt | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > 142-144_ChIP_cre1-GFP_GFP_Rep1_S144_Homerpeaks.bed
+
+
  done
 #
  ml Homer
  ml Perl
 # ##annotating peak files with masked reference (use HOMER module)
 # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
- annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
-#
+ annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed /home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.fna -gtf ry00555/Research/Genomes/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+ annotatePeaks.pl 142-144_ChIP_cre1-GFP_GFP_Rep1_S144_Homerpeaks.bed /home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.fna -gtf  /home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gtf > 142-144_ChIP_cre1-GFP_GFP_Rep1_S144_Homerpeaks_ann.txt
+ annotatePeaks.pl 142-142_ChIP_WT_GFP_Rep1_S142_Homerpeaks.bed /home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.fna -gtf /home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.gtf > 142-142_ChIP_WT_GFP_Rep1_S142_Homerpeaks_ann.txt
+
+
+
 # #now filtering for only peaks that are w/i 1000bps of their annotation:
   for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
   do
