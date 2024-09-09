@@ -105,7 +105,7 @@ HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
 
     for bam_file in ${BAMDIR}/*_L007_R1_001_val_1.fq.gz_Q30.bam; do
   sample_id=$(basename "${bam_file}" _L007_R1_001_val_1.fq.gz_Q30.bam)
-input_id=$(basename "${bam_file}" *Input*_L007_R1_001_val_1.fq.gz_Q30.bam)
+input_id=$(basename  *Input*_L007_R1_001_val_1.fq.gz_Q30.bam)
 
   # Define HOMERINPUT by matching the control input based on the sample_id
   #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
