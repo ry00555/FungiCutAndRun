@@ -3,13 +3,13 @@ THREADS=12
 
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
-FASTQ="/scratch/ry00555/OutputRun142/TrichodermaReesi/FASTQ"
+FASTQ="/scratch/ry00555/Run144Trichoderma/FASTQ"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-outdir="/scratch/ry00555/OutputRun142/Trichoderma"
+outdir="/scratch/ry00555/Run144Trichoderma"
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
 
 GENOME="/home/ry00555/Research/Genomes/TrichodermaReesiQM6a/TrichodermaReesiQM6a_GCA_000167675.2_v2.0_genomic.fna"
