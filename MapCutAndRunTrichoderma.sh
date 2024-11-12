@@ -41,8 +41,8 @@ BEDDIR="${OUTDIR}/Beds"
  ml Trim_Galore/0.6.7-GCCcore-11.2.0
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
- FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001\.fq\.gz" #Don't forget the *
-# #
+ #FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001\.fq\.gz" #Don't forget the *
+ FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz" #Don't forget the *
 #
 # #
 # #Iterate over the files
@@ -56,7 +56,7 @@ for f in $FILES
 #
  	file=${f##*/}
 # 	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L002_R1_001.fq.gz/}
+name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
 # #
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
