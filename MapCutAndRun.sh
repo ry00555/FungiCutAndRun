@@ -17,25 +17,27 @@ cd $SLURM_SUBMIT_DIR
 source config.txt
 OUTDIR="/scratch/ry00555/Run145"
 
+#if output directory doesn't exist, create it
+if [ ! -d $OUTDIR ]
+then
+    mkdir -p $OUTDIR
+    mkdir -p "${OUTDIR}/TrimmedReads"
+    mkdir -p "${OUTDIR}/BigWigs"
+   mkdir -p "$OUTDIR/HomerTagDirectories"
+   mkdir -p "$OUTDIR/TdfFiles"
+  mkdir -p "$OUTDIR/SortedBamFiles"
 
-  #mkdir "${OUTDIR}/TrimmedReads"
-   #mkdir "${OUTDIR}/BigWigs"
-  # mkdir "$OUTDIR/HomerTagDirectories"
- #mkdir "$OUTDIR/TdfFiles"
-# mkdir "$OUTDIR/SortedBamFiles"
-#
-#
+fi
+
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
  ml Trim_Galore
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
- FILES="${OUTDIR}/TrimmedReads/*_R1_001\.fq\.gz" #Don't forget the *
-# #
-#
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
 # #
 # #Iterate over the files
 for f in $FILES
@@ -49,7 +51,8 @@ for f in $FILES
  	file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
 #name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
-name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
+
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
  	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
