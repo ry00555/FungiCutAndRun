@@ -15,7 +15,6 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-
 OUTDIR="/scratch/ry00555/Run145"
 
 
