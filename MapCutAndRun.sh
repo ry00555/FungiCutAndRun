@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=48:00:00
-#SBATCH --output=../MapCutAndRun132.%j.out
-#SBATCH --error=../MapCutAndRun132.%j.err
+#SBATCH --output=../MapCutAndRun145.%j.out
+#SBATCH --error=../MapCutAndRun145.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
@@ -16,14 +16,14 @@ cd $SLURM_SUBMIT_DIR
 
 source config.txt
 
-OUTDIR="/scratch/ry00555/OutputRun142"
+OUTDIR="/scratch/ry00555/Run145"
 
 
-  # mkdir "${OUTDIR}/TrimmedReads"
-  # mkdir "${OUTDIR}/BigWigs"
-  # mkdir "$OUTDIR/HomerTagDirectories"
- #mkdir "$OUTDIR/TdfFiles"
- #mkdir "$OUTDIR/SortedBamFiles"
+  mkdir "${OUTDIR}/TrimmedReads"
+   mkdir "${OUTDIR}/BigWigs"
+   mkdir "$OUTDIR/HomerTagDirectories"
+ mkdir "$OUTDIR/TdfFiles"
+ mkdir "$OUTDIR/SortedBamFiles"
 #
 #
 TAGDIR="${OUTDIR}/HomerTagDirectories"
@@ -31,11 +31,10 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
+ ml Trim_Galore/0.6.7-GCCcore-11.2.0
+ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-# ml Trim_Galore/0.6.7-GCCcore-11.2.0
-# trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-# #
- FILES="${OUTDIR}/CSR1TrimmedReadstoFinish/*_R1_001_val_1\.fq\.gz" #Don't forget the *
+ FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz" #Don't forget the *
 # #
 #
 # #
