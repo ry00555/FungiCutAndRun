@@ -30,7 +30,7 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
- ml Trim_Galore/0.6.7-GCCcore-11.2.0
+ ml Trim_Galore
  trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
  FILES="${OUTDIR}/TrimmedReads/*_R1_001\.fq\.gz" #Don't forget the *
