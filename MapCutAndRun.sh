@@ -37,8 +37,13 @@ BEDDIR="${OUTDIR}/Beds"
 # ml Trim_Galore
  #trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
-# #
+FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
+
+#145-42_ChIP_set1E8_H3K24me2_Rep2_S39_L002_R1_001_val_1.fq.gz
+#145-42_ChIP_set1E8_H3K24me2_Rep2_S39_L002_R2_001_val_2.fq.gz
+
+
 # #Iterate over the files
 for f in $FILES
  do
@@ -51,11 +56,13 @@ for f in $FILES
  	file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
 #name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
-name=${file/%_S[1-12]*_L002_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
+#name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
 
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
- 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+ #	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 # 	#variable for naming bam file
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
