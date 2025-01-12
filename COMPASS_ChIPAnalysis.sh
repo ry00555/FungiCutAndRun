@@ -35,7 +35,7 @@ for f in $FILES
 do
 file=${f##*/}
 name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
-#	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
