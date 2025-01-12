@@ -62,7 +62,6 @@ BEDDIR="${OUTDIR}/Beds"
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
  #	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-  #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 # 	#variable for naming bam file
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
