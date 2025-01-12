@@ -32,6 +32,8 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
+FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+
 for f in $FILES
 do
 file=${f##*/}
