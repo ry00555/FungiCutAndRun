@@ -13,12 +13,12 @@
 cd $SLURM_SUBMIT_DIR
 source config.txt
 
-OUTDIR= "/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
+OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
 
 if [ ! -d $OUTDIR ]
 then
     mkdir -p $OUTDIR
-    mkdir -p "${OUTDIR}/TrimmedReads"
+  #  mkdir -p "${OUTDIR}/TrimmedReads"
     mkdir -p "${OUTDIR}/BigWigs"
    mkdir -p "$OUTDIR/HomerTagDirectories"
    mkdir -p "$OUTDIR/TdfFiles"
@@ -32,12 +32,14 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
-FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+#142-105_ChIP_swd1_Input__S105_L007_R1_001_val_1.fq.gz
+#142-105_ChIP_swd1_Input__S105_L007_R2_001_val_2.fq.gz
 
 for f in $FILES
 do
 file=${f##*/}
-name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
