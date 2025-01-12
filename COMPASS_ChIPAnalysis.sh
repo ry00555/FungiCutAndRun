@@ -11,6 +11,7 @@
 #SBATCH --error=../MapCutAndRun145_142.%j.err
 
 cd $SLURM_SUBMIT_DIR
+source config.txt
 
 OUTDIR= "/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
 
