@@ -98,21 +98,21 @@ ml BEDTools
 #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 #done
 
-findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
-findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-105_ChIP_swd1_Input
-findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
-findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
+#findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
+findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-33_ChIP_set7_Input_Rep2
+#findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-105_ChIP_swd1_Input
+#findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
+#findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
 findPeaks ${TAGDIR}/142-10_ChIP_WT_H3K27me3_Rep3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3_Homerpeaks.txt -i ${TAGDIR}/142-75_ChIP_WT_Input
-findPeaks ${TAGDIR}/142-115_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3_Homerpeaks.txt
-findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt
-findPeaks ${TAGDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-41_ChIP_set1E8_Input_Rep2
+#findPeaks ${TAGDIR}/142-115_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3_Homerpeaks.txt
+#findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt
+#findPeaks ${TAGDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-41_ChIP_set1E8_Input_Rep2
 findPeaks ${TAGDIR}/145-118_ChIP_swd1_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-116_ChIP_swd1_Input_Rep2
 findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-33_ChIP_set7_Input_Rep2
 findPeaks ${TAGDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-112_ChIP_sgr9_Input_Rep2
 findPeaks ${TAGDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-37_ChIP_set1E7_Input_Rep2
 findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
-findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
+#findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
 
 ml ChIP-R
  for infile in ${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt
@@ -132,3 +132,6 @@ chipr -i ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed ${HOMERPEAKS
 chipr -i ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3 ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_swd1_H3K27me3
 #set2
 chipr -i ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_set2_H3K27me3
+
+
+annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
