@@ -31,7 +31,7 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
-FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/UNFTrimmedReads/*_R1_001_val_1\.fq\.gz"
 #142-105_ChIP_swd1_Input__S105_L007_R1_001_val_1.fq.gz
 #142-105_ChIP_swd1_Input__S105_L007_R2_001_val_2.fq.gz
 
