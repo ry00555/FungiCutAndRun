@@ -56,6 +56,6 @@ samtools view -b -q 30 $bam > "$QualityBam"
 samtools index "$QualityBam"
 
 ml deepTools/3.5.2-foss-2022a
-bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_10.smooth_${SMOOTH}Bulk.bw"
 
 done
