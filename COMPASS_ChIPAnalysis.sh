@@ -89,9 +89,7 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 #mkdir ${OUTDIR}/HomerPeaks
 HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
 ml Homer
-ml Perl/5.36.1-GCCcore-12.3.0
-ml SAMtools
-ml BEDTools
+ml Perl
 
 #for bam_file in "${BAMDIR}"/145*_Q30.bam; do
 #  sample_id=$(basename "${bam_file}" _Q30.bam)
@@ -118,7 +116,7 @@ ml BEDTools
 do
   base=$(basename ${infile} _Homerpeaks.txt)
   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
- annotatePeaks.pl ${base}.peaks.bed -gtf scratch/ry00555/Ncrassa.gtf > ${base}_ann.txt
+ annotatePeaks.pl ${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa.gtf > ${base}_ann.txt
 
 done
 
