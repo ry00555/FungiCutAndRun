@@ -82,19 +82,19 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 
 
-ml ChIP-R
+#ml ChIP-R
 #set7
-chipr -i ${PEAKDIR}/1142-94_ChIP_set7_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-35_ChIP_set7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set7_H3K27me3
+#chipr -i ${PEAKDIR}/1142-94_ChIP_set7_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-35_ChIP_set7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set7_H3K27me3
 #WT
-chipr -i ${PEAKDIR}/142-10_ChIP_WT_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-30_ChIP_WT_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_WT_H3K27me3
+#chipr -i ${PEAKDIR}/142-10_ChIP_WT_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-30_ChIP_WT_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_WT_H3K27me3
 #set1
-chipr -i ${PEAKDIR}/142-121_ChIP_set1_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-124_ChIP_set1_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_peaks.broadPeak ${PEAKDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set1_H3K27me3
+#chipr -i ${PEAKDIR}/142-121_ChIP_set1_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-124_ChIP_set1_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_peaks.broadPeak ${PEAKDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set1_H3K27me3
 #sgr9 1
-chipr -i ${PEAKDIR}/142-127_ChIP_sgr9_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_sgr9_H3K27me3
+#chipr -i ${PEAKDIR}/142-127_ChIP_sgr9_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_sgr9_H3K27me3
 #swd1
-chipr -i ${PEAKDIR}/145-118_ChIP_swd1_H3K27me3_Rep2_peaks.broadPeak ${PEAKDIR}/142-106_ChIP_swd1_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_swd1_H3K27me3
+#chipr -i ${PEAKDIR}/145-118_ChIP_swd1_H3K27me3_Rep2_peaks.broadPeak ${PEAKDIR}/142-106_ChIP_swd1_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_swd1_H3K27me3
 #set2
-chipr -i ${PEAKDIR}/142-115_ChIP_set2_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-118_ChIP_set2_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set2_H3K27me3
+#chipr -i ${PEAKDIR}/142-115_ChIP_set2_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-118_ChIP_set2_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set2_H3K27me3
 
 #mkdir ${OUTDIR}/HomerPeaks
 HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
@@ -122,7 +122,7 @@ ml Perl
 #findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
 Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
- for infile in ${HOMERPEAKSDIR}/_Homerpeaks.txt
+ for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
 do
   base=$(basename ${infile} _Homerpeaks.txt)
   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
