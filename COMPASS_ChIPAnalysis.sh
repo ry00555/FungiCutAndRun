@@ -116,7 +116,7 @@ Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBar
 do
   base=$(basename ${infile} .peaks.bed)
 #  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
- annotatePeaks.pl ${base}.peaks.bed $Genome -gtf "/scratch/ry00555/Ncrassa.gtf" > ${base}_ann.txt
+ annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed $Genome -gtf "/scratch/ry00555/Ncrassa.gtf" > ${HOMERPEAKSDIR}/${base}_ann.txt
 
 done
 
