@@ -59,17 +59,6 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 # done
 
 
-#142-94_ChIP_set7_H3K27me3__Q30.bam 142-93_ChIP_set7_Input__Q30.bam
-#142-106_ChIP_swd1_H3K27me3__Q30.bam       142-105_ChIP_swd1_Input__Q30.bam
-#142-10_ChIP_WT_H3K27me3_Rep3_Q30.bam 142-75_ChIP_WT_Input__Q30.bam
-
-#142-115_ChIP_set2_H3K27me3__Q30.bam
-#142-118_ChIP_set2_H3K27me3__Q30.bam
-#142-121_ChIP_set1_H3K27me3__Q30.bam       142-123_ChIP_set1_Input__Q30.bam
-#142-124_ChIP_set1_H3K27me3__Q30.bam         142-123_ChIP_set1_Input__Q30.bam
-#142-127_ChIP_sgr9_H3K27me3__Q30.bam       142-126_ChIP_sgr9_Input__Q30.bam
-#142-75_ChIP_WT_Input__Q30.bam
-
 
 mkdir $OUTDIR/MACSPeaks
 
@@ -85,19 +74,14 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 # macs3 callpeak -t $BAMDIR/142-115_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-115_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/142-118_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-118_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 
-#145-110_ChIP_set1E8_H3K27me3_Rep2_Q30.bam 145-41_ChIP_set1E8_Input_Rep2_Q30.bam
-#145-112_ChIP_sgr9_Input_Rep2_Q30.bam
-#145-114_ChIP_sgr9_H3K27me3_Rep2_Q30.bam 145-112_ChIP_sgr9_Input_Rep2_Q30.bam
 
-#145-35_ChIP_set7_H3K27me3_Rep2_Q30.bam 145-33_ChIP_set7_Input_Rep2_Q30.bam
-#145-39_ChIP_set1E7_H3K27me3_Rep2_Q30.bam    145-37_ChIP_set1E7_Input_Rep2_Q30.bam
-#145-118_ChIP_swd1_H3K27me3_Rep2_Q30.bam 145-116_ChIP_swd1_Input_Rep2_Q30.bam
 
-macs3 callpeak -t $BAMDIR/145-110_ChIP_set1E8_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-110_ChIP_set1E8_H3K27me3_Rep2 -c $BAMDIR/145-41_ChIP_set1E8_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-macs3 callpeak -t $BAMDIR/145-118_ChIP_swd1_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-118_ChIP_swd1_H3K27me3_Rep2 -c $BAMDIR/145-116_ChIP_swd1_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-macs3 callpeak -t $BAMDIR/145-35_ChIP_set7_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-35_ChIP_set7_H3K27me3_Rep2 -c $BAMDIR/145-33_ChIP_set7_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-macs3 callpeak -t $BAMDIR/145-114_ChIP_sgr9_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-114_ChIP_sgr9_H3K27me3_Rep2 -c $BAMDIR/145-112_ChIP_sgr9_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-macs3 callpeak -t $BAMDIR/145-39_ChIP_set1E7_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-39_ChIP_set1E7_H3K27me3_Rep2 -c $BAMDIR/145-37_ChIP_set1E7_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/145-110_ChIP_set1E8_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-110_ChIP_set1E8_H3K27me3_Rep2 -c $BAMDIR/145-41_ChIP_set1E8_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/145-118_ChIP_swd1_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-118_ChIP_swd1_H3K27me3_Rep2 -c $BAMDIR/145-116_ChIP_swd1_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/145-35_ChIP_set7_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-35_ChIP_set7_H3K27me3_Rep2 -c $BAMDIR/145-33_ChIP_set7_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/145-114_ChIP_sgr9_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-114_ChIP_sgr9_H3K27me3_Rep2 -c $BAMDIR/145-112_ChIP_sgr9_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/145-39_ChIP_set1E7_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-39_ChIP_set1E7_H3K27me3_Rep2 -c $BAMDIR/145-37_ChIP_set1E7_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/145-30_ChIP_WT_H3K27me3_Q30.bam -f BAMPE -n 145-30_ChIP_WT_H3K27me3 -c $BAMDIR/145-29_ChIP_WT_Input_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 
 
 #mkdir ${OUTDIR}/HomerPeaks
@@ -107,10 +91,10 @@ ml Perl
 ml SAMtools
 ml BEDTools
 
-for bam_file in "${BAMDIR}"/145*_Q30.bam; do
-  sample_id=$(basename "${bam_file}" _Q30.bam)
-makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
-done
+#for bam_file in "${BAMDIR}"/145*_Q30.bam; do
+#  sample_id=$(basename "${bam_file}" _Q30.bam)
+#makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+#done
 
 findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
 findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-105_ChIP_swd1_Input
@@ -118,13 +102,14 @@ findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 
 findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
 findPeaks ${TAGDIR}/142-10_ChIP_WT_H3K27me3_Rep3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3_Homerpeaks.txt -i ${TAGDIR}/142-75_ChIP_WT_Input
 findPeaks ${TAGDIR}/142-115_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3_Homerpeaks.txt
-findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt 
+findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt
 
 findPeaks ${TAGDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-41_ChIP_set1E8_Input_Rep2
 findPeaks ${TAGDIR}/145-118_ChIP_swd1_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-116_ChIP_swd1_Input_Rep2
 findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2
 findPeaks ${TAGDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-112_ChIP_sgr9_Input_Rep2
 findPeaks ${TAGDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-37_ChIP_set1E7_Input_Rep2
+findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 
 
 ml ChIP-R
@@ -133,5 +118,15 @@ do
   base=$(basename ${infile} _Homerpeaks.txt)
   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
 done
-
-chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
+#set7
+chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_set7
+#WT
+#chipr -i ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
+#set1
+#chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
+#sgr9
+#chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
+#swd1
+#chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
+#set2
+#chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
