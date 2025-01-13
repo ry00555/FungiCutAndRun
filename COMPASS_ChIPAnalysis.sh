@@ -113,12 +113,12 @@ makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 done
 
 findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-10_ChIP_WT_H3K27me3_Rep3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-115_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
-findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-94_ChIP_set7_Input
+findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-105_ChIP_swd1_Input
+findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
+findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
+findPeaks ${TAGDIR}/142-10_ChIP_WT_H3K27me3_Rep3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3_Homerpeaks.txt -i ${TAGDIR}/142-75_ChIP_WT_Input
+findPeaks ${TAGDIR}/142-115_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3_Homerpeaks.txt
+findPeaks ${TAGDIR}/142-118_ChIP_set2_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3_Homerpeaks.txt 
 
 findPeaks ${TAGDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-41_ChIP_set1E8_Input_Rep2
 findPeaks ${TAGDIR}/145-118_ChIP_swd1_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-116_ChIP_swd1_Input_Rep2
@@ -133,3 +133,5 @@ do
   base=$(basename ${infile} _Homerpeaks.txt)
   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
 done
+
+chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/2_suvAB_MO_K9_4_5h.peaks.bed ${HOMERPEAKSDIR}/3_suvAB_MO_K9_4_5h.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_suvAB_MO_K9_4_5h
