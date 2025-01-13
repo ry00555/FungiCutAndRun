@@ -58,6 +58,8 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 #
 # done
 
+ml deepTools
+computeMatrix scale-regions -p 12 -R /scratch/ry00555/neurospora.bed -S ${OUTDIR}/BigWigs/
 
 
 #mkdir $OUTDIR/MACSPeaks
@@ -96,10 +98,19 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 #set2
 #chipr -i ${PEAKDIR}/142-115_ChIP_set2_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-118_ChIP_set2_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set2_H3K27me3
 
+ml BEDTools
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_WT_H3K27me3_all.bed > $BEDDIR/MACS_WT_IntersectedH3K27me3_peaks.bed
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set2_H3K27me3_all.bed > $BEDDIR/MACS_set2_IntersectedH3K27me3_peaks.bed
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set1_H3K27me3_all.bed > $BEDDIR/MACS_set1_IntersectedH3K27me3_peaks.bed
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_swd1_H3K27me3_all.bed > $BEDDIR/MACS_swd1_IntersectedH3K27me3_peaks.bed
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_sgr9_H3K27me3_all.bed > $BEDDIR/MACS_sgr9_IntersectedH3K27me3_peaks.bed
+bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set7_H3K27me3_all.bed > $BEDDIR/MACS_set7_IntersectedH3K27me3_peaks.bed
+
+
 #mkdir ${OUTDIR}/HomerPeaks
 HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-ml Homer
-ml Perl
+#ml Homer
+#ml Perl
 
 #for bam_file in "${BAMDIR}"/145*_Q30.bam; do
 #  sample_id=$(basename "${bam_file}" _Q30.bam)
@@ -123,13 +134,14 @@ ml Perl
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
 Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf"
- for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
-do
-  base=$(basename ${infile} _Homerpeaks.txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
- annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed $Genome -gtf $GTF > ${HOMERPEAKSDIR}/${base}_ann.txt
+#GFF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.gff"
+ #for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
+#do
+  #base=$(basename ${infile} _Homerpeaks.txt)
+#  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+ #annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed $Genome -gff3 $GFF3 > ${HOMERPEAKSDIR}/${base}_ann.txt
 
-done
+#done
 
-ml BEDTools
-# bedtools intersect -a $OUTDIR/peaks/gfp_MO_K9_4_5h_intpeaks_all.bed -b $OUTDIR/peaks/setAB_MO_K9_4_5h_intpeaks_all.bed -wa > $OUTDIR/peaks/MO_K9_setAB_gfp_peaks.bed
+#ml BEDTools
+# bedtools intersect -a $HOMERPEAKSDIR/gfp_MO_K9_4_5h_intpeaks_all.bed -b $HOMERPEAKSDIR/setAB_MO_K9_4_5h_intpeaks_all.bed -wa > $BEDDIR/peaks/HOMER_Intersected_K9_setAB_peaks.bed
