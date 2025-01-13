@@ -123,13 +123,13 @@ done
 ml ChIP-R
 
 #set7
-chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_set7_H3K27me3
+chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_set7_H3K27me3
 #WT
-chipr -i ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_WT_H3K27me3
+chipr -i ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_WT_H3K27me3
 #set1
-chipr -i ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_set1_H3K27me3
+chipr -i ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_set1_H3K27me3
 #sgr9
-chipr -i ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_sgr9_H3K27me3
+chipr -i ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_sgr9_H3K27me3
 #swd1
 chipr -i ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_swd1_H3K27me3
 #set2
