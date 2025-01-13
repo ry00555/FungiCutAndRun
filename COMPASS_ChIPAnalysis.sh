@@ -111,7 +111,7 @@ ml Perl
 #findPeaks ${TAGDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-37_ChIP_set1E7_Input_Rep2
 #findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
-$Genome= "/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
+Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
  for infile in ${HOMERPEAKSDIR}/*.peaks.bed
 do
   base=$(basename ${infile} .peaks.bed)
