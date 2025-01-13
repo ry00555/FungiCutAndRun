@@ -117,9 +117,11 @@ ml BEDTools
  for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
 do
   base=$(basename ${infile} _Homerpeaks.txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed | annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+ annotatePeaks.pl ${base}.peaks.bed -gtf scratch/ry00555/Ncrassa.gtf > ${base}_ann.txt
 
 done
+
 ml ChIP-R
 
 #set7
@@ -131,6 +133,6 @@ chipr -i ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/
 #sgr9
 chipr -i ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_sgr9_H3K27me3
 #swd1
-chipr -i ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3 ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_swd1_H3K27me3
+chipr -i ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_swd1_H3K27me3
 #set2
 chipr -i ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_set2_H3K27me3
