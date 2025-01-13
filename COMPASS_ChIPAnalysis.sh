@@ -112,11 +112,11 @@ ml Perl
 #findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
 
- for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
+ for infile in ${HOMERPEAKSDIR}/*.peaks.bed
 do
-  base=$(basename ${infile} _Homerpeaks.txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
- annotatePeaks.pl ${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa.gtf > ${base}_ann.txt
+  base=$(basename ${infile} .peaks.bed)
+#  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+ annotatePeaks.pl ${base}.peaks.bed -gtf "/scratch/ry00555/Ncrassa.gtf" > ${base}_ann.txt
 
 done
 
