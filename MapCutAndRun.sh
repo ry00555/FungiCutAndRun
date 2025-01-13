@@ -88,12 +88,12 @@ ml deepTools/3.5.2-foss-2022a
  #plot mononucleosomes
  #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
 #done
-#mkdir $OUTDIR/MACSPeaks
-#PEAKDIR="${OUTDIR}/MACSPeaks"
+mkdir $OUTDIR/MACSPeaks
+PEAKDIR="${OUTDIR}/MACSPeaks"
 
-#module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
- #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
+macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
  #for infile in $BAMDIR/*_Q30.bam
 #do
