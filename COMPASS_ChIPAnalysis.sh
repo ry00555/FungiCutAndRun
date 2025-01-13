@@ -17,13 +17,12 @@ OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
 
 if [ ! -d $OUTDIR ]
 then
-    mkdir -p $OUTDIR
-  #  mkdir -p "${OUTDIR}/TrimmedReads"
-    mkdir -p "${OUTDIR}/BigWigs"
-   mkdir -p "$OUTDIR/HomerTagDirectories"
-   mkdir -p "$OUTDIR/TdfFiles"
-  mkdir -p "$OUTDIR/SortedBamFiles"
-  mkdir -p "$OUTDIR/MACSPeaks"
+mkdir -p $OUTDIR
+mkdir -p "${OUTDIR}/TrimmedReads"
+mkdir -p "${OUTDIR}/BigWigs"
+mkdir -p "$OUTDIR/HomerTagDirectories"
+mkdir -p "$OUTDIR/TdfFiles"
+mkdir -p "$OUTDIR/SortedBamFiles"
 
 fi
 
