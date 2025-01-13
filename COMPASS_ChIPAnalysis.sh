@@ -114,12 +114,14 @@ ml BEDTools
 #findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
 
-ml ChIP-R
  for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
 do
   base=$(basename ${infile} _Homerpeaks.txt)
-  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed | annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+
 done
+ml ChIP-R
+
 #set7
 chipr -i ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed  -m 2 -o ${HOMERPEAKSDIR}/Intersected_set7_H3K27me3
 #WT
@@ -132,6 +134,3 @@ chipr -i ${HOMERPEAKSDIR}/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed ${HOMERPEAKS
 chipr -i ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3 ${HOMERPEAKSDIR}/145-118_ChIP_swd1_H3K27me3_Rep2.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_swd1_H3K27me3
 #set2
 chipr -i ${HOMERPEAKSDIR}/142-115_ChIP_set2_H3K27me3.peaks.bed ${HOMERPEAKSDIR}/142-118_ChIP_set2_H3K27me3.peaks.bed -m 2 -o ${HOMERPEAKSDIR}/Intersected_set2_H3K27me3
-
-
-annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
