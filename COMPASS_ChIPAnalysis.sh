@@ -41,7 +41,7 @@ name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 #
 # bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # variable name for bigwig output
-#  	bigwig="${OUTDIR}/BigWigs/${name}"
+ 	bigwig="${OUTDIR}/BigWigs/${name}"
  QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
  ml SAMtools/1.16.1-GCC-11.3.0
@@ -144,27 +144,24 @@ GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_Wi
 #done
 
 #ml BEDTools
-bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-106_ChIP_swd1_H3K27me3.peaks.bed > $BEDDIR/HOMER_Annotated_142-106_ChIP_swd1_H3K27me3.peaks.bed
+ # bedtools multiinter -header -i HOMER_Annotated_142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed  HOMER_Annotated_145-30_ChIP_WT_H3K27me3.peaks.bed  > WT_H3K27me3_Homer_Merged_peaks.bed
+ #
+ # bedtools multiinter -header -i HOMER_Annotated_142-115_ChIP_set2_H3K27me3.peaks.bed  HOMER_Annotated_142-118_ChIP_set2_H3K27me3.peaks.bed  > set2_H3K27me3_Homer_Merged_peaks.bed
+ #
+ # bedtools multiinter -header -i HOMER_Annotated_142-121_ChIP_set1_H3K27me3.peaks.bed  HOMER_Annotated_142-124_ChIP_set1_H3K27me3.peaks.bed HOMER_Annotated_145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed HOMER_Annotated_145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed > set1_H3K27me3_Homer_Merged_peaks.bed
+ #
+ # bedtools multiinter -header -i HOMER_Annotated_142-127_ChIP_sgr9_H3K27me3.peaks.bed  HOMER_Annotated_145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed  > sgr9_H3K27me3_Homer_Merged_peaks.bed
+ # bedtools multiinter -header -i HOMER_Annotated_142-94_ChIP_set7_H3K27me3.peaks.bed  HOMER_Annotated_145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed > set7_H3K27me3_Homer_Merged_peaks.bed
 
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed > $BEDDIR/HOMER_Annotated_142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed
+
+#HOMER_Annotated_142-106_ChIP_swd1_H3K27me3.peaks.bed
+
+# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b WT_H3K27me3_Homer_Merged_peaks.bed > WT_H3K27me3_Homer_Merged_Annotated.peaks.bed
 #
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-115_ChIP_set2_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-115_ChIP_set2_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-118_ChIP_set2_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-118_ChIP_set2_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-121_ChIP_set1_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-121_ChIP_set1_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-124_ChIP_set1_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-124_ChIP_set1_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-127_ChIP_sgr9_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-127_ChIP_sgr9_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/142-94_ChIP_set7_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_142-94_ChIP_set7_H3K27me3.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed  > $BEDDIR/HOMER_Annotated_145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed  > $BEDDIR/HOMER_Annotated_145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/145-30_ChIP_WT_H3K27me3.peaks.bed  > $BEDDIR/HOMER_Annotated_145-30_ChIP_WT_H3K27me3.peaks.bed
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed  > $BEDDIR/HOMER_Annotated_145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed
-#
-# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $HOMERPEAKSDIR/145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed  > $BEDDIR/HOMER_Annotated_145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed
+#  bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b set2_H3K27me3_Homer_Merged_peaks.bed > set2_H3K27me3_Homer_Merged_Annotated.peaks.bed
+# #
+#  bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b set1_H3K27me3_Homer_Merged_peaks.bed  > set1_H3K27me3_Homer_Merged_Annotated.peaks.bed
+# #
+# bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b sgr9_H3K27me3_Homer_Merged_peaks.bed  > sgr9_H3K27me3_Homer_Merged_Annotated.peaks.bed
+# #
+#  bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b set7_H3K27me3_Homer_Merged_peaks.bed  > set7_H3K27me3_Homer_Merged_Annotated.peaks.bed
