@@ -107,9 +107,8 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 
 
 ml BEDTools
-ml UCSC
+ml ucsc
 #bedGraphToBigWig [options] in.bedGraph chrom.sizes out.bw
-module load ucsc/359
  for infile in $PEAKDIR/BedGraphs/*bedgraph
 do
   base=$(basename ${infile} .bedgraph)
