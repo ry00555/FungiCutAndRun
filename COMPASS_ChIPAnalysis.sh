@@ -109,17 +109,17 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 ml BEDTools
 ml ucsc
 #bedGraphToBigWig [options] in.bedGraph chrom.sizes out.bw
- for infile in $PEAKDIR/BedGraphs/*bedgraph
-do
-  base=$(basename ${infile} .bedgraph)
-  bedSort $infile $PEAKDIR/BedGraphs/${base}.sort.bedgraph
- done
+# for infile in $PEAKDIR/BedGraphs/*bedgraph
+#do
+  #base=$(basename ${infile} .bedgraph)
+  #bedSort $infile $PEAKDIR/BedGraphs/${base}.sort.bedgraph
+ #done
 
 #mkdir $OUTDIR/bigwigs
 ml deepTools
 for infile in $PEAKDIR/BedGraphs/*.sort.bedgraph
  do
-  base=$(basename ${infile} .kmet_sort.bga)
+  base=$(basename ${infile} .sort.bedgraph)
  bedGraphToBigWig $infile /scratch/ry00555/Run137CutandRun/ref/Ncrassa_ref/chrNameLength.txt $PEAKDIR/BedGraphs/${base}.bw
  done
 
