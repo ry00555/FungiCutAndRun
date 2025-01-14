@@ -36,7 +36,7 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
  for f in $FILES
  do
  file=${f##*/}
-# name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 # read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #
 # bam="${OUTDIR}/SortedBamFiles/${name}.bam"
