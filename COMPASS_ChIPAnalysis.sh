@@ -141,6 +141,7 @@ ml Perl
 #  sample_id=$(basename "${bam_file}" _Q30.bam)
 #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 #done
+#makeTagDirectory 145-116_ChIP_swd1_Input_Rep2 ../SortedBamFiles/145-116_ChIP_swd1_Input_Rep2_Q30.bam
 
 #findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
 #findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-33_ChIP_set7_Input_Rep2
@@ -160,30 +161,30 @@ findPeaks ${TAGDIR}/145-118_ChIP_swd1_H3K27me3_Rep2 -style histone -region -size
 Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf"
 #GFF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.gff"
- #for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
-#do
-  #base=$(basename ${infile} _Homerpeaks.txt)
-#  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+ for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
+do
+  base=$(basename ${infile} _Homerpeaks.txt)
+pos2bed.pl ${HOMERPEAKSDIR}/${base}_Homerpeaks.txt > ${HOMERPEAKSDIR}/${base}.bed
  #annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed $Genome -gff3 $GFF3 > ${HOMERPEAKSDIR}/${base}_ann.txt
+done
 
-#done
-142-106_ChIP_swd1_H3K27me3.peaks.bed
-142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed
-142-115_ChIP_set2_H3K27me3.peaks.bed
-142-118_ChIP_set2_H3K27me3.peaks.bed
-142-121_ChIP_set1_H3K27me3.peaks.bed
-142-124_ChIP_set1_H3K27me3.peaks.bed
-142-127_ChIP_sgr9_H3K27me3.peaks.bed
-142-94_ChIP_set7_H3K27me3.peaks.bed
-145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed
-145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed
-145-30_ChIP_WT_H3K27me3.peaks.bed
-145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed
-145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed
+#142-106_ChIP_swd1_H3K27me3.peaks.bed
 
-
-#mergePeaks -d <maximum distance to merge> 142-106_ChIP_swd1_H3K27me3.peaks.bed <peak file2> [peak file3] ... > newPeakFile.txt
 #mergePeaks
+#ml Homer
+#mergePeaks -d <maximum distance to merge> 142-106_ChIP_swd1_H3K27me3.peaks.bed <peak file2> [peak file3] ... > newPeakFile.txt
+
+#mergePeaks 142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed 145-30_ChIP_WT_H3K27me3.peaks.bed > ../Beds/Homer_merged_WT_h3K27me3.bed
+
+#mergePeaks 142-115_ChIP_set2_H3K27me3.peaks.bed 142-118_ChIP_set2_H3K27me3.peaks.bed > ../Beds/Homer_merged_set2_h3K27me3.bed
+
+#mergePeaks 142-121_ChIP_set1_H3K27me3.peaks.bed 142-124_ChIP_set1_H3K27me3.peaks.bed 145-110_ChIP_set1E8_H3K27me3_Rep2.peaks.bed 145-39_ChIP_set1E7_H3K27me3_Rep2.peaks.bed > ../Beds/Homer_merged_set1_h3K27me3.bed
+
+#mergePeaks 145-114_ChIP_sgr9_H3K27me3_Rep2.peaks.bed 142-127_ChIP_sgr9_H3K27me3.peaks.bed > ../Beds/Homer_merged_sgr9_h3K27me3.bed
+
+#mergePeaks 142-94_ChIP_set7_H3K27me3.peaks.bed 145-35_ChIP_set7_H3K27me3_Rep2.peaks.bed > ../Beds/Homer_merged_set7_h3K27me3.bed
+
+
 #ml BEDTools
  # bedtools multiinter -header -i HOMER_Annotated_142-10_ChIP_WT_H3K27me3_Rep3.peaks.bed  HOMER_Annotated_145-30_ChIP_WT_H3K27me3.peaks.bed  > WT_H3K27me3_Homer_Merged_peaks.bed
  #
