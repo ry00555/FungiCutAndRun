@@ -31,21 +31,21 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
- FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+ #FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 #
- for f in $FILES
- do
- file=${f##*/}
-name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
+# for f in $FILES
+# do
+# file=${f##*/}
+#name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 # read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #
 # bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # variable name for bigwig output
- 	bigwig="${OUTDIR}/BigWigs/${name}"
- QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+ #	bigwig="${OUTDIR}/BigWigs/${name}"
+ #QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
- ml SAMtools/1.16.1-GCC-11.3.0
- ml BWA/0.7.17-GCCcore-11.3.0
+ #ml SAMtools/1.16.1-GCC-11.3.0
+ #ml BWA/0.7.17-GCCcore-11.3.0
 #
 # bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 # samtools index "$bam"
@@ -53,10 +53,10 @@ name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 # samtools view -b -q 30 $bam > "$QualityBam"
 # samtools index "$QualityBam"
 #
- ml deepTools/3.5.2-foss-2022a
- bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_10.smooth_${SMOOTH}Bulk.bw"
+ #ml deepTools/3.5.2-foss-2022a
+ #bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_10.smooth_${SMOOTH}Bulk.bw"
 #
- done
+ #done
 
 #ml deepTools
 #computeMatrix scale-regions -p 12 -R /scratch/ry00555/neurospora.bed -S ${OUTDIR}/BigWigs/
@@ -86,7 +86,7 @@ name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 
 #ml ChIP-R
 #set7
-#chipr -i ${PEAKDIR}/1142-94_ChIP_set7_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-35_ChIP_set7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set7_H3K27me3
+#chipr -i 142-94_ChIP_set7_H3K27me3_peaks.broadPeak 145-35_ChIP_set7_H3K27me3_Rep2_peaks.broadPeak -m 2 -o Intersected_set7_H3K27me3
 #WT
 #chipr -i ${PEAKDIR}/142-10_ChIP_WT_H3K27me3_peaks.broadPeak ${PEAKDIR}/145-30_ChIP_WT_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_WT_H3K27me3
 #set1
@@ -98,7 +98,32 @@ name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
 #set2
 #chipr -i ${PEAKDIR}/142-115_ChIP_set2_H3K27me3_peaks.broadPeak ${PEAKDIR}/142-118_ChIP_set2_H3K27me3_peaks.broadPeak -m 2 -o ${PEAKDIR}/Intersected_set2_H3K27me3
 
+#awk '{print $1, $2, $3, $5}' Intersected_WT_H3K27me3_all.bed > BedGraphs/Intersected_WT_H3K27me3_all.bedgraph
+#awk '{print $1, $2, $3, $5}' Intersected_set1_H3K27me3_all.bed > BedGraphs/Intersected_set1_H3K27me3_all.bedgraph
+#awk '{print $1, $2, $3, $5}' Intersected_swd1_H3K27me3_all.bed > BedGraphs/Intersected_swd1_H3K27me3_all.bedgraph
+#awk '{print $1, $2, $3, $5}' Intersected_set2_H3K27me3_all.bed > BedGraphs/Intersected_set2_H3K27me3_all.bedgraph
+#awk '{print $1, $2, $3, $5}' Intersected_sgr9_H3K27me3_all.bed > BedGraphs/Intersected_sgr9_H3K27me3_all.bedraph
+#awk '{print $1, $2, $3, $5}' Intersected_set7_H3K27me3_all.bed  > BedGraphs/Intersected_set7_H3K27me3_all.bedgraph
+
+
 ml BEDTools
+ml UCSC
+#bedGraphToBigWig [options] in.bedGraph chrom.sizes out.bw
+module load ucsc/359
+ for infile in $PEAKDIR/BedGraphs/*bedgraph
+do
+  base=$(basename ${infile} .bedgraph)
+  bedSort $infile $PEAKDIR/BedGraphs/${base}.sort.bedgraph
+ done
+
+#mkdir $OUTDIR/bigwigs
+ml deepTools
+for infile in $PEAKDIR/BedGraphs/*.sort.bedgraph
+ do
+  base=$(basename ${infile} .kmet_sort.bga)
+ bedGraphToBigWig $infile /scratch/ry00555/Run137CutandRun/ref/Ncrassa_ref/chrNameLength.txt $PEAKDIR/BedGraphs/${base}.bw
+ done
+
 #bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_WT_H3K27me3_all.bed > $BEDDIR/MACS_WT_IntersectedH3K27me3_peaks.bed
 #bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set2_H3K27me3_all.bed > $BEDDIR/MACS_set2_IntersectedH3K27me3_peaks.bed
 #bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set1_H3K27me3_all.bed > $BEDDIR/MACS_set1_IntersectedH3K27me3_peaks.bed
@@ -119,7 +144,7 @@ ml Perl
 
 #findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
 #findPeaks ${TAGDIR}/145-35_ChIP_set7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-35_ChIP_set7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-33_ChIP_set7_Input_Rep2
-findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt
+#findPeaks ${TAGDIR}/142-106_ChIP_swd1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-106_ChIP_swd1_H3K27me3_Homerpeaks.txt
 #findPeaks ${TAGDIR}/142-121_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-121_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
 #findPeaks ${TAGDIR}/142-124_ChIP_set1_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-124_ChIP_set1_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-123_ChIP_set1_Input
 #findPeaks ${TAGDIR}/142-10_ChIP_WT_H3K27me3_Rep3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-10_ChIP_WT_H3K27me3_Rep3_Homerpeaks.txt -i ${TAGDIR}/142-75_ChIP_WT_Input
