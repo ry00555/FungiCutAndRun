@@ -30,13 +30,14 @@ TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
+#for bam_file in "${BAMDIR}"/145*_Q30.bam; do
 
  FILES="${OUTDIR}/TrimmedReads/145-113*_R1_001_val_1\.fq\.gz"
 #
-for f in $FILES
+for f in "${OUTDIR}/TrimmedReads/145-113*_R1_001_val_1\.fq\.gz"
  do
- file=${f##*/}
-name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
+
+name=${f/%_S[1-990]*_R1_001_val_1.fq.gz/}
  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #
  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
