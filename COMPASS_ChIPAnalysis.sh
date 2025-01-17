@@ -13,7 +13,7 @@
 cd $SLURM_SUBMIT_DIR
 source config.txt
 
-OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
+OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp"
 
 if [ ! -d $OUTDIR ]
 then
@@ -29,9 +29,9 @@ fi
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
-PEAKDIR="${OUTDIR}/MACSPeaks"
+#PEAKDIR="${OUTDIR}/MACSPeaks"
 
- FILES="${OUTDIR}/temp/*_R1_001_val_1\.fq\.gz"
+ FILES="${OUTDIR}/*_R1_001_val_1\.fq\.gz"
 #
 for f in $FILES
  do
@@ -128,15 +128,15 @@ bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smo
 #bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set7_H3K27me3_all.bed > $BEDDIR/MACS_set7_IntersectedH3K27me3_peaks.bed
 
 
-#mkdir ${OUTDIR}/HomerPeaks
+mkdir ${OUTDIR}/HomerPeaks
 HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-#ml Homer
-#ml Perl
+ml Homer
+ml Perl
 
-#for bam_file in "${BAMDIR}"/145*_Q30.bam; do
-#  sample_id=$(basename "${bam_file}" _Q30.bam)
-#makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
-#done
+for bam_file in "${BAMDIR}"/*_Q30.bam; do
+  sample_id=$(basename "${bam_file}" _Q30.bam)
+makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+done
 #makeTagDirectory 145-116_ChIP_swd1_Input_Rep2 ../SortedBamFiles/145-116_ChIP_swd1_Input_Rep2_Q30.bam
 
 #findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
