@@ -15,60 +15,67 @@ source config.txt
 
 OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp"
 
-if [ ! -d $OUTDIR ]
-then
-mkdir -p $OUTDIR
-mkdir -p "${OUTDIR}/TrimmedReads"
-mkdir -p "${OUTDIR}/BigWigs"
-mkdir -p "$OUTDIR/HomerTagDirectories"
-mkdir -p "$OUTDIR/TdfFiles"
-mkdir -p "$OUTDIR/SortedBamFiles"
-
-fi
+#if [ ! -d $OUTDIR ]
+# then
+# mkdir -p $OUTDIR
+# mkdir -p "${OUTDIR}/TrimmedReads"
+# mkdir -p "${OUTDIR}/BigWigs"
+# mkdir -p "$OUTDIR/HomerTagDirectories"
+# mkdir -p "$OUTDIR/TdfFiles"
+# mkdir -p "$OUTDIR/SortedBamFiles"
+#
+# fi
 
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
-#PEAKDIR="${OUTDIR}/MACSPeaks"
+PEAKDIR="${OUTDIR}/MACSPeaks"
 
  FILES="${OUTDIR}/*_R1_001_val_1\.fq\.gz"
-#
-for f in $FILES
- do
- file=${f##*/}
-name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
- read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
-#
+
+ for f in $FILES
+  do
+  file=${f##*/}
+ name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
+  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+
  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # variable name for bigwig output
-	bigwig="${OUTDIR}/BigWigs/${name}"
-QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
- ml SAMtools/1.16.1-GCC-11.3.0
- ml BWA/0.7.17-GCCcore-11.3.0
- bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
- samtools index "$bam"
-#
- samtools view -b -q 30 $bam > "$QualityBam"
- samtools index "$QualityBam"
-ml deepTools/3.5.2-foss-2022a
-bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_10.smooth_${SMOOTH}Bulk.bw"
- done
+ 	bigwig="${OUTDIR}/BigWigs/${name}"
+ QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+  ml SAMtools/1.16.1-GCC-11.3.0
+  ml BWA/0.7.17-GCCcore-11.3.0
+  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  samtools index "$bam"
+  samtools view -b -q 30 $bam > "$QualityBam"
+  samtools index "$QualityBam"
+ ml deepTools/3.5.2-foss-2022a
+ bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_10.smooth_${SMOOTH}Bulk.bw"
+  done
 
 #ml deepTools
 #computeMatrix scale-regions -p 12 -R /scratch/ry00555/neurospora.bed -S ${OUTDIR}/BigWigs/
 
 
-#mkdir $OUTDIR/MACSPeaks
+mkdir $OUTDIR/MACSPeaks
 
 
-#module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
-# macs3 callpeak -t $BAMDIR/142-94_ChIP_set7_H3K27me3__Q30.bam -f BAMPE -n 142-94_ChIP_set7_H3K27me3 -c $BAMDIR/142-93_ChIP_set7_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/142-106_ChIP_swd1_H3K27me3__Q30.bam -f BAMPE -n 142-106_ChIP_swd1_H3K27me3 -c $BAMDIR/142-105_ChIP_swd1_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/142-121_ChIP_set1_H3K27me3__Q30.bam -f BAMPE -n 142-121_ChIP_set1_H3K27me3 -c $BAMDIR/142-123_ChIP_set1_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/142-124_ChIP_set1_H3K27me3__Q30.bam -f BAMPE -n 142-124_ChIP_set1_H3K27me3 -c $BAMDIR/142-123_ChIP_set1_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/142-127_ChIP_sgr9_H3K27me3__Q30.bam  -f BAMPE -n 142-127_ChIP_sgr9_H3K27me3 -c $BAMDIR/142-126_ChIP_sgr9_Input__Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/142-10_ChIP_WT_H3K27me3_Rep3_Q30.bam  -f BAMPE -n 142-10_ChIP_WT_H3K27me3 -c $BAMDIR/142-75_ChIP_WT_Input__Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+
+
+
+
+  #       135-66_ChIP_isw_Input_Rep1_Q30.bam
+
+
+
+ macs3 callpeak -t $BAMDIR/135-30_ChIP_pot-1__nat_H3K27me3_Rep1_Q30.bam -f BAMPE -n 135-30_ChIP_pot-1__nat_H3K27me3_Rep1 -c $BAMDIR/135-29_ChIP_pot-1__nat_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/137-89_ChIP_pot-1_H3K27me3_Rep2_Q30.bam -f BAMPE -n 137-89_ChIP_pot-1_H3K27me3_Rep2 -c $BAMDIR/137-90_ChIP_pot-1_H3K36me3_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/138-55_ChIP_EPR1_H3K27me3_Rep1_6252_Q30.bam -f BAMPE -n 138-55_ChIP_EPR1_H3K27me3_Rep1 -c $BAMDIR/138-53_ChIP_EPR1_Input_Rep1_6252_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/135-2_ChIP_ncu00423_H3K27me3_Rep3_Q30.bam  -f BAMPE -n 135-2_ChIP_ncu00423_H3K27me3_Rep3 -c $BAMDIR/135-1_ChIP_ncu00423_Input_Rep3_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/135-27_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 135-27_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/135-7_ChIP_WT_Input_Rep3_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/138-57_ChIP_WT_H3K27me3_Rep3_6252_Q30.bam  -f BAMPE -n 138-57_ChIP_WT_H3K27me3_Rep3 -c $BAMDIR/138-72_ChIP_WT_input__6252_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/142-115_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-115_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/142-118_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-118_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 #macs3 callpeak -t $BAMDIR/145-110_ChIP_set1E8_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-110_ChIP_set1E8_H3K27me3_Rep2 -c $BAMDIR/145-41_ChIP_set1E8_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
@@ -128,7 +135,7 @@ bamCoverage -p $THREADS -bs 10 --normalizeUsing BPM --minMappingQuality 10 --smo
 #bedtools intersect -wa -a /home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_GenesOnly.bed -b $PEAKDIR/Intersected_set7_H3K27me3_all.bed > $BEDDIR/MACS_set7_IntersectedH3K27me3_peaks.bed
 
 
-mkdir ${OUTDIR}/HomerPeaks
+#mkdir ${OUTDIR}/HomerPeaks
 HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
 ml Homer
 ml Perl
