@@ -13,7 +13,7 @@
 cd $SLURM_SUBMIT_DIR
 source config.txt
 
-OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp2"
+OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp"
 
 if [ ! -d $OUTDIR ]
  then
@@ -72,9 +72,7 @@ mkdir $OUTDIR/MACSPeaks
 
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
-macs3 callpeak -t $BAMDIR/142-42_ChIP_rco1KOa_H3K27me3__Q30.bam -f BAMPE -n 142-42_ChIP_rco1KOa_H3K27me3 -c $BAMDIR/142-44_ChIP_rco1KOA_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  macs3 callpeak -t $BAMDIR/142-14_ChIP_iswKO_H3K27me3_Rep2_Q30.bam -f BAMPE -n 142-14_ChIP_iswKO_H3K27me3_Rep2 -c $BAMDIR/135-66_ChIP_isw_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-
  macs3 callpeak -t $BAMDIR/133-78_ChIP_WT_H3K27me3_Rep1_Q30.bam -f BAMPE -n 133-78_ChIP_WT_H3K27me3 --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  macs3 callpeak -t $BAMDIR/142-45_ChIP_rco1KOA_H3K27me3__Q30.bam -f BAMPE -n 142-45_ChIP_rco1KOA_H3K27me3 -c $BAMDIR/142-44_ChIP_rco1KOA_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  macs3 callpeak -t $BAMDIR/142-42_ChIP_rco1KOa_H3K27me3__Q30.bam -f BAMPE -n 142-42_ChIP_rco1KOa_H3K27me3 -c $BAMDIR/142-41_ChIP_rco1KOa_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
@@ -83,12 +81,18 @@ macs3 callpeak -t $BAMDIR/142-42_ChIP_rco1KOa_H3K27me3__Q30.bam -f BAMPE -n 142-
 
 
 
-#  macs3 callpeak -t $BAMDIR/135-30_ChIP_pot-1__nat_H3K27me3_Rep1_Q30.bam -f BAMPE -n 135-30_ChIP_pot-1__nat_H3K27me3_Rep1 -c $BAMDIR/135-29_ChIP_pot-1__nat_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+# macs3 callpeak -t $BAMDIR/135-30_ChIP_pot-1__nat_H3K27me3_Rep1_Q30.bam -f BAMPE -n 135-30_ChIP_pot-1__nat_H3K27me3_Rep1 -c $BAMDIR/135-29_ChIP_pot-1__nat_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 #  macs3 callpeak -t $BAMDIR/137-89_ChIP_pot-1_H3K27me3_Rep2_Q30.bam -f BAMPE -n 137-89_ChIP_pot-1_H3K27me3_Rep2 -c $BAMDIR/137-90_ChIP_pot-1_H3K36me3_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/138-55_ChIP_EPR1_H3K27me3_Rep1_6252_Q30.bam -f BAMPE -n 138-55_ChIP_EPR1_H3K27me3_Rep1 -c $BAMDIR/138-53_ChIP_EPR1_Input_Rep1_6252_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/135-2_ChIP_ncu00423_H3K27me3_Rep3_Q30.bam  -f BAMPE -n 135-2_ChIP_ncu00423_H3K27me3_Rep3 -c $BAMDIR/135-1_ChIP_ncu00423_Input_Rep3_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-# macs3 callpeak -t $BAMDIR/135-27_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 135-27_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/135-7_ChIP_WT_Input_Rep3_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/135-27_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 135-27_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/135-26_ChIP_WT_Input_Rep1_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/138-57_ChIP_WT_H3K27me3_Rep3_6252_Q30.bam  -f BAMPE -n 138-57_ChIP_WT_H3K27me3_Rep3 -c $BAMDIR/138-72_ChIP_WT_input__6252_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+macs3 callpeak -t $BAMDIR/137-70_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 137-70_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/137-63_ChIP_WT_input__Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+
+
+
+
+
 #  macs3 callpeak -t $BAMDIR/142-115_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-115_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/142-118_ChIP_set2_H3K27me3__Q30.bam -f BAMPE -n 142-118_ChIP_set2_H3K27me3  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 #macs3 callpeak -t $BAMDIR/145-110_ChIP_set1E8_H3K27me3_Rep2_Q30.bam -f BAMPE -n 145-110_ChIP_set1E8_H3K27me3_Rep2 -c $BAMDIR/145-41_ChIP_set1E8_Input_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
