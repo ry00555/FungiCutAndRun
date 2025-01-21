@@ -13,36 +13,25 @@
 cd $SLURM_SUBMIT_DIR
 source config.txt
 
-OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp"
+OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp2"
 
-#if [ ! -d $OUTDIR ]
-# then
-# mkdir -p $OUTDIR
+if [ ! -d $OUTDIR ]
+ then
+ mkdir -p $OUTDIR
 # mkdir -p "${OUTDIR}/TrimmedReads"
-# mkdir -p "${OUTDIR}/BigWigs"
-# mkdir -p "$OUTDIR/HomerTagDirectories"
-# mkdir -p "$OUTDIR/TdfFiles"
-# mkdir -p "$OUTDIR/SortedBamFiles"
+ mkdir -p "${OUTDIR}/BigWigs"
+ mkdir -p "$OUTDIR/HomerTagDirectories"
+ mkdir -p "$OUTDIR/TdfFiles"
+ mkdir -p "$OUTDIR/SortedBamFiles"
 #
-# fi
+ fi
 
-for dir in $OUTDIR/Run106/*; do
-    # Extract the sample name from the directory name (remove the trailing '/')
-    sample_name=$(basename "$dir" | sed 's/_L[0-9]*-ds.*//')
 
-    # Create the output file in OUTDIR
-    output_file="${OUTDIR}/${sample_name}.R1.fastq.gz"
-
-    # Combine the L1, L2, L3, L4 files into a single file
-    cat "${dir}*L1*" "${dir}*L2*" "${dir}*L3*" "${dir}*L4*" > "$output_file"
-
-    # Print a message indicating the processing is complete for this sample
-    echo "Processed $sample_name, output saved to $output_file"
-done
 
 ml Trim_Galore
- trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR} ${OUTDIR}/*fastq\.gz
- trim_galore --illumina --length 20 --fastqc --gzip -o ${OUTDIR} ${OUTDIR}/106*fastq\.gz
+trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/132*fastq\.gz
+trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/133*fastq\.gz
+trim_galore --illumina --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/106*fastq\.gz
 
 
 TAGDIR="${OUTDIR}/HomerTagDirectories"
