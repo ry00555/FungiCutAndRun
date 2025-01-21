@@ -28,10 +28,10 @@ if [ ! -d $OUTDIR ]
 
 
 
-ml Trim_Galore
-trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/132*fastq\.gz
-trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/133*fastq\.gz
-trim_galore --illumina --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/106*fastq\.gz
+#ml Trim_Galore
+#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/132*fastq\.gz
+#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/133*fastq\.gz
+#trim_galore --illumina --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${OUTDIR}/FASTQ/106*fastq\.gz
 
 
 TAGDIR="${OUTDIR}/HomerTagDirectories"
@@ -39,13 +39,13 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
- FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+ FILES="${OUTDIR}/TrimmedReads/106*_R1_001_val_1\.fq\.gz"
 
  for f in $FILES
   do
   file=${f##*/}
  name=${file/%_S[1-990]*_R1_001_val_1.fq.gz/}
-  read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+  #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 
  bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # variable name for bigwig output
@@ -53,7 +53,9 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
  QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
   ml SAMtools/1.16.1-GCC-11.3.0
   ml BWA/0.7.17-GCCcore-11.3.0
-  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+  bwa mem -M -v 3 -t $THREADS $GENOME $f | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+
   samtools index "$bam"
   samtools view -b -q 30 $bam > "$QualityBam"
   samtools index "$QualityBam"
@@ -70,11 +72,14 @@ mkdir $OUTDIR/MACSPeaks
 
 module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
+macs3 callpeak -t $BAMDIR/142-42_ChIP_rco1KOa_H3K27me3__Q30.bam -f BAMPE -n 142-42_ChIP_rco1KOa_H3K27me3 -c $BAMDIR/142-44_ChIP_rco1KOA_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/142-14_ChIP_iswKO_H3K27me3_Rep2_Q30.bam -f BAMPE -n 142-14_ChIP_iswKO_H3K27me3_Rep2 -c $BAMDIR/135-66_ChIP_isw_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 
+ macs3 callpeak -t $BAMDIR/133-78_ChIP_WT_H3K27me3_Rep1_Q30.bam -f BAMPE -n 133-78_ChIP_WT_H3K27me3 --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/142-45_ChIP_rco1KOA_H3K27me3__Q30.bam -f BAMPE -n 142-45_ChIP_rco1KOA_H3K27me3 -c $BAMDIR/142-44_ChIP_rco1KOA_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/142-42_ChIP_rco1KOa_H3K27me3__Q30.bam -f BAMPE -n 142-42_ChIP_rco1KOa_H3K27me3 -c $BAMDIR/142-41_ChIP_rco1KOa_Input__Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ macs3 callpeak -t $BAMDIR/132-35_ChIP_ncu00423_H3K27me3_Rep_1_Q30.bam -f BAMPE -n 132-35_ChIP_ncu00423_H3K27me3 -c $BAMDIR/132-34_ChIP_ncu00423_Input_Rep_1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 
-
-
-  #       135-66_ChIP_isw_Input_Rep1_Q30.bam
 
 
 
@@ -144,14 +149,14 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 
 #mkdir ${OUTDIR}/HomerPeaks
-HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-ml Homer
-ml Perl
+#HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
+#ml Homer
+#ml Perl
 
-for bam_file in "${BAMDIR}"/*_Q30.bam; do
-  sample_id=$(basename "${bam_file}" _Q30.bam)
-makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
-done
+#for bam_file in "${BAMDIR}"/*_Q30.bam; do
+#  sample_id=$(basename "${bam_file}" _Q30.bam)
+#makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+#done
 #makeTagDirectory 145-116_ChIP_swd1_Input_Rep2 ../SortedBamFiles/145-116_ChIP_swd1_Input_Rep2_Q30.bam
 
 #findPeaks ${TAGDIR}/142-127_ChIP_sgr9_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-127_ChIP_sgr9_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-126_ChIP_sgr9_Input
