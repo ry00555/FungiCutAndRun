@@ -39,7 +39,7 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
- FILES="${OUTDIR}/*_R1_001_val_1\.fq\.gz"
+ FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 
  for f in $FILES
   do
