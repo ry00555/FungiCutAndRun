@@ -258,24 +258,23 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 
 
 ml deepTools
-bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw -of bigwig
+#bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw -of bigwig
 #142-119_ChIP_set2_H3K36me3__Q30.bam
-bamCompare -b1 ${BAMDIR}/142-125_ChIP_set1_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-123_ChIP_set1_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/142-125_ChIP_set1_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-123_ChIP_set1_Input__Q30.bam -of bigwig --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/145-40_ChIP_set1E7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-37_ChIP_set1E7_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/145-40_ChIP_set1E7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-37_ChIP_set1E7_Input_Rep2_Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/142-128_ChIP_sgr9_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-126_ChIP_sgr9_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/142-128_ChIP_sgr9_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-126_ChIP_sgr9_Input__Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz_Q30.bam	-b2	${BAMDIR}/142-75_ChIP_WT_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz_Q30.bam	-b2	${BAMDIR}/142-75_ChIP_WT_Input__Q30.bam  --scaleFactorsMethod None --effectiveGenomeSize 41037538 -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/145-115_ChIP_sgr9_H3K36me3_Rep2_Q30.bam -b2 ${BAMDIR}/145-112_ChIP_sgr9_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/145-115_ChIP_sgr9_H3K36me3_Rep2_Q30.bam -b2 ${BAMDIR}/145-112_ChIP_sgr9_Input_Rep2_Q30.bam -of bigwig   --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/145-32_ChIP_S1_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-29_ChIP_WT_Input_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/145-32_ChIP_S1_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-29_ChIP_WT_Input_Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw
 
-bamCompare -b1 ${BAMDIR}/145-36_ChIP_set7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-33_ChIP_set7_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw
+bamCompare -b1 ${BAMDIR}/145-36_ChIP_set7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-33_ChIP_set7_Input_Rep2_Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw
 
-computeMatrix scale-regions  -p 12 --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000  --regionBodyLength ${scale_length} \
-  --regionsFileName /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros  --scoreFileName ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw ${OUTDIR}/142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw  --outFileName ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz
+computeMatrix scale-regions  -p 12 --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000  --regionsFileName /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros  --scoreFileName ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw ${OUTDIR}/142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw  --outFileName ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz
 
   plotProfile --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 --averageType mean  --matrixFile ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz --outFileName ${OUTDIR}/Heatmaps/H3K36me3_log2ratiomatrix_mean_V1.png  --outFileNameData H3K36me3_log2ratiomatrix_mean.tab --numPlotsPerRow 2 --plotType=fill  --perGroup --legendLocation lower-right --samplesLabel "142-77-WT" "145-32-WT" "145-36-set7" "142-119-set2" "142-125-set1" "145-40-set1E7" "142-128-sgr9" "145-115-sgr9" --regionsLabel "H3K27me3 marked genes" "True rDNA genes" "Neighboring H3K27me3 genes" "Pseudo rDNA genes" "Ash1 H3K36me genes" --plotTitle "L2FC Input Normalized H3K36me3_COMPASS Mean profile"
 
