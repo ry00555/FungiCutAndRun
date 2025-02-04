@@ -13,7 +13,7 @@
 cd $SLURM_SUBMIT_DIR
 source config.txt
 
-OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP/temp"
+OUTDIR="/scratch/ry00555/RNASeqPaper/COMPASS/ChIP"
 
 if [ ! -d $OUTDIR ]
  then
@@ -70,7 +70,7 @@ PEAKDIR="${OUTDIR}/MACSPeaks"
 #mkdir $OUTDIR/MACSPeaks
 
 
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+#module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
 # macs3 callpeak -t $BAMDIR/142-14_ChIP_iswKO_H3K27me3_Rep2_Q30.bam -f BAMPE -n 142-14_ChIP_iswKO_H3K27me3_Rep2 -c $BAMDIR/135-66_ChIP_isw_Input_Rep1_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
  #macs3 callpeak -t $BAMDIR/133-78_ChIP_WT_H3K27me3_Rep1_Q30.bam -f BAMPE -n 133-78_ChIP_WT_H3K27me3 --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
@@ -85,9 +85,9 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 #  macs3 callpeak -t $BAMDIR/137-89_ChIP_pot-1_H3K27me3_Rep2_Q30.bam -f BAMPE -n 137-89_ChIP_pot-1_H3K27me3_Rep2 -c $BAMDIR/137-90_ChIP_pot-1_H3K36me3_Rep2_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/138-55_ChIP_EPR1_H3K27me3_Rep1_6252_Q30.bam -f BAMPE -n 138-55_ChIP_EPR1_H3K27me3_Rep1 -c $BAMDIR/138-53_ChIP_EPR1_Input_Rep1_6252_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/135-2_ChIP_ncu00423_H3K27me3_Rep3_Q30.bam  -f BAMPE -n 135-2_ChIP_ncu00423_H3K27me3_Rep3 -c $BAMDIR/135-1_ChIP_ncu00423_Input_Rep3_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
- macs3 callpeak -t $BAMDIR/135-27_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 135-27_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/135-26_ChIP_WT_Input_Rep1_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+ #macs3 callpeak -t $BAMDIR/135-27_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 135-27_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/135-26_ChIP_WT_Input_Rep1_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 # macs3 callpeak -t $BAMDIR/138-57_ChIP_WT_H3K27me3_Rep3_6252_Q30.bam  -f BAMPE -n 138-57_ChIP_WT_H3K27me3_Rep3 -c $BAMDIR/138-72_ChIP_WT_input__6252_Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
-macs3 callpeak -t $BAMDIR/137-70_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 137-70_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/137-63_ChIP_WT_input__Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#macs3 callpeak -t $BAMDIR/137-70_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 137-70_ChIP_WT_H3K27me3_Rep1 -c $BAMDIR/137-63_ChIP_WT_input__Q30.bam  --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
 
 
 
@@ -178,8 +178,8 @@ macs3 callpeak -t $BAMDIR/137-70_ChIP_WT_H3K27me3_Rep1_Q30.bam   -f BAMPE -n 137
 #findPeaks ${TAGDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-39_ChIP_set1E7_H3K27me3_Rep2_Homerpeaks.txt -i ${TAGDIR}/145-37_ChIP_set1E7_Input_Rep2
 #findPeaks ${TAGDIR}/145-30_ChIP_WT_H3K27me3 -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/145-30_ChIP_WT_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/145-29_ChIP_WT_Input
 #findPeaks ${TAGDIR}/142-94_ChIP_set7_H3K27me3  -style histone -region -size 150 -minDist 530 -o ${HOMERPEAKSDIR}/142-94_ChIP_set7_H3K27me3_Homerpeaks.txt -i ${TAGDIR}/142-93_ChIP_set7_Input
-Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
-GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf"
+#Genome="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
+#GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_WithExtras_GFFtoGTFconversion.gtf"
 #GFF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.gff"
  #for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
 #do
@@ -255,3 +255,28 @@ GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic_Wi
 # bigWigAverageOverBed Intersected_WT_H3K27me3_all.bw /scratch/ry00555/neurospora.bed WT_WG_enrichment.txt
 # bigWigAverageOverBed Intersected_swd1_H3K27me3_all.bw /scratch/ry00555/heatmapPRC2genes.bed swd1_K27Genes_enrichment.txt
 #
+
+
+ml deepTools
+bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw -of bigwig
+#142-119_ChIP_set2_H3K36me3__Q30.bam
+bamCompare -b1 ${BAMDIR}/142-125_ChIP_set1_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-123_ChIP_set1_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/145-40_ChIP_set1E7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-37_ChIP_set1E7_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/142-128_ChIP_sgr9_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-126_ChIP_sgr9_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz_Q30.bam	-b2	${BAMDIR}/142-75_ChIP_WT_Input__Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/145-115_ChIP_sgr9_H3K36me3_Rep2_Q30.bam -b2 ${BAMDIR}/145-112_ChIP_sgr9_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/145-32_ChIP_S1_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-29_ChIP_WT_Input_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw
+
+bamCompare -b1 ${BAMDIR}/145-36_ChIP_set7_H3K36me3_Rep2_Q30.bam	-b2	${BAMDIR}/145-33_ChIP_set7_Input_Rep2_Q30.bam -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing BPM --smoothLength 40 -o ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw
+
+computeMatrix scale-regions  -p 12 --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000  --regionBodyLength ${scale_length} \
+  --regionsFileName /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros  --scoreFileName ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-32_ChIP_S1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-36_ChIP_set7_H3K36me3_log2ratio.bw ${OUTDIR}/142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio.bw ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio.bw ${OUTDIR}/BigWigs/145-115_ChIP_sgr9_H3K36me3_log2ratio.bw  --outFileName ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz
+
+  plotProfile --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 --averageType mean  --matrixFile ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz --outFileName ${OUTDIR}/Heatmaps/H3K36me3_log2ratiomatrix_mean_V1.png  --outFileNameData H3K36me3_log2ratiomatrix_mean.tab --numPlotsPerRow 2 --plotType=fill  --perGroup --legendLocation lower-right --samplesLabel "142-77-WT" "145-32-WT" "145-36-set7" "142-119-set2" "142-125-set1" "145-40-set1E7" "142-128-sgr9" "145-115-sgr9" --regionsLabel "H3K27me3 marked genes" "True rDNA genes" "Neighboring H3K27me3 genes" "Pseudo rDNA genes" "Ash1 H3K36me genes" --plotTitle "L2FC Input Normalized H3K36me3_COMPASS Mean profile"
+
+  plotProfile --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 --averageType median  --matrixFile ${OUTDIR}/Matrices/H3K36me3_log2ratiomatrix.gz --outFileName ${OUTDIR}/Heatmaps/H3K36me3_log2ratiomatrix_median_V1.png  --outFileNameData H3K36me3_log2ratiomatrix_mean.tab --numPlotsPerRow 2 --plotType=fill  --perGroup --legendLocation lower-right --samplesLabel "142-77-WT" "145-32-WT" "145-36-set7" "142-119-set2" "142-125-set1" "145-40-set1E7" "142-128-sgr9" "145-115-sgr9" --regionsLabel "H3K27me3 marked genes" "True rDNA genes" "Neighboring H3K27me3 genes" "Pseudo rDNA genes" "Ash1 H3K36me genes" --plotTitle "L2FC Input Normalized H3K36me3_COMPASS Median profile"

@@ -17,6 +17,58 @@ ml deepTools
 
 #conda install -c bioconda deeptools
 
+ computeMatrix scale-regions --startLabel "5''" --endLabel "3''" -b 2000 -a 200- -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-104_ChIP_suz12_H3K36me3_.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-65_ChIP_cac3_H3K36me3__S65_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-15_ChIP_iswKO_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o H3K36me3_PRC2KOs_matrix_PRC2Genes.gz
+
+ plotHeatmap -m H3K36me3_PRC2KOs_matrix_PRC2Genes.gz -out H3K36me3_PRC2KOs_matrix_PRC2Genes_V1.png --samplesLabel "142-77-WT" "142-104-suz12" "145-36-set7" "142-65-cac3" "142-95-set7" "142-15-isw" --sortUsingSamples 1 --sortRegions descend
+
+ computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-104_ChIP_suz12_H3K36me3_.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-65_ChIP_cac3_H3K36me3__S65_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-15_ChIP_iswKO_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o H3K36me3_PRC2KOs_matrix_PRC2Genes_Tss.gz
+
+
+ plotHeatmap -m H3K36me3_PRC2KOs_matrix_PRC2Genes_Tss.gz -out H3K36me3_PRC2KOs_matrix_PRC2Genes_Tss_V1.png --samplesLabel "142-77-WT" "142-104-suz12" "145-36-set7" "142-65-cac3" "142-95-set7" "142-15-isw" --sortUsingSamples 1 --sortRegions descend
+
+
+awk '{if ($4 ~ /Name=NCU/) { match($4, /Name=([^;]+)/, arr); $4 = arr[1]; print $0; }}' rDNA_regions_no_duplicates.bed > rDNA_regions_no_duplicates_genes.bed
+
+awk '{if ($4 ~ /Name=NCU/) { match($4, /Name=([^;]+)/, arr); $4 = arr[1]; print $0; }}' TRUErDNA_regions_merged.bed > TRUErDNA_genes.bed
+sed -i 's/ \+/\t/g' /scratch/ry00555/rDNA_regions_no_duplicates_genes.bed
+tr -s ' ' '\t' < /scratch/ry00555/rDNA_regions_no_duplicates_genes.bed > /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed
+
+
+  computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw 142-104_ChIP_suz12_H3K36me3_.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw 142-65_ChIP_cac3_H3K36me3__S65_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw 142-15_ChIP_iswKO_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R /scratch/ry00555/neurospora.bed /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed --skipZeros -o H3K36me3_PRC2KOs_matrix_Compiled.gz --outFileNameMatrix H3K36me3_PRC2KOs_matrix_Compiled_scaled.tab
+
+
+  plotHeatmap -m H3K36me3_PRC2KOs_matrix_Compiled.gz -out H3K36me3_PRC2KOs_matrix_Compiled_V1.png --samplesLabel "142-77-WT" "142-104-suz12" "145-36-set7" "142-65-cac3" "142-95-set7" "142-15-isw" --sortUsingSamples 1 --sortRegions descend
+
+
+  computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw 142-104_ChIP_suz12_H3K36me3_.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw 142-65_ChIP_cac3_H3K36me3__S65_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw 142-15_ChIP_iswKO_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_PRC2KOs_matrix_Compiled_subseted.gz
+
+  plotHeatmap -m H3K36me3_PRC2KOs_matrix_Compiled_subseted.gz -out H3K36me3_PRC2KOs_matrix_Compiled_subseted_V1.png --samplesLabel "142-77-WT" "142-104-suz12" "145-36-set7" "142-65-cac3" "142-95-set7" "142-15-isw" --sortUsingSamples 1 --sortRegions descend
+
+
+  computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	145-32_ChIP_S1_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-122_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	142-125_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	145-40_ChIP_set1E7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	145-111_ChIP_set1E8_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_set1Reps_matrix_.gz
+
+  plotHeatmap -m H3K36me3_set1Reps_matrix_.gz -out H3K36me3_set1Reps_matrix__V1.png --samplesLabel "142-77-WT" "145-32-WT" "142-95-set7" "142-122-set1" "142-125-set1" "145-40-set1E7" "145-111-set1E8" --sortUsingSamples 1 2 --sortRegions descend
+
+computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	145-32_ChIP_S1_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-125_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	145-40_ChIP_set1E7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	 -R  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_set1Reps_matrix_V2.gz
+
+plotHeatmap -m H3K36me3_set1Reps_matrix_V2.gz -out H3K36me3_set1Reps_matrix__V2.png --samplesLabel "142-77-WT" "145-32-WT" "142-95-set7" "142-125-set1" "145-40-set1E7"  --sortUsingSamples 1 2 --sortRegions descend --colorMap bwr
+
+
+computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-116_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw	142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-122_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	142-125_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	145-40_ChIP_set1E7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	145-111_ChIP_set1E8_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw -R  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_SETKOs_matrix.gz
+
+plotHeatmap -m H3K36me3_SETKOs_matrix.gz -out H3K36me3_SETKOs_matrix_V1.png --samplesLabel "142-77-WT" "142-116-set2" "142-119-set2" "142-95-set7" "145-36-set7" "142-122-set1" "142-125-set1" "145-40-set1E7" "145-111-set1E8" --sortUsingSamples 1 2 --sortRegions descend --colorMap bwr
+
+computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	142-116_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw	142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw	142-95_ChIP_set7_H3K36me3__S95_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw	145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw 142-125_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	145-40_ChIP_set1E7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	-R  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_SETKOs_matrix_V2.gz
+
+plotHeatmap -m H3K36me3_SETKOs_matrix_V2.gz -out H3K36me3_SETKOs_matrix_V2.png --samplesLabel "142-77-WT" "142-116-set2" "142-119-set2" "142-95-set7" "145-36-set7" "142-125-set1" "145-40-set1E7"  --sortUsingSamples 1 2 --sortRegions descend --colorMap bwr
+
+computeMatrix scale-regions --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S 142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw 145-32_ChIP_S1_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-119_ChIP_set2_H3K36me3_.bin_25.smooth_50_Q30.bw 145-36_ChIP_set7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-125_ChIP_set1_H3K36me3_.bin_25.smooth_50_Q30.bw	145-40_ChIP_set1E7_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	142-128_ChIP_sgr9_H3K36me3_.bin_25.smooth_50_Q30.bw	145-115_ChIP_sgr9_H3K36me3_Rep2.bin_25.smooth_50_Q30.bw	/scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros  /scratch/ry00555/heatmapPRC2genes.bed /scratch/ry00555/TRUErDNA_genes_with_names_fixed.bed /scratch/ry00555/neighboringK27genes.bed /scratch/ry00555/rDNA_regions_no_duplicates_genes_format.bed /scratch/ry00555/ash1depgenes.bed --skipZeros -o H3K36me3_COMPASS_matrix.gz
+
+plotHeatmap -m H3K36me3_COMPASS_matrix.gz -out H3K36me3_COMPASS_matrix.png --samplesLabel "142-77-WT" "145-32-WT" "142-119-set2" "145-36-set7" "142-125-set1" "145-40-set1E7" "142-128-sgr9" "145-115-sgr9" --sortUsingSamples 1 2 --sortRegions descend --colorMap bwr
+
+
+plotProfile -m H3K36me3_COMPASS_matrix.gz -out H3K36me3_COMPASS_matrix_PlotProvile_V4.png --numPlotsPerRow 2 --plotType=fill  --perGroup --legendLocation lower-right --samplesLabel "142-77-WT" "145-32-WT" "142-119-set2" "145-36-set7" "142-125-set1" "145-40-set1E7" "142-128-sgr9" "145-115-sgr9" --regionsLabel "H3K27me3 marked genes" "True rDNA genes" "Neighboring H3K27me3 genes" "Pseudo rDNA genes" "Ash1 H3K36me genes" --averageType mean --yMin 0 --yMax 10 100 10 10 10 --plotTitle "Test H3K36me3_COMPASS profile"
+
 #computeMatrix reference-point --referencePoint center -b 1500 -a 1500 -S $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-22_CUTANDRUN_WT_H3K27me3_Rep1_S22_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-2_CUTANDRUN_WT_H3K27me3_Rep1_S2_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-25_CUTANDRUN_set-7_H3K27me3_Rep1_S25_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw $OUTDIR/137-7_CUTANDRUN_set-7_H3K27me3_Rep1_S7_R1_001_val_1.fq.gz.bin_25.smooth_75_MNase.bw -R /scratch/ry00555/heatmapPRC2genes.bed --skipZeros -o $MATRICESDIR/matrix_PRC2Genes.gz
 
 #plotHeatmap -m $MATRICESDIR/matrix_PRC2Genes.gz -out $HEATMAPDIR/ZLRun137CutandRunWTset7Only_Prc2Genes.png --samplesLabel WT-22Bulk WT-22Mnase WT2-Bulk WT2-Mnase set7-25Bulk set7-25MNase set7-7Bulk set7-7MNase --hclust 1 --colorMap Reds
