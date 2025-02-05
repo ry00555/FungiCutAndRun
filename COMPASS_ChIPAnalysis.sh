@@ -296,9 +296,9 @@ ml deepTools
 
 #  bamCompare -p max -b1 ${BAMDIR}/142-125_ChIP_set1_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-123_ChIP_set1_Input__Q30.bam -of bigwig --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/142-125_ChIP_set1_H3K36me3_log2ratio_smooth60_CPM.bw
 
-bamCompare -p max -b1 ${BAMDIR}/145-40_ChIP_set1E7_H3K36me3_Rep2_Q30.bam -b2	${BAMDIR}/145-37_ChIP_set1E7_Input_Rep2_Q30.bam --of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio_smooth60_CPM.bw
+bamCompare -p max -b1 ${BAMDIR}/145-40_ChIP_set1E7_H3K36me3_Rep2_Q30.bam -b2	${BAMDIR}/145-37_ChIP_set1E7_Input_Rep2_Q30.bam --of bigwig --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/145-40_ChIP_set1E7_H3K36me3_Rep2_log2ratio_smooth60_CPM.bw
 
-bamCompare -p max -b1 ${BAMDIR}/142-128_ChIP_sgr9_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-126_ChIP_sgr9_Input__Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio_smooth60_CPM.bw
+#bamCompare -p max -b1 ${BAMDIR}/142-128_ChIP_sgr9_H3K36me3__Q30.bam	-b2	${BAMDIR}/142-126_ChIP_sgr9_Input__Q30.bam -of bigwig  --scaleFactorsMethod None --effectiveGenomeSize 41037538 --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/142-128_ChIP_sgr9_H3K36me3_log2ratio_smooth60_CPM.bw
 
 #  bamCompare -p max -b1 ${BAMDIR}/142-77_ChIP_WT_H3K36me3__S77_L007_R1_001_val_1.fq.gz_Q30.bam	-b2	${BAMDIR}/142-75_ChIP_WT_Input__Q30.bam --scaleFactorsMethod None --effectiveGenomeSize 41037538 -of bigwig --skipZeroOverZero --binSize 30 --normalizeUsing CPM --smoothLength 60 -o ${OUTDIR}/BigWigs/142-77_ChIP_WT_H3K36me3_log2ratio_smooth60_CPM.bw
 
