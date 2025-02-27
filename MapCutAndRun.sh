@@ -37,8 +37,8 @@ BEDDIR="${OUTDIR}/Beds"
 #ml Trim_Galore
 #trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
-FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
+#FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 
 #145-42_ChIP_set1E8_H3K24me2_Rep2_S39_L002_R1_001_val_1.fq.gz
