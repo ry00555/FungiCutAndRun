@@ -34,8 +34,8 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-ml Trim_Galore
-trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#ml Trim_Galore
+#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
@@ -55,7 +55,7 @@ for f in $FILES
 #
 file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}#
+name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
 
@@ -97,8 +97,8 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  for infile in $BAMDIR/*_Q30.bam
 do
    base=$(basename ${infile} _Q30.bam)
-  Input=$BAMDIR/ ${infile} Input_Q30.bam
- macs3 callpeak -t $infile -f BAMPE -n $base -c $Input --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500
+#  Input=$BAMDIR/ ${infile} Input_Q30.bam
+ macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
  done
 
  HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
@@ -110,14 +110,14 @@ do
 # #   # Get the sample ID from the BAM file name
   sample_id=$(basename "${bam_file}" __Q30.bam)
 # #   # Remove everything after "Rep_1" in the sample ID
-HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
+#HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
 
 # #
   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 # # #
 # # #   # Call peaks
 # # #
- findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
+ findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" #-i $HOMERINPUT
 # # #
   done
 # #changing peak txt files to bed files to input into chipr
