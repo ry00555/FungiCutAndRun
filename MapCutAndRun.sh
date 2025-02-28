@@ -18,16 +18,16 @@ source config.txt
 OUTDIR="/scratch/ry00555/Run146"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
-then
-    mkdir -p $OUTDIR
-    mkdir -p "${OUTDIR}/TrimmedReads"
-    mkdir -p "${OUTDIR}/BigWigs"
-   mkdir -p "$OUTDIR/HomerTagDirectories"
-   mkdir -p "$OUTDIR/TdfFiles"
-  mkdir -p "$OUTDIR/SortedBamFiles"
+#if [ ! -d $OUTDIR ]
+#then
+#    mkdir -p $OUTDIR
+#    mkdir -p "${OUTDIR}/TrimmedReads"
+#    mkdir -p "${OUTDIR}/BigWigs"
+#   mkdir -p "$OUTDIR/HomerTagDirectories"
+#   mkdir -p "$OUTDIR/TdfFiles"
+#  mkdir -p "$OUTDIR/SortedBamFiles"
 
-fi
+#fi
 
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
@@ -59,7 +59,7 @@ file=${f##*/}
 #name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
-name=${file/%_S[1-99]*_R1_001_val_1.fq.gz/}
+name=${file/_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
