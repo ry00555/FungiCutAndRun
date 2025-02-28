@@ -101,49 +101,49 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
  #command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
- for infile in $BAMDIR/*_Q30.bam
-do
-   base=$(basename ${infile} _Q30.bam)
-#  Input=$BAMDIR/ ${infile} Input_Q30.bam
- macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
- done
-
- HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-  ml Homer
- ml Perl
- ml SAMtools
-  ml BEDTools
-    for bam_file in "${BAMDIR}"/*__Q30.bam; do
-# #   # Get the sample ID from the BAM file name
-  sample_id=$(basename "${bam_file}" __Q30.bam)
-# #   # Remove everything after "Rep_1" in the sample ID
-#HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
-
+#  for infile in $BAMDIR/*_Q30.bam
+# do
+#    base=$(basename ${infile} _Q30.bam)
+# #  Input=$BAMDIR/ ${infile} Input_Q30.bam
+#  macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
+#  done
+#
+#  HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
+#   ml Homer
+#  ml Perl
+#  ml SAMtools
+#   ml BEDTools
+#     for bam_file in "${BAMDIR}"/*__Q30.bam; do
+# # #   # Get the sample ID from the BAM file name
+#   sample_id=$(basename "${bam_file}" __Q30.bam)
+# # #   # Remove everything after "Rep_1" in the sample ID
+# #HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
+#
+# # #
+#   makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+# # # #
+# # # #   # Call peaks
+# # # #
+#  findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" #-i $HOMERINPUT
+# # # #
+#   done
+# # #changing peak txt files to bed files to input into chipr
+#  ml ChIP-R
+#   for infile in ${HOMERPEAKSDIR}/${sample_id}_peaks.txt
+#  do
+#    base=$(basename ${infile} .txt)
+#    sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+#  done
 # #
-  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
-# # #
-# # #   # Call peaks
-# # #
- findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" #-i $HOMERINPUT
-# # #
-  done
-# #changing peak txt files to bed files to input into chipr
- ml ChIP-R
-  for infile in ${HOMERPEAKSDIR}/${sample_id}_peaks.txt
- do
-   base=$(basename ${infile} .txt)
-   sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
- done
-#
- ml Homer
- ml Perl
-# ##annotating peak files with masked reference (use HOMER module)
-# #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
- annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
-#
-# #now filtering for only peaks that are w/i 1000bps of their annotation:
-  for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
-  do
-    base=$(basename ${infile} _masked_ann.txt)
-    awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
-  done
+#  ml Homer
+#  ml Perl
+# # ##annotating peak files with masked reference (use HOMER module)
+# # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
+#  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+# #
+# # #now filtering for only peaks that are w/i 1000bps of their annotation:
+#   for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
+#   do
+#     base=$(basename ${infile} _masked_ann.txt)
+#     awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
+#   done
