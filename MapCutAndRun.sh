@@ -5,17 +5,17 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=50gb
-#SBATCH --time=48:00:00
-#SBATCH --output=../MapCutAndRun146.%j.out
-#SBATCH --error=../MapCutAndRun146.%j.err
+#SBATCH --mem=100gb
+#SBATCH --time=72:00:00
+#SBATCH --output=../MapCutAndRun147.%j.out
+#SBATCH --error=../MapCutAndRun147.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run146"
+OUTDIR="/scratch/ry00555/Run147"
 
 #if output directory doesn't exist, create it
 #if [ ! -d $OUTDIR ]
@@ -34,8 +34,8 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-#ml Trim_Galore
-#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ml Trim_Galore
+trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
