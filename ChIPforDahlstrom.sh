@@ -50,17 +50,14 @@ FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #Iterate over the files
 for f in $FILES
 do
-#
 # 	#Examples to Get Different parts of the file name
 # 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
 		#${string//substring/replacement}
 # 		#dir=${f%/*}
-
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-190]*_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-190]*_L001_R1_001_val_1.fq.gz/}
 
-#
 # 	# File Vars
 # 	#use sed to get the name of the second read matching the input file
 	read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
@@ -69,8 +66,9 @@ do
 	#variable name for bigwig output
 	bigwig="${OUTDIR}/BigWigs/${name}"
 	#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-#
 
+ml SAMtools
+ml BWA
 #
 bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
@@ -80,7 +78,7 @@ samtools index "$bam"
 
 ############################
 # # #deeptools
-
+ml deepTools
 #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
