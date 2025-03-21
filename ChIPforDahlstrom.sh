@@ -37,7 +37,7 @@ OUTDIR="/scratch/ry00555/Run147/Dahlstrom"
 
 # #process reads using trimGalore
 
- trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz" #Don't forget the *
 #
@@ -58,7 +58,7 @@ do
 
 	file=${f##*/}
 	#remove ending from file name to create shorter names for bam files and other downstream output
-	name=${file/%_S[1-100]*_R1_001_val_1.fq.gz/}
+	name=${file/%_S[1-190]*_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
