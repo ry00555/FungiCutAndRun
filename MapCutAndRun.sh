@@ -34,10 +34,10 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-ml Trim_Galore
-trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#ml Trim_Galore
+#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_L001_R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
 
 
@@ -54,8 +54,8 @@ for f in $FILES
 file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
 #name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
-name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
-#name=${file/%_S[1-12]*_L001_R1_001_val_1.fq.gz/}
+#name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-190]*_L001_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
