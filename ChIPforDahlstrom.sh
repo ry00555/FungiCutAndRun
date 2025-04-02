@@ -87,17 +87,17 @@ OUTDIR="/scratch/ry00555/Run147/Dahlstrom"
 #done
 
 #mkdir $OUTDIR/MACSPeaks
-PEAKDIR="${OUTDIR}/MACSPeaks"
+#PEAKDIR="${OUTDIR}/MACSPeaks"
 
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+#module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 #147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam
 #147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam
 
 #147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam
 #147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam
- macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+# macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-  macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#  macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
   #  147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam
   # 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam
@@ -105,9 +105,9 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 	# 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam
 	 #147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam
 
-	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+	# macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
 #147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam
 #147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam
@@ -120,13 +120,13 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam
 #	147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+#macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 #  for infile in $BAMDIR/*_Q30.bam
  #do
 #    base=$(basename ${infile} _Q30.bam)
@@ -142,37 +142,37 @@ ml Homer/4.11-foss-2022a
 ml Perl/5.34.1-GCCcore-11.3.0
 #basic command
 
-makeTagDirectory ${TAGDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA ${BAMDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA ${BAMDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA ${BAMDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA ${BAMDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA ${BAMDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA ${BAMDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA ${BAMDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA ${BAMDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA ${BAMDIR}/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam
-makeTagDirectory ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA ${BAMDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA ${BAMDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA ${BAMDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA ${BAMDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA ${BAMDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA ${BAMDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA ${BAMDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA ${BAMDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA ${BAMDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA ${BAMDIR}/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam
+#makeTagDirectory ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA ${BAMDIR}/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam
 
-findPeaks ${TAGDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.txt -i ${TAGDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.txt -i ${TAGDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.txt -i ${TAGDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.txt -i ${TAGDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt -i ${TAGDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA
-findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.txt -i ${TAGDIR}/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.txt -i ${TAGDIR}/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.txt -i ${TAGDIR}/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.txt -i ${TAGDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt -i ${TAGDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA
 
-findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA
 
-for peakfile in ${PEAKSDIR}/*.txt; do
-    bedfile="${peakfile%.txt}.bed"
-    pos2bed.pl "$peakfile" > "$bedfile"
-done
+#for peakfile in ${PEAKSDIR}/*.txt; do
+#    bedfile="${peakfile%.txt}.bed"
+#    pos2bed.pl "$peakfile" > "$bedfile"
+#done
 # Loop through each sample
 #for sample in "${samples[@]}"; do
 #    bam_file="${BAMDIR}/${sample}_L001_R1_001_val_1.fq.gz.bam"
@@ -200,17 +200,31 @@ done
 # Run annotatePeaks.pl for each peak file
 #annotatePeaks.pl "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/135-41_ChIP_WT_Anti6xHis_Rep1_S38_peaks_wINPUT_ann.txt"
 
-annotatePeaks.pl "${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.txt" $GENOME -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep_2_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA_ann.txt"
-annotatePeaks.pl "${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.txt" $GENOME -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep_2_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA_ann.txt"
+#annotatePeaks.pl "${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA.txt" "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.fna" -gtf "/home/ry00555/Research/Genomes/GCA_019428685.1_ASM1942868v1_genomic.gtf" > "${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA_ann.txt"
 
 
 
+mergePeaks -d given ${PEAKSDIR}/93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA.txt \
+                   -matrix > ${PEAKSDIR}/6His_merged_peaks.txt
+
+mergePeaks -d given ${PEAKSDIR}/95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.txt \
+                   ${PEAKSDIR}/104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.txt \
+                   -matrix > ${PEAKSDIR}/WT_merged_peaks.txt
+
+# Find unique 6His peaks (peaks in 6His but NOT in WT)
+getDifferentialPeaks ${PEAKSDIR}/6His_merged_peaks.txt ${PEAKSDIR}/WT_merged_peaks.txt > ${PEAKSDIR}/6His_unique_peaks.txt
 
 
 
