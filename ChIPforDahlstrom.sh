@@ -95,9 +95,9 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam
 #147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam
- macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+ macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-  macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+  macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-102_ChIP_C3_6His__IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-106_ChIP_C3_6His__Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
   #  147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam
   # 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam
@@ -105,9 +105,9 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 	# 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam
 	 #147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam
 
-	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-93_ChIP_C1_6His_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+	 macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
 #147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam
 #147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam
@@ -120,13 +120,13 @@ module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
 
 #147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam
 #	147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA.bam -f BAMPE -n 147-95_ChIP_C1_WT_IP_Rep1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-99_ChIP_C1_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA.bam -f BAMPE -n 147-96_ChIP_C1_WT_IP_Rep2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-100_ChIP_C1_WT_Input_Rep2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA.bam -f BAMPE -n 147-103_ChIP_C3_WT_IP_Rep_1_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-107_ChIP_C3_WT_Input_Rep_1_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 
-macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam --narrow -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
+macs3 callpeak -t ${OUTDIR}/SortedBamFiles/147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA.bam -f BAMPE -n 147-104_ChIP_C3_WT_IP_Rep_2_Ped_48hrPDA -c ${OUTDIR}/SortedBamFiles/147-108_ChIP_C3_WT_Input_Rep_2_Ped_48hrPDA.bam --broad -g 8298884 --broad-cutoff 0.1 --outdir ${OUTDIR}/MACSPeaks --min-length 50
 #  for infile in $BAMDIR/*_Q30.bam
  #do
 #    base=$(basename ${infile} _Q30.bam)
