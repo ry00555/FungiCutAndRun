@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Run146ChIP
+#SBATCH --job-name=Run148ChIP
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -7,25 +7,25 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=72:00:00
-#SBATCH --output=../MapCutAndRun147.%j.out
-#SBATCH --error=../MapCutAndRun147.%j.err
+#SBATCH --output=../MapCutAndRun148.%j.out
+#SBATCH --error=../MapCutAndRun148.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run147"
+OUTDIR="/scratch/ry00555/Run148"
 
 #if output directory doesn't exist, create it
-#if [ ! -d $OUTDIR ]
-#then
-#    mkdir -p $OUTDIR
-#    mkdir -p "${OUTDIR}/TrimmedReads"
-#    mkdir -p "${OUTDIR}/BigWigs"
-#   mkdir -p "$OUTDIR/HomerTagDirectories"
+if [ ! -d $OUTDIR ]
+then
+    mkdir -p $OUTDIR
+    mkdir -p "${OUTDIR}/TrimmedReads"
+    mkdir -p "${OUTDIR}/BigWigs"
+   mkdir -p "$OUTDIR/HomerTagDirectories"
 #   mkdir -p "$OUTDIR/TdfFiles"
-#  mkdir -p "$OUTDIR/SortedBamFiles"
+  mkdir -p "$OUTDIR/SortedBamFiles"
 
 #fi
 
@@ -34,10 +34,10 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-#ml Trim_Galore
-#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ml Trim_Galore
+trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*_L001_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
 
 
@@ -55,7 +55,7 @@ file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
 #name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
-name=${file/%_S[1-190]*_L001_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-190]*_L003_R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
