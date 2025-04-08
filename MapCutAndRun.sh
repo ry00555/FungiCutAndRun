@@ -27,7 +27,7 @@ then
 #   mkdir -p "$OUTDIR/TdfFiles"
   mkdir -p "$OUTDIR/SortedBamFiles"
 
-#fi
+fi
 
 TAGDIR="${OUTDIR}/HomerTagDirectories"
 BAMDIR="${OUTDIR}/SortedBamFiles"
