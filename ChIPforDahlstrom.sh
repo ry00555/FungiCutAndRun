@@ -167,7 +167,8 @@ ml Perl/5.34.1-GCCcore-11.3.0
 #findPeaks ${TAGDIR}/147-94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/94_ChIP_C1_6His_IP_Rep2_Ped_48hrPDA.txt -i ${TAGDIR}/147-98_ChIP_C1_6His_Input_Rep_2_Ped_48hrPDA
 #findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-105_ChIP_C3_6His_Input_Rep_1_Ped_48hrPDA
 
-#findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA
+#findPeaks ${TAGDIR}/147-101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA -style factor -o ${PEAKSDIR}/101_ChIP_C3_6His_IP_Rep_1_Ped_48hrPDA.txt -i ${TAGDIR}/147-97_ChIP_C1_6His_Input_Rep_1_Ped_48hrPDA
+findPeaks ${TAGDIR}/147-102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA -style factor -o ${PEAKSDIR}/102_ChIP_C3_6His_IP_Rep_2_Ped_48hrPDA.txt -i ${TAGDIR}/147-106_ChIP_C3_6His_Input_Rep_2_Ped_48hrPDA   -F 2 -L 2
 
 #for peakfile in ${PEAKSDIR}/*.txt; do
 #    bedfile="${peakfile%.txt}.bed"
