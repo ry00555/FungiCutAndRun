@@ -113,20 +113,51 @@ ml deepTools/3.5.2-foss-2022a
 
 #computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/BigWigs/147-27_ChIP_ETT11_3_qasuz12_H3K27me3_Rep1_Nc_24hrVMMON_S27_L001_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/137-69_ChIP_qa-suz12_H3K27me3_Rep1_S66_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/137-71_ChIP_qa-suz12_H3K27me3_Rep1_S68_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/147-69_ChIP_8hr_ETT11_3_qasuz12_H3K27me3_Rep1_Nc_24hrVMMON_S69_L001_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes.gz  --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes.matrix.txt --sortRegions keep --missingDataAsZero -bs 10
 
-plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes.gz -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/qasuz12_strongdenovo_K27genes_V2_hclust2.png --samplesLabel 147-27-H3K27me3 137-69-H3K27me3 137-71-H3K27me3 147-69-H3K27me3 --hclust 2 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes_V2_hclust2.txt
+#plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes.gz -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/qasuz12_strongdenovo_K27genes_V2_hclust2.png --samplesLabel 147-27-H3K27me3 137-69-H3K27me3 137-71-H3K27me3 147-69-H3K27me3 --hclust 2 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes_V2_hclust2.txt
 
 #computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/BigWigs/147-76_12hr_ChIP_ETT11_3_qasuz12_H3K27me3_Rep1_Nc_24hrVMMON_S76_L001_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/147-88_ChIP_48hr_ETT11_3_qasuz12_H3K27me3_Rep1_Nc_24hrVMMON_S88_L001_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/137-73_ChIP_qa-suz12_H3K27me3_Rep1_S70_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/137-75_ChIP_qa-suz12_H3K27me3_Rep1_S72_R1_001_val_1.fq.gz.bin_25.smooth_75Bulk.bw -R "/scratch/ry00555/heatmapPRC2genes.bed" --skipZeros -o /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes.gz  --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes.matrix.txt --sortRegions keep --missingDataAsZero -bs 10
 
-plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes.gz -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/qasuz12_weakdenovo_K27genes_V2_hclust2.png --samplesLabel 147-76-H3K27me3 147-88-H3K27me3 137-73-H3K27me3 137-75-H3K27me3 --hclust 2 --startLabel "5'" --endLabel "3'" --outFileSortedRegions /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes_V2_hclust2.txt
+#plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes.gz -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/qasuz12_weakdenovo_K27genes_V2_hclust2.png --samplesLabel 147-76-H3K27me3 147-88-H3K27me3 137-73-H3K27me3 137-75-H3K27me3 --hclust 2 --startLabel "5'" --endLabel "3'" --outFileSortedRegions /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes_V2_hclust2.txt
 
 #ml BEDTools
-#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes_V1.txt" > "/scratch/ry00555/WeakDeNovo_K27genes.bed"
+#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/qasuz12_weakdenovo_K27genes_V2_hclust2_ONLY.txt" > "/scratch/ry00555/WeakDeNovo_K27genes.bed"
 
-#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_strongdenovo_K27genes_v1.txt" > "/scratch/ry00555/StrongDeNovo_K27genes.bed"
+#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/qasuz12_strongdenovo_K27genes_V2_hclust2_ONLY.txt" > "/scratch/ry00555/StrongDeNovo_K27genes.bed"
 
 #sort -k1,1 -k2,2n /scratch/ry00555/WeakDeNovo_K27genes.bed > weak_sorted.bed
 #sort -k1,1 -k2,2n /scratch/ry00555/StrongDeNovo_K27genes.bed > strong_sorted.bed
 
-#bedtools intersect -a strong_sorted.bed -b weak_sorted.bed > shared_strong_weak_denovoK27genes.bed
-#bedtools intersect -a strong_sorted.bed -b weak_sorted.bed -v > only_strongdenovoK27genes.bed
-#bedtools intersect -a weak_sorted.bed -b strong_sorted.bed -v > only_weakdenovoK27genes.bed
+#bedtools intersect -a strong_sorted.bed -b weak_sorted.bed > shared_strong_weak_denovoK27genes.bed # this one has the strong de novo genes
+#bedtools intersect -a weak_sorted.bed -b strong_sorted.bed -v > only_weakdenovoK27genes.bed #this one has only the genes that pop up later (weaker de novo)
+#cat only_weakdenovoK27genes.bed shared_strong_weak_denovoK27genes.bed | sort -k1,1 -k2,2n > K27genesduringqasuz12Exp.bed
+
+#bedtools intersect -a heatmapPRC2genes.bed -b K27genesduringqasuz12Exp.bed -v > MaintainenceDepK27Genes.bed
+
+#bedtools intersect  -a "/scratch/ry00555/neurospora.bed" -b 2024_04_23_24hr_peaks.bed > 24hrqasuz12K27genes.bed | sort -k1,1 -k2,2n > 24hrqasuz12K27genes.bed
+
+#bedtools intersect  -a 24hrqasuz12K27genes.bed -b heatmapPRC2genes.bed > 24hrqasuz12K27genesONLY.bed | sort -k1,1 -k2,2n > 24hrqasuz12K27genesONLY.bed
+
+
+#bedtools intersect  -a "/scratch/ry00555/neurospora.bed" -b qasuz12_12hr_peaks.bed > 12hrqasuz12K27genes.bed | sort -k1,1 -k2,2n > 12hrqasuz12K27genes.bed
+
+bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_12hr_peaks.bed | sort -k1,1 -k2,2n > 12hrqasuz12K27genesONLY_sorted.bed
+
+bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_4hr_peaks.bed | sort -k1,1 -k2,2n > 4hrqasuz12K27genes.bed
+
+bedtools intersect -a 12hrqasuz12K27genesONLY_sorted.bed -b 4hrqasuz12K27genes.bed -v > weakdenovo12v4hr_K27Genes.bed
+
+cat 12hrqasuz12K27genesONLY_sorted.bed 4hrqasuz12K27genes.bed | sort -k1,1 -k2,2n | cut -f1-4 | uniq| awk '!seen[$1,$2,$3]++' > K27genesduringqasuz12Exp12and4hr_sorted_unique.bed
+
+bedtools intersect -a heatmapPRC2genes.bed -b K27genesduringqasuz12Exp12and4hr_sorted_unique.bed -v | awk '!seen[$1,$2,$3]++' > MaintainenceDepK27GenesONLY.bed
+
+
+cut -f1-3 heatmapPRC2genes.bed > heatmapPRC2genes_3col.bed
+cut -f1-3 K27genesduringqasuz12Exp12and4hr_sorted_unique.bed > K27genes_3col.bed
+sort -k1,1 -k2,2n heatmapPRC2genes_3col.bed > heatmapPRC2genes_3col_sorted.bed
+sort -k1,1 -k2,2n K27genes_3col.bed > K27genes_3col_sorted.bed
+bedtools intersect -a heatmapPRC2genes_3col_sorted.bed -b K27genes_3col_sorted.bed -v > MaintainenceDepK27GenesONLY_fixed.bed
+wc -l heatmapPRC2genes_3col_sorted.bed
+wc -l K27genes_3col_sorted.bed
+wc -l MaintainenceDepK27GenesONLY_fixed.bed
+bedtools intersect -a heatmapPRC2genes_3col_sorted.bed -b K27genes_3col_sorted.bed > overlapping_genes.bed
+wc -l overlapping_genes.bed

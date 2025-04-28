@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run148"
+OUTDIR="/scratch/ry00555/RTT109PaperFigures"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -37,7 +37,7 @@ BEDDIR="${OUTDIR}/Beds"
 ml Trim_Galore
 trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
-FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
 
 
@@ -55,7 +55,7 @@ file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
 #name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
-name=${file/%_S[1-190]*_L003_R1_001_val_1.fq.gz/}
+name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 
 #
 # 	# File Vars
