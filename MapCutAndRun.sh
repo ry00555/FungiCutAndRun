@@ -109,14 +109,14 @@ BEDDIR="${OUTDIR}/Beds"
   ml Perl
   ml SAMtools
    ml BEDTools
-     for bam_file in "${BAMDIR}"/*__Q30.bam; do
+     for bam_file in "${BAMDIR}"/*_Q30.bam; do
 # # #   # Get the sample ID from the BAM file name
-   sample_id=$(basename "${bam_file}" __Q30.bam)
+   sample_id=$(basename "${bam_file}" _Q30.bam)
 # # #   # Remove everything after "Rep_1" in the sample ID
-# #HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
+ #HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
 #
 # # #
-  # makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 # # # #
 # # # #   # Call peaks
 # # # #
