@@ -131,7 +131,7 @@ BEDDIR="${OUTDIR}/Beds"
   do
     base=$(basename ${infile} _Homerpeaks.txt)
   #  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
-    annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+    annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gff /scratch/ry00555/GCA_000182925.2_NC12_genomic_WithExtras.gff > ${HOMERPEAKSDIR}/${base}_ann.txt
 
   done
 # #
