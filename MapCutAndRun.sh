@@ -134,11 +134,11 @@ BEDDIR="${OUTDIR}/Beds"
 
 #  done
 # #
-for infile in ${HOMERPEAKSDIR}/*.peaks.bed
-do
-base=$(basename ${infile} .peaks.bed)
-annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed "/home/ry00555/Research/Genomes/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna" -gff "/scratch/ry00555/GCA_000182925.2_NC12_genomic_WithExtras.gff" > ${HOMERPEAKSDIR}/${base}_ann.txt
-done
+#for infile in ${HOMERPEAKSDIR}/*.peaks.bed
+#do
+#base=$(basename ${infile} .peaks.bed)
+#annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed "/home/ry00555/Research/Genomes/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna" -gff "/scratch/ry00555/GCA_000182925.2_NC12_genomic_WithExtras.gff" > ${HOMERPEAKSDIR}/${base}_ann.txt
+#done
 # # ##annotating peak files with masked reference (use HOMER module)
 # # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
 #  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
@@ -146,11 +146,11 @@ done
 # # #now filtering for only peaks that are w/i 1000bps of their annotation:
 for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
    do
-     base=$(basename ${infile} _masked_ann.txt)
+     base=$(basename ${infile} _ann.txt)
      awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
    done
 
-ml deepTools
+#ml deepTools
  #bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw
  #bamCompare -p max -b1 "${BAMDIR}"/147-3_ChIP_S2_WT_H3K27me3_Rep5_Nc_24hrVMMON_S3_L001_R1_001_val_1.fq.gz_Q30.bam -b2 "${BAMDIR}"/147-1_ChIP_S2_WT_Input_Rep5_Nc_24hrVMMON_Q30.bam -of bigwig -o "${BAMDIR}"/147-WT-H3K27me3-ReadCountInputNorm.bw
 
