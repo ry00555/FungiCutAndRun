@@ -137,7 +137,7 @@ BEDDIR="${OUTDIR}/Beds"
 for infile in ${HOMERPEAKSDIR}/*.peaks.bed
 do
 base=$(basename ${infile} .peaks.bed)
-annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gff /scratch/ry00555/GCA_000182925.2_NC12_genomic_WithExtras.gff > ${HOMERPEAKSDIR}/${base}_ann.txt
+annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed "/home/ry00555/Research/Genomes/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna" -gff "/scratch/ry00555/GCA_000182925.2_NC12_genomic_WithExtras.gff" > ${HOMERPEAKSDIR}/${base}_ann.txt
 done
 # # ##annotating peak files with masked reference (use HOMER module)
 # # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
