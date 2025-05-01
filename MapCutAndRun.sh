@@ -144,7 +144,7 @@ BEDDIR="${OUTDIR}/Beds"
 #  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
 # #
 # # #now filtering for only peaks that are w/i 1000bps of their annotation:
-for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
+for infile in ${HOMERPEAKSDIR}/*_ann.txt
    do
      base=$(basename ${infile} _ann.txt)
      awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
