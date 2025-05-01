@@ -127,18 +127,18 @@ BEDDIR="${OUTDIR}/Beds"
 #ml ChIP-R
 #ml Homer
 #ml Perl
-   #for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
-  #do
-  #  base=$(basename ${infile} _Homerpeaks.txt)
+   for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
+  do
+    base=$(basename ${infile} _Homerpeaks.txt)
   #  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
-  #  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+    annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
 
-  #done
+  done
 # #
 
 # # ##annotating peak files with masked reference (use HOMER module)
 # # #curl -s https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/182/925/GCF_000182925.2_NC12/GCF_000182925.2_NC12_genomic.gtf.gz | gunzip -c > Ncrassa_refann.gtf
-  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+#  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf /scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
 # #
 # # #now filtering for only peaks that are w/i 1000bps of their annotation:
 for infile in ${HOMERPEAKSDIR}/${base}_ann.txt
