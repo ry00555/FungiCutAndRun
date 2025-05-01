@@ -119,45 +119,53 @@ ml deepTools/3.5.2-foss-2022a
 
 #plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes.gz -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/qasuz12_weakdenovo_K27genes_V2_hclust2.png --samplesLabel 147-76-H3K27me3 147-88-H3K27me3 137-73-H3K27me3 137-75-H3K27me3 --hclust 2 --startLabel "5'" --endLabel "3'" --outFileSortedRegions /scratch/ry00555/RTT109PaperFigures/Matrices/qasuz12_weakdenovo_K27genes_V2_hclust2.txt
 
-#ml BEDTools
-#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/qasuz12_weakdenovo_K27genes_V2_hclust2_ONLY.txt" > "/scratch/ry00555/WeakDeNovo_K27genes.bed"
 
-#bedtools intersect -a "/scratch/ry00555/neurospora.bed" -b "/scratch/ry00555/qasuz12_strongdenovo_K27genes_V2_hclust2_ONLY.txt" > "/scratch/ry00555/StrongDeNovo_K27genes.bed"
-
-#sort -k1,1 -k2,2n /scratch/ry00555/WeakDeNovo_K27genes.bed > weak_sorted.bed
-#sort -k1,1 -k2,2n /scratch/ry00555/StrongDeNovo_K27genes.bed > strong_sorted.bed
-
-#bedtools intersect -a strong_sorted.bed -b weak_sorted.bed > shared_strong_weak_denovoK27genes.bed # this one has the strong de novo genes
-#bedtools intersect -a weak_sorted.bed -b strong_sorted.bed -v > only_weakdenovoK27genes.bed #this one has only the genes that pop up later (weaker de novo)
-#cat only_weakdenovoK27genes.bed shared_strong_weak_denovoK27genes.bed | sort -k1,1 -k2,2n > K27genesduringqasuz12Exp.bed
-
-#bedtools intersect -a heatmapPRC2genes.bed -b K27genesduringqasuz12Exp.bed -v > MaintainenceDepK27Genes.bed
-
-#bedtools intersect  -a "/scratch/ry00555/neurospora.bed" -b 2024_04_23_24hr_peaks.bed > 24hrqasuz12K27genes.bed | sort -k1,1 -k2,2n > 24hrqasuz12K27genes.bed
-
-#bedtools intersect  -a 24hrqasuz12K27genes.bed -b heatmapPRC2genes.bed > 24hrqasuz12K27genesONLY.bed | sort -k1,1 -k2,2n > 24hrqasuz12K27genesONLY.bed
-
-
-#bedtools intersect  -a "/scratch/ry00555/neurospora.bed" -b qasuz12_12hr_peaks.bed > 12hrqasuz12K27genes.bed | sort -k1,1 -k2,2n > 12hrqasuz12K27genes.bed
-
-bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_12hr_peaks.bed | sort -k1,1 -k2,2n > 12hrqasuz12K27genesONLY_sorted.bed
-
-bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_4hr_peaks.bed | sort -k1,1 -k2,2n > 4hrqasuz12K27genes.bed
-
-bedtools intersect -a 12hrqasuz12K27genesONLY_sorted.bed -b 4hrqasuz12K27genes.bed -v > weakdenovo12v4hr_K27Genes.bed
-
-cat 12hrqasuz12K27genesONLY_sorted.bed 4hrqasuz12K27genes.bed | sort -k1,1 -k2,2n | cut -f1-4 | uniq| awk '!seen[$1,$2,$3]++' > K27genesduringqasuz12Exp12and4hr_sorted_unique.bed
-
-bedtools intersect -a heatmapPRC2genes.bed -b K27genesduringqasuz12Exp12and4hr_sorted_unique.bed -v | awk '!seen[$1,$2,$3]++' > MaintainenceDepK27GenesONLY.bed
+# bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_12hr_peaks.bed -u | sort -k1,1 -k2,2n > 12hrqasuz12K27genesONLY_sorted.bed
+#
+# bedtools intersect  -a heatmapPRC2genes.bed -b qasuz12_4hr_peaks.bed -u | sort -k1,1 -k2,2n > 4hrqasuz12K27genes.bed
+#
+# cat 12hrqasuz12K27genesONLY_sorted.bed 4hrqasuz12K27genes.bed | sort -k1,1 -k2,2n | cut -f1-4 | uniq| awk '!seen[$1,$2,$3]++' > K27genesduringqasuz12Exp12and4hr_sorted_unique.bed #this is strong de novo genes
+#
+# bedtools intersect  -a heatmapPRC2genes.bed -b 2024_04_23_24hr_peaks.bed -u -wa | sort -k1,1 -k2,2n > 24hrqasuz12K27genes.bed
+#
+# bedtools intersect  -a 24hrqasuz12K27genes.bed -b K27genesduringqasuz12Exp12and4hr_sorted_unique.bed -v -wa | sort -k1,1 -k2,2n > WeakDeNovo_K27genes.bed
+#
+# bedtools intersect -a heatmapPRC2genes.bed -b 24hrqasuz12K27genes.bed -v -wa | sort -k1,1 -k2,2n | cut -f1-4 | uniq| awk '!seen[$1,$2,$3]++' > MaintainenceDepK27GenesONLY.bed
+#
+# ml MACS3
+# macs3 callpeak -t 135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz_Q30.bam -f BAMPE -n 135-83_ChIP_rtt109_H3K27me3_InputNorm -c 135-80_ChIP_rtt109_Input_Rep2_S76_L001_R1_001_val_1.fq.gz_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir ../MACSPeaks --min-length 800 --max-gap 500
+#
+# macs3 callpeak -t 147-55_ChIP_337rtt109P3_rtt109hph_H3K27me3_Rep1_Nc_24hrVMMON_S55_L001_R1_001_val_1.fq.gz_Q30.bam -f BAMPE -n 147-55_ChIP_337rtt109P3_H3K27me3_InputNorm -c 147-53_ChIP_337rtt109P3_rtt109hph_Input_Rep1_Nc_24hrVMMON_S53_L001_R1_001_val_1.fq.gz_Q30.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir ../MACSPeaks --min-length 800 --max-gap 500
+#
+# ml deepTools
+#  bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw
+#  bamCompare -p max -b1 147-3_ChIP_S2_WT_H3K27me3_Rep5_Nc_24hrVMMON_S3_L001_R1_001_val_1.fq.gz_Q30.bam -b2 147-1_ChIP_S2_WT_Input_Rep5_Nc_24hrVMMON_Q30.bam -of bedgraph -o 147-WT-H3K27me3-ReadCountInputNorm.bedgraph
+#
+#   bamCompare -p max -b1 135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz_Q30.bam -b2 135-80_ChIP_rtt109_Input_Rep2_S76_L001_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o 135-RTT109-H3K27me3-ReadCountInputNorm.bedgraph
+#
+#     bamCompare -p max -b1 142-70_ChIP_naf2_H3K27me3__S70_L007_R1_001_val_1.fq.gz_Q30.bam -b2 142-69_ChIP_naf2_Input__S69_L007_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o 142-NAF2-H3K27me3-ReadCountInputNorm.bedgraph
+#
+# bamCompare -p max -b1    142-88_ChIP_rtt1093xFLAG_H3K27me3__S88_L007_R1_001_val_1.fq.gz_Q30.bam -b2  142-87_ChIP_rtt1093xFLAG_Input__S87_L007_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o 142-RTT1093xFLAG-H3K27me3-ReadCountInputNorm.bedgraph
 
 
-cut -f1-3 heatmapPRC2genes.bed > heatmapPRC2genes_3col.bed
-cut -f1-3 K27genesduringqasuz12Exp12and4hr_sorted_unique.bed > K27genes_3col.bed
-sort -k1,1 -k2,2n heatmapPRC2genes_3col.bed > heatmapPRC2genes_3col_sorted.bed
-sort -k1,1 -k2,2n K27genes_3col.bed > K27genes_3col_sorted.bed
-bedtools intersect -a heatmapPRC2genes_3col_sorted.bed -b K27genes_3col_sorted.bed -v > MaintainenceDepK27GenesONLY_fixed.bed
-wc -l heatmapPRC2genes_3col_sorted.bed
-wc -l K27genes_3col_sorted.bed
-wc -l MaintainenceDepK27GenesONLY_fixed.bed
-bedtools intersect -a heatmapPRC2genes_3col_sorted.bed -b K27genes_3col_sorted.bed > overlapping_genes.bed
-wc -l overlapping_genes.bed
+ml deepTools
+computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/147-WT-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/135-RTT109-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/142-RTT1093xFLAG-H3K27me3-ReadCountInputNorm.bw --skipZeros -R "/scratch/ry00555/neurospora.bed" -o /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_allgenes_inputNorm.matrix --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_allgenes_inputNorm.matrix.txt 	-b 1000 -a 1000 --sortUsing sum --sortUsingSamples 1 --sortRegions descend
+
+plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_allgenes_inputNorm.matrix --samplesLabel 147-WT-H3K27me3 135-RTT109-H3K27me3 142-RTT1093xFLAG-H3K27me3 --hclust 1 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_allgenes_inputNorm.txt -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/RTT109_allgenes_inputNorm.png
+
+computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/147-WT-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/135-RTT109-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/142-RTT1093xFLAG-H3K27me3-ReadCountInputNorm.bw --skipZeros -R "/scratch/ry00555/heatmapPRC2genes.bed" -o /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genesONLY_inputNorm.matrix --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genesONLY_inputNorm.matrix.txt	-b 1000 -a 1000 --sortUsing sum --sortUsingSamples 1 --sortRegions descend
+
+plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genesONLY_inputNorm.matrix --samplesLabel 147-WT-H3K27me3 135-RTT109-H3K27me3 142-RTT1093xFLAG-H3K27me3 --hclust 1 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genesONLY_inputNorm.txt -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/RTT109_K27genesONLY_inputNorm.png
+
+computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/147-WT-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/142-NAF2-H3K27me3-ReadCountInputNorm.bedgraph --skipZeros -R "/scratch/ry00555/heatmapPRC2genes.bed" -o /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_K27genesONLY_inputNorm.matrix --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_K27genesONLY_inputNorm.matrix.txt	-b 1000 -a 1000 --sortUsing sum --sortUsingSamples 1 --sortRegions descend
+
+plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_K27genesONLY_inputNorm.matrix --samplesLabel 147-WT-H3K27me3 142-NAF2-H3K27me3 --hclust 1 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_K27genesONLY_inputNorm.txt -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/NAF2_K27genesONLY_inputNorm.png
+
+
+computeMatrix scale-regions -p 12  -S /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/147-WT-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/142-NAF2-H3K27me3-ReadCountInputNorm.bedgraph --skipZeros -R "/scratch/ry00555/neurospora.bed" -o /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_ALLgenes_inputNorm.matrix --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_ALLgenes_inputNorm.matrix.txt	-b 1000 -a 1000 --sortUsing sum --sortUsingSamples 1 --sortRegions descend
+
+plotHeatmap -m /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_ALLgenes_inputNorm.matrix --samplesLabel 147-WT-H3K27me3 142-NAF2-H3K27me3 --hclust 1 --startLabel "5'" --endLabel "3'" --outFileSortedRegions  /scratch/ry00555/RTT109PaperFigures/Matrices/NAF2_ALLgenes_inputNorm.txt -out /scratch/ry00555/RTT109PaperFigures/Heatmaps/NAF2_ALLgenes_inputNorm.png
+
+computeMatrix scale-regions -p max --startLabel "TSS'" --endLabel "TES'" -b 1000 -a 1000 -S /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/147-WT-H3K27me3-ReadCountInputNorm.bw /scratch/ry00555/RTT109PaperFigures/SortedBamFiles/135-RTT109-H3K27me3-ReadCountInputNorm.bw -R /scratch/ry00555/K27genesduringqasuz12Exp12and4hr_sorted_unique.bed /scratch/ry00555/WeakDeNovo_K27genes.bed /scratch/ry00555/MaintainenceDepK27GenesONLY.bed --skipZeros -o /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genes_categories.matrix --outFileNameMatrix /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genes_categories.matrix.txt --sortUsing sum --sortUsingSamples 1 --sortRegions descend
+
+plotHeatmap --startLabel "TSS'" --endLabel "TES'" --averageType mean  --matrixFile /scratch/ry00555/RTT109PaperFigures/Matrices/RTT109_K27genes_categories.matrix --outFileName /scratch/ry00555/RTT109PaperFigures/Heatmaps/RTT109_K27genes_categories.matrix_V1.png  --outFileNameData /scratch/ry00555/RTT109PaperFigures/Heatmaps/RTT109_K27genes_categories.matrix_V1_mean_readcount.tab --legendLocation lower-right --samplesLabel 147-WT-H3K27me3 135-RTT109-H3K27me3 --regionsLabel "Strong De novo" "Weak De novo" "Maintainence Dependent H3K27me3 genes" --plotTitle "L2FC Input Normalized H3K27me3 Mean profile"
