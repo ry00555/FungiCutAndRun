@@ -116,7 +116,7 @@ BEDDIR="${OUTDIR}/Beds"
  #HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
 #
 # # #
- makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+ #makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 # # # #
 # # # #   # Call peaks
 # # # #
@@ -125,9 +125,9 @@ BEDDIR="${OUTDIR}/Beds"
    done
 # # #changing peak txt files to bed files to input into chipr
 ml ChIP-R
-   for infile in ${HOMERPEAKSDIR}/${sample_id}_peaks.txt
+   for infile in ${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt
   do
-    base=$(basename ${infile} .txt)
+    base=$(basename ${infile} _Homerpeaks.txt)
     sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
   done
 # #
