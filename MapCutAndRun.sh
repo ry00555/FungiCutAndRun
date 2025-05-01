@@ -124,16 +124,16 @@ BEDDIR="${OUTDIR}/Beds"
 # # # #
   # done
 # # #changing peak txt files to bed files to input into chipr
-ml ChIP-R
-ml Homer
-ml Perl
-   for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
-  do
-    base=$(basename ${infile} _Homerpeaks.txt)
-    sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
-    annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
+#ml ChIP-R
+#ml Homer
+#ml Perl
+   #for infile in ${HOMERPEAKSDIR}/*_Homerpeaks.txt
+  #do
+  #  base=$(basename ${infile} _Homerpeaks.txt)
+  #  sed '/^#/d' $infile | awk '{print $2 "\t" $3 "\t" $4 "\t" $1 "\t" $8 "\t" $5 "\t" $6 "\t" $12 "\t" "-1"}' | sed 's/\.000000//g' > ${HOMERPEAKSDIR}/${base}.peaks.bed
+  #  annotatePeaks.pl ${HOMERPEAKSDIR}/${base}.peaks.bed -gtf scratch/ry00555/Ncrassa_refann.gtf > ${HOMERPEAKSDIR}/${base}_ann.txt
 
-  done
+  #done
 # #
 
 # # ##annotating peak files with masked reference (use HOMER module)
@@ -146,3 +146,13 @@ ml Perl
 #     base=$(basename ${infile} _masked_ann.txt)
 #     awk -F'\t' 'sqrt($10*$10) <=1000' $infile > ${HOMERPEAKSDIR}/${base}.1000bp_ann.txt
 #   done
+
+ml deepTools
+ #bamCompare -b1 treatment.bam -b2 control.bam -o log2ratio.bw
+ bamCompare -p max -b1 "${BAMDIR}"/147-3_ChIP_S2_WT_H3K27me3_Rep5_Nc_24hrVMMON_S3_L001_R1_001_val_1.fq.gz_Q30.bam -b2 "${BAMDIR}"/147-1_ChIP_S2_WT_Input_Rep5_Nc_24hrVMMON_Q30.bam -of bedgraph -o "${BAMDIR}"/147-WT-H3K27me3-ReadCountInputNorm.bedgraph
+
+  bamCompare -p max -b1 "${BAMDIR}"/135-83_ChIP_rtt109_H3K27me3_Rep2_S79_L001_R1_001_val_1.fq.gz_Q30.bam -b2 "${BAMDIR}"/135-80_ChIP_rtt109_Input_Rep2_S76_L001_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o "${BAMDIR}"/135-RTT109-H3K27me3-ReadCountInputNorm.bedgraph
+
+    bamCompare -p max -b1 "${BAMDIR}"/142-70_ChIP_naf2_H3K27me3__S70_L007_R1_001_val_1.fq.gz_Q30.bam -b2 "${BAMDIR}"/142-69_ChIP_naf2_Input__S69_L007_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o "${BAMDIR}"/142-NAF2-H3K27me3-ReadCountInputNorm.bedgraph
+
+bamCompare -p max -b1 "${BAMDIR}"/142-88_ChIP_rtt1093xFLAG_H3K27me3__S88_L007_R1_001_val_1.fq.gz_Q30.bam -b2  "${BAMDIR}"/142-87_ChIP_rtt1093xFLAG_Input__S87_L007_R1_001_val_1.fq.gz_Q30.bam -of bedgraph -o "${BAMDIR}"/142-RTT1093xFLAG-H3K27me3-ReadCountInputNorm.bedgraph
