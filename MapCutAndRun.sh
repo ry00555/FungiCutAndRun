@@ -104,9 +104,9 @@ BEDDIR="${OUTDIR}/Beds"
 #  macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
 #  done
 #
-  HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-  ml Homer
-  ml Perl
+#  HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
+#  ml Homer
+#  ml Perl
 #  ml SAMtools
 #   ml BEDTools
   #   for bam_file in "${BAMDIR}"/*_Q30.bam; do
@@ -159,4 +159,4 @@ ml deepTools
   #  bamCompare -p max -b1 "${BAMDIR}"/142-70_ChIP_naf2_H3K27me3__S70_L007_R1_001_val_1.fq.gz_Q30.bam -b2 "${BAMDIR}"/142-69_ChIP_naf2_Input__S69_L007_R1_001_val_1.fq.gz_Q30.bam -of bigwig -o "${BAMDIR}"/142-NAF2-H3K27me3-ReadCountInputNorm.bw
 
 #bamCompare -p max -b1 "${BAMDIR}"/142-88_ChIP_rtt1093xFLAG_H3K27me3__S88_L007_R1_001_val_1.fq.gz_Q30.bam -b2  "${BAMDIR}"/142-87_ChIP_rtt1093xFLAG_Input__S87_L007_R1_001_val_1.fq.gz_Q30.bam -of bigwig -o "${BAMDIR}"/142-RTT1093xFLAG-H3K27me3-ReadCountInputNorm.bw
-bamCompare -p max -b1 "${BAMDIR}"/ 147-43_ChIP_H3K56R13P4_H3K56R13_H3K27me3_Rep1_Nc_24hrVMMON_S43_L001_R1_001_val_1.fq.gz_Q30.bam -b2  "${BAMDIR}"/147-41_ChIP_H3K56R13P4_H3K56R13_Input_Rep1_Nc_24hrVMMON_S41_L001_R1_001_val_1.fq.gz_Q30.bam -of bigwig -o "${BAMDIR}"/147-H3K56R13-H3K27me3-ReadCountInputNorm.bw
+bamCompare -p max -b1 "${BAMDIR}"/147-43_ChIP_H3K56R13P4_H3K56R13_H3K27me3_Rep1_Nc_24hrVMMON_S43_L001_R1_001_val_1.fq.gz_Q30.bam -b2  "${BAMDIR}"/147-41_ChIP_H3K56R13P4_H3K56R13_Input_Rep1_Nc_24hrVMMON_S41_L001_R1_001_val_1.fq.gz_Q30.bam -of bigwig -o "${BAMDIR}"/147-H3K56R13-H3K27me3-ReadCountInputNorm.bw
