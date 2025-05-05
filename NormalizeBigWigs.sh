@@ -51,3 +51,9 @@ for chip_bw in ${OUTDIR}/CandidateBigWigs/*H3K27me3*.bw; do
     echo "⚠️ No matching input found for $chip_bw" >&2
   fi
 done
+
+multiBigwigSummary BED-file \
+  --bwfiles ${OUTDIR}/NormalizedBigWigs/*.bw \
+  --BED "/scratch/ry00555/heatmapPRC2genes.bed" \
+  -out ${OUTDIR}/region_signal_matrix.npz \
+  --outRawCounts ${OUTDIR}/NormalizedBigWigs_K27genesonly_signal_matrix.tab
