@@ -18,21 +18,20 @@ source config.txt
 OUTDIR="/scratch/ry00555/RNASeqPaper/"
 
 #if output directory doesn't exist, create it
-if [ ! -d $OUTDIR ]
-then
-    mkdir -p $OUTDIR
-    mkdir -p "${OUTDIR}/NormalizedBigWigs"
-
+if [ ! -d "$OUTDIR" ]; then
+    mkdir -p "$OUTDIR"
 fi
+
+mkdir -p "${OUTDIR}/NormalizedBigWigs"
+
 
 ml deepTools
 # Loop through all H3K27me3 bigwigs
+# Loop through all H3K27me3 BigWigs in the input directory
 for chip_bw in ${OUTDIR}/CandidateBigWigs/*H3K27me3*.bw; do
-  # Attempt to infer input file
-  base=$(echo "$chip_bw" | sed 's/H3K27me3.*/Input/')
-
-  # Find matching Input BigWig
-  input_bw=$(ls *"$base"*.bw 2>/dev/null | head -n 1)
+  # Attempt to infer the matching Input BigWig
+  base=$(basename "$chip_bw" | sed 's/H3K27me3.*/Input/')
+  input_bw=$(find ${OUTDIR}/CandidateBigWigs -name "*${base}*.bw" | head -n 1)
 
   if [[ -f "$input_bw" ]]; then
     outname=$(basename "$chip_bw" .bw)_norm_foldchange.bw
@@ -45,7 +44,7 @@ for chip_bw in ${OUTDIR}/CandidateBigWigs/*H3K27me3*.bw; do
       --pseudocount 1 \
       --smoothLength 150 \
       --binSize 25 \
-      -o "normalized_bigwigs_foldchange/$outname" \
+      -o "${OUTDIR}/NormalizedBigWigs/$outname" \
       --skipZeroOverZero \
       --verbose
   else
