@@ -54,3 +54,9 @@ multiBigwigSummary BED-file \
   --BED "/scratch/ry00555/heatmapPRC2genes.bed" \
   -out ${OUTDIR}/region_signal_matrix.npz \
   --outRawCounts ${OUTDIR}/NormalizedBigWigs_K27genesonly_signal_matrix.tab
+
+  multiBigwigSummary BED-file \
+    --bwfiles *.bw \
+    --BED "/scratch/ry00555/heatmapPRC2genes.bed" \
+    -out L2FC_region_signal_matrix.npz \
+    --outRawCounts NormalizedBigWigs_K27genesonly_signal_matrix.tab
