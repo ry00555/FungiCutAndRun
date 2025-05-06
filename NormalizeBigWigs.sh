@@ -14,8 +14,7 @@ cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
-source config.txt
-OUTDIR="/scratch/ry00555/RNASeqPaper/"
+OUTDIR="/scratch/ry00555/RNASeqPaper"
 
 #if output directory doesn't exist, create it
 if [ ! -d "$OUTDIR" ]; then
@@ -24,33 +23,31 @@ fi
 
 mkdir -p "${OUTDIR}/NormalizedBigWigs"
 
+PAIRFILE="${OUTDIR}/chip_input_pairs.txt"
 
 ml deepTools
-# Loop through all H3K27me3 bigwigs
-# Loop through all H3K27me3 BigWigs in the input directory
-for chip_bw in ${OUTDIR}/CandidateBigWigs/*H3K27me3*.bw; do
-  # Attempt to infer the matching Input BigWig
-  base=$(basename "$chip_bw" | sed 's/H3K27me3.*/Input/')
-  input_bw=$(find ${OUTDIR}/CandidateBigWigs -name "*${base}*.bw" | head -n 1)
+while IFS=$'\t' read -r chip_bw input_bw; do
+    chip_path="${OUTDIR}/CandidateBigWigs/$chip_bw"
+    input_path="${OUTDIR}/CandidateBigWigs/$input_bw"
 
-  if [[ -f "$input_bw" ]]; then
-    outname=$(basename "$chip_bw" .bw)_norm_foldchange.bw
-    echo "Normalizing $chip_bw against $input_bw → $outname"
+    if [[ -f "$chip_path" && -f "$input_path" ]]; then
+        outname=$(basename "$chip_bw" .bw)_norm_foldchange.bw
+        echo "Normalizing $chip_bw against $input_bw → $outname"
 
-    bigwigCompare \
-      -b1 "$chip_bw" \
-      -b2 "$input_bw" \
-      --operation ratio \
-      --pseudocount 1 \
-      --smoothLength 150 \
-      --binSize 25 \
-      -o "${OUTDIR}/NormalizedBigWigs/$outname" \
-      --skipZeroOverZero \
-      --verbose
-  else
-    echo "⚠️ No matching input found for $chip_bw" >&2
-  fi
-done
+        bigwigCompare \
+          -b1 "$chip_path" \
+          -b2 "$input_path" \
+          --operation ratio \
+          --pseudocount 1 \
+          --smoothLength 150 \
+          --binSize 25 \
+          -o "${OUTDIR}/NormalizedBigWigs/$outname" \
+          --skipZeroOverZero \
+          --verbose
+    else
+        echo "⚠️ Missing file(s): $chip_path or $input_path" >&2
+    fi
+done < "$PAIRFILE"
 
 multiBigwigSummary BED-file \
   --bwfiles ${OUTDIR}/NormalizedBigWigs/*.bw \
