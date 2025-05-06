@@ -32,6 +32,100 @@ computeMatrix reference-point --referencePoint TSS -b 1500 -a 1500 -S 133-79_ChI
 
 plotHeatmap --matrixFile Matrices_WholeGenome_K36.gz --outFileName "Eaf3_K36_extraWT_rtt109_wholegenome.png" --samplesLabel WTRep1 WTRep2 WTRep3 NCU06788Rep1 NCU06788Rep2 NCU06788Rep3 --colorMap coolwarm --sortRegions descend --missingDataColor white --sortUsingSamples 1
 
+bigwigCompare --bigwig1 142-27_ChIP_vad3KO_H3K27me3_Rep1_S27_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-26_ChIP_vad3KO_Input_Rep1_S26_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-27_ChIP_vad3KO_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-30_ChIP_dis3KOa_H3K27me3__S30_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-29_ChIP_dis3KOa_Input__S29_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-30_ChIP_dis3KOa_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-33_ChIP_jhdm3KO_H3K27me3__S33_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-32_ChIP_jhdm3KO_Input__S32_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-33_ChIP_jhdm3KO_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-36_ChIP_snf1KOa_H3K27me3__S36_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-35_ChIP_snf1KOa_Input__S35_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-36_ChIP_snf1KOa_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-39_ChIP_snf1KOA_H3K27me3__S39_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-38_ChIP_snf1KOA_Input__S38_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-39_ChIP_snf1KOA_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-76_ChIP_WT_H3K27me3__S76_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-75_ChIP_WT_Input__S75_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-76_ChIP_WT_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-79_ChIP_rtt109_H3K27me3__S79_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-84_rtt109_Input_ChIP.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-79_ChIP_rtt109_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-73_ChIP_asf1_H3K27me3__S73_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-72_ChIP_asf1_Input__S72_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-73_ChIP_asf1_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-85_rtt109_H3K27me3_ChIP.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-84_rtt109_Input_ChIP.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-85_rtt109_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-45_ChIP_rco1KOA_H3K27me3__S45_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-44_ChIP_rco1KOA_Input__S44_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-45_ChIP_rco1KOA_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-82_ChIP_naf1KO_H3K27me3__S82_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-81_ChIP_naf1KO_Input__S81_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-82_ChIP_naf1KO_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-48_ChIP_chd1KOa_H3K27me3__S48_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-47_ChIP_chd1KOa_Input__S47_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-48_ChIP_chd1KOa_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-57_ChIP_nst4KOA_H3K27me3_.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-56_ChIP_nst4KOA_Input_.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-57_ChIP_nst4KOA_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-64_ChIP_cac3_H3K27me3__S64_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-63_ChIP_cac3_Input__S63_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-64_ChIP_cac3_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-67_ChIP_naf2_H3K27me3__S67_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-66_ChIP_naf2_Input__S66_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-67_ChIP_naf2_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-97_ChIP_pole4_H3K27me3__S97_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-96_ChIP_pole4_Input__S96_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-97_ChIP_pole4_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-8_ChIP_NCU06788KOa_H3K27me3_Rep3_S8_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-7_ChIP_NCU06788KOa_Input_Rep3_S7_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-8_ChIP_NCU06788KOa_H3K27me3_Rep3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-91_ChIP_dmm2_H3K27me3__S91_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --bigwig2 142-90_ChIP_dmm2_Input__S90_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+              --operation log2 \
+              --outFileName ../NormalizedBigWigs/142-91_ChIP_dmm2_H3K27me3_vs_Input_log2.bw
+
+bigwigCompare --bigwig1 142-94_ChIP_set7_H3K27me3__S94_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+--bigwig2 142-93_ChIP_set7_Input__S93_L007_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw \
+--operation log2 \
+--outFileName ../NormalizedBigWigs/142-94_ChIP_set7_H3K27me3_vs_Input_log2.bw
 
 # remove a wildtype
 
