@@ -10,7 +10,7 @@ THREADS=12
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
 #fastqPath="/scratch/ry00555/RTT109PaperFigures/2024_Run142_FASTQ"
-FASTQ="/scratch/ry00555/Run149/FASTQ"
+FASTQ="/scratch/ry00555/Run1450/FASTQ"
 
 #Edit Code to add Q score option
 

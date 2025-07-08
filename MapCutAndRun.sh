@@ -7,15 +7,15 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=72:00:00
-#SBATCH --output=../MapCutAndRun149.%j.out
-#SBATCH --error=../MapCutAndRun149.%j.err
+#SBATCH --output=../MapCutAndRun150.%j.out
+#SBATCH --error=../MapCutAndRun150.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run149"
+OUTDIR="/scratch/ry00555/Run150"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
@@ -34,8 +34,8 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-#ml Trim_Galore
-#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ml Trim_Galore
+trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
@@ -53,7 +53,7 @@ do
 #
 file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L004_R1_001_val_1.fq.gz/}#
+name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 
