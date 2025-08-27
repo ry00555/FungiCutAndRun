@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Run149ChIP
+#SBATCH --job-name=Run151ChIP
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
