@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=72:00:00
-#SBATCH --output=../MapCutAndRun150.%j.out
-#SBATCH --error=../MapCutAndRun150.%j.err
+#SBATCH --output=../MapCutAndRun151.%j.out
+#SBATCH --error=../MapCutAndRun151.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
