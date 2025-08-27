@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run150"
+OUTDIR="/scratch/ry00555/Run151"
 
 #if output directory doesn't exist, create it
 if [ ! -d $OUTDIR ]
