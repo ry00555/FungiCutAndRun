@@ -34,11 +34,11 @@ BAMDIR="${OUTDIR}/SortedBamFiles"
 BEDDIR="${OUTDIR}/Beds"
 #
 # # #process reads using trimGalore
-ml Trim_Galore
-trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#ml Trim_Galore
+#trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 # #
 FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
-#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"#
+#FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 
 
 
@@ -53,7 +53,7 @@ do
 #
 file=${f##*/}
  	#remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}#
+name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 
@@ -84,7 +84,7 @@ samtools index "$QualityBam"
 # ############################
 # # # #deeptools
 #
-ml deepTools/3.5.2-foss-2022a
+ml deepTools
  #Plot all reads
 bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
@@ -93,7 +93,7 @@ done
 mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
-module load MACS3/3.0.0b1-foss-2022a-Python-3.10.4
+ml MACS3
  #command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
