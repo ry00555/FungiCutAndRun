@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=500gb
-#SBATCH --time=48:00:00
+#SBATCH --time=8:00:00
 #SBATCH --output=../NormalizeBigWigs.%j.out
 #SBATCH --error=../NormalizeBigWigs.%j.err
 
@@ -52,17 +52,17 @@ done < "$PAIRFILE"
 multiBigwigSummary BED-file \
   --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
   --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
-  -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/region_signal_matrix.npz \
+  -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/K27genes_signal_matrix.npz \
   --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_K27genesonly_signal_matrix.tab
 
     multiBigwigSummary BED-file \
       --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
       --BED "/scratch/ry00555/GeneList_BedFiles/NonK27genes.bed" \
-      -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/region_signal_matrix.npz \
+      -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NonK27genes_signal_matrix.npz \
       --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_NonK27genesonly_signal_matrix.tab
 
       multiBigwigSummary BED-file \
         --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
         --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
-        -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/region_signal_matrix.npz \
+        -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/K27regions_signal_matrix.npz \
         --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
