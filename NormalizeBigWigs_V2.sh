@@ -60,3 +60,9 @@ multiBigwigSummary BED-file \
       --BED "/scratch/ry00555/GeneList_BedFiles/NonK27genes.bed" \
       -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/region_signal_matrix.npz \
       --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_NonK27genesonly_signal_matrix.tab
+
+      multiBigwigSummary BED-file \
+        --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
+        --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
+        -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/region_signal_matrix.npz \
+        --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
