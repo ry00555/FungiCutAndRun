@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=500gb
+#SBATCH --mem=50gb
 #SBATCH --time=8:00:00
 #SBATCH --output=../NormalizeBigWigs.%j.out
 #SBATCH --error=../NormalizeBigWigs.%j.err
