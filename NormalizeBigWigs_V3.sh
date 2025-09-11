@@ -23,80 +23,68 @@ fi
 
 #mkdir -p "${OUTDIR}/NormalizedBigWigs/Run135toRun150"
 
+#!/bin/bash
+
 PAIRFILE="${OUTDIR}/chip_input_pairs_Run135_Run150_H3K27me3only.txt"
 BW_DIR="${OUTDIR}/CandidateBigWigs"
+OUT_NORM="${OUTDIR}/NormalizedBigWigs/Run135toRun150"
 
 ml deepTools
+
+mkdir -p "$OUT_NORM"
+
 echo "🔍 Checking pairs listed in: $PAIRFILE"
 echo "   against files in: $BW_DIR"
 echo
 
 missing_pairs=()
-valid_pairs=()
+processed_pairs=()
 
 while IFS=$'\t' read -r chip_bw input_bw; do
-    chip_path="${BW_DIR}/$chip_bw"
-    input_path="${BW_DIR}/$input_bw"
+    chip_path="${BW_DIR}/${chip_bw}"
+    input_path="${BW_DIR}/${input_bw}"
 
-    if [[ -f "$chip_path" && -f "$input_path" ]]; then
-        valid_pairs+=("$chip_bw vs $input_bw")
-    else
-        missing_pairs+=("$chip_bw vs $input_bw")
+    # Skip if ChIP file is missing
+    if [[ ! -f "$chip_path" ]]; then
+        echo "⚠️ Missing ChIP file: $chip_path"
+        missing_pairs+=("$chip_bw")
+        continue
     fi
-done < "$PAIRFILE"
 
-echo "========== CHECK SUMMARY =========="
-echo "✅ Valid pairs: ${#valid_pairs[@]}"
-for v in "${valid_pairs[@]}"; do
-    echo "   $v"
-done
-
-echo
-echo "⚠️ Missing pairs: ${#missing_pairs[@]}"
-for m in "${missing_pairs[@]}"; do
-    echo "   $m"
-done
-
-
-ml deepTools
-
-missing_files=()
-processed_files=()
-
-while IFS=$'\t' read -r chip_bw input_bw; do
-    chip_path="${OUTDIR}/CandidateBigWigs/$chip_bw"
-    input_path="${OUTDIR}/CandidateBigWigs/$input_bw"
-
-    if [[ -f "$chip_path" && -f "$input_path" ]]; then
-        outname=$(basename "$chip_bw" .bw)_norm_foldchange.bw
+    outname=$(basename "$chip_bw" .bw)_norm
+    if [[ -n "$input_bw" && -f "$input_path" ]]; then
+        # Input exists → do full normalization
+        outname="${outname}_foldchange.bw"
         echo "Normalizing $chip_bw against $input_bw → $outname"
-
         bigwigCompare \
           -b1 "$chip_path" \
           -b2 "$input_path" \
           --operation ratio \
           --pseudocount 1 \
-          --smoothLength 150 \
           --binSize 25 \
-          -o "${OUTDIR}/NormalizedBigWigs/Run135toRun150/$outname" \
+          -o "${OUT_NORM}/${outname}" \
           --skipZeroOverZero \
           --verbose
-
-        processed_files+=("$chip_bw vs $input_bw")
     else
-        echo "⚠️ Missing file(s): $chip_path or $input_path" >&2
-        missing_files+=("$chip_bw | $input_bw")
+        # No Input → just copy or rename the ChIP file
+        outname="${outname}.bw"
+        echo "⚠️ No Input for $chip_bw → copying as $outname"
+        cp "$chip_path" "${OUT_NORM}/${outname}"
     fi
+
+    processed_pairs+=("$chip_bw vs ${input_bw:-none}")
 done < "$PAIRFILE"
 
-echo "========== SUMMARY =========="
-echo "✅ Processed: ${#processed_files[@]} pairs"
-for p in "${processed_files[@]}"; do
+echo
+echo "========== PROCESSING SUMMARY =========="
+echo "✅ Processed pairs/files: ${#processed_pairs[@]}"
+for p in "${processed_pairs[@]}"; do
     echo "   $p"
 done
 
-echo "⚠️ Missing: ${#missing_files[@]} pairs"
-for m in "${missing_files[@]}"; do
+echo
+echo "⚠️ Missing ChIP files: ${#missing_pairs[@]}"
+for m in "${missing_pairs[@]}"; do
     echo "   $m"
 done
 
