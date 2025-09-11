@@ -58,6 +58,48 @@ for m in "${missing_pairs[@]}"; do
 done
 
 
+ml deepTools
+
+missing_files=()
+processed_files=()
+
+while IFS=$'\t' read -r chip_bw input_bw; do
+    chip_path="${OUTDIR}/CandidateBigWigs/$chip_bw"
+    input_path="${OUTDIR}/CandidateBigWigs/$input_bw"
+
+    if [[ -f "$chip_path" && -f "$input_path" ]]; then
+        outname=$(basename "$chip_bw" .bw)_norm_foldchange.bw
+        echo "Normalizing $chip_bw against $input_bw → $outname"
+
+        bigwigCompare \
+          -b1 "$chip_path" \
+          -b2 "$input_path" \
+          --operation ratio \
+          --pseudocount 1 \
+          --smoothLength 150 \
+          --binSize 25 \
+          -o "${OUTDIR}/NormalizedBigWigs/Run135toRun150/$outname" \
+          --skipZeroOverZero \
+          --verbose
+
+        processed_files+=("$chip_bw vs $input_bw")
+    else
+        echo "⚠️ Missing file(s): $chip_path or $input_path" >&2
+        missing_files+=("$chip_bw | $input_bw")
+    fi
+done < "$PAIRFILE"
+
+echo "========== SUMMARY =========="
+echo "✅ Processed: ${#processed_files[@]} pairs"
+for p in "${processed_files[@]}"; do
+    echo "   $p"
+done
+
+echo "⚠️ Missing: ${#missing_files[@]} pairs"
+for m in "${missing_files[@]}"; do
+    echo "   $m"
+done
+
 multiBigwigSummary BED-file \
   --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
   --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
