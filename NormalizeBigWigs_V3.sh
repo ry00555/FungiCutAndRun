@@ -65,6 +65,7 @@ while IFS=$'\t' read -r chip_bw input_bw; do
           -o "${OUT_NORM}/${outname}" \
           --skipZeroOverZero \
           --verbose
+
     else
         # No Input → just copy or rename the ChIP file
         outname="${outname}.bw"
@@ -94,7 +95,7 @@ multiBigwigSummary BED-file \
   -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/K27genes_signal_matrix.npz \
   --outRawCounts ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NormalizedBigWigs_K27genesonly_signal_matrix.tab
 
-    multiBigwigSummary BED-file \
+multiBigwigSummary BED-file \
       --bwfiles ${OUTDIR}/NormalizedBigWigs/Run135toRun150/*.bw \
       --BED "/scratch/ry00555/GeneList_BedFiles/NonK27genes.bed" \
       -out ${OUTDIR}/NormalizedBigWigs/Run135toRun150/NonK27genes_signal_matrix.npz \
