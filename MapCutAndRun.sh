@@ -1,14 +1,14 @@
-# !/bin/bash
-# SBATCH --job-name=Run151ChIP
-# SBATCH --partition=batch
-# SBATCH --mail-type=ALL
-# SBATCH --mail-user=ry00555@uga.edu
-# SBATCH --ntasks=1
-# SBATCH --cpus-per-task=24
-# SBATCH --mem=100gb
-# SBATCH --time=72:00:00
-# SBATCH --output=../MapCutAndRun151.%j.out
-# SBATCH --error=../MapCutAndRun151.%j.err
+#!/bin/bash
+#SBATCH --job-name=Run151ChIP
+#SBATCH --partition=batch
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=20gb
+#SBATCH --time=2:00:00
+#SBATCH --output=../MapCutAndRun134.%j.out
+#SBATCH --error=../MapCutAndRun134.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
