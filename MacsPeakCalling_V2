@@ -11,10 +11,11 @@
 #SBATCH --error=../MacsPeakCalling.%j.err
 
 cd $SLURM_SUBMIT_DIR
+# Paths
 
-
-OUTDIR="/scratch/ry00555/RNASeqPaper/SortedBamFiles"
-
+BAMDIR="/scratch/ry00555/RNASeqPaper/SortedBamFiles"
+META="${BAMDIR}/SortedBamFiles_meta_132to149.txt"
+OUTDIR="/scratch/ry00555/RNASeqPaper/MACSPeaks"
 
 for bam in $(find . -name "*.bam"); do
     bai="${bam}.bai"
@@ -23,4 +24,62 @@ for bam in $(find . -name "*.bam"); do
     fi
 done
 
-module load MACS3
+# File to collect all output peaks
+OUTLIST="${OUTDIR}/MACS_peak_files.txt"
+> "$OUTLIST"
+
+# Loop through metadata (skip header)
+tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep Input InputIndex MACS; do
+
+    # Build full paths
+    chip_path="${BAMDIR}/${ChIPBam}"
+    input_path=""
+    [[ -n "$Input" ]] && input_path="${BAMDIR}/${Input}"
+
+    base=$(basename "$ChIPBam" .bam)
+    echo "➡️ Processing: $base"
+
+    # Check BAM and index
+    if [[ ! -f "$chip_path" ]]; then
+        echo "⚠️ Missing ChIP BAM: $chip_path"
+        continue
+    fi
+    if [[ ! -f "${BAMDIR}/${BamIndex}" ]]; then
+        echo "⚠️ Missing BAM index for: $chip_path"
+        continue
+    fi
+
+        # Run with input if available
+        if [[ -n "$Input" && -f "$input_path" ]]; then
+            echo "   Using input: $input_path"
+            macs3 callpeak \
+                -t "$chip_path" \
+                -c "$input_path" \
+                -f BAMPE \
+                -n "$base" \
+                --broad \
+                --broad-cutoff 0.1 \
+                -g 41037538 \
+                --outdir "$OUTDIR" \
+                --min-length 800 \
+                --max-gap 500
+        else
+            echo "   No input found → calling without control"
+            macs3 callpeak \
+                -t "$chip_path" \
+                -f BAMPE \
+                -n "$base" \
+                --broad \
+                --broad-cutoff 0.1 \
+                -g 41037538 \
+                --outdir "$OUTDIR" \
+                --min-length 800 \
+                --max-gap 500
+        fi
+
+        # Collect output file
+        echo "${OUTDIR}/${base}_peaks.broadPeak" >> "$OUTLIST"
+
+    done
+
+    echo "✅ Peak calling complete. Outputs listed in $OUTLIST"
