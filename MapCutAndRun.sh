@@ -31,8 +31,8 @@ OUTDIR="/scratch/ry00555/RNASeqPaper/FastQ"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
- ml Trim_Galore
- trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ #ml Trim_Galore
+ #trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #
