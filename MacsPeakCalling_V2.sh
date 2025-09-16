@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=90gb
-#SBATCH --time=4:00:00
+#SBATCH --time=6:00:00
 #SBATCH --output=../MacsPeakCalling.%j.out
 #SBATCH --error=../MacsPeakCalling.%j.err
 
@@ -28,6 +28,7 @@ done
 OUTLIST="${OUTDIR}/MACS_peak_files.txt"
 > "$OUTLIST"
 ml MACS3
+
 # Loop through metadata (skip header)
 tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep Input InputIndex MACS; do
 
@@ -37,7 +38,31 @@ tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Re
     [[ -n "$Input" ]] && input_path="${BAMDIR}/${Input}"
 
     base=$(basename "$ChIPBam" .bam)
+    prefix="${OUTDIR}/${base}"
     echo "➡️ Processing: $base"
+    # Expected output files for a complete run
+       expected=("${prefix}_peaks.broadPeak" "${prefix}_peaks.xls")
+
+       # Check if outputs already exist and are complete
+       all_exist=true
+       for f in "${expected[@]}"; do
+           if [[ ! -s "$f" ]]; then
+               all_exist=false
+               break
+           fi
+       done
+
+       if $all_exist; then
+           echo "   ✅ Skipping (MACS3 output already complete)"
+           echo "${prefix}_peaks.broadPeak" >> "$OUTLIST"
+           continue
+       else
+           # Cleanup partials
+           echo "   ⚠️ Detected missing/partial output → cleaning up"
+           for f in "${expected[@]}"; do
+               [[ -f "$f" ]] && rm -f "$f"
+           done
+       fi
 
     # ✅ Skip if already processed
     if [[ -f "$peakfile" ]]; then
@@ -85,6 +110,7 @@ tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Re
 
         # Collect output file
         echo "${OUTDIR}/${base}_peaks.broadPeak" >> "$OUTLIST"
+        echo "${prefix}_peaks.broadPeak" >> "$OUTLIST"
 
     done
 
