@@ -39,6 +39,12 @@ tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Re
     base=$(basename "$ChIPBam" .bam)
     echo "➡️ Processing: $base"
 
+    # ✅ Skip if already processed
+    if [[ -f "$peakfile" ]]; then
+        echo "   🔄 Peaks already exist: $peakfile → skipping"
+        continue
+    fi
+
     # Check BAM and index
     if [[ ! -f "$chip_path" ]]; then
         echo "⚠️ Missing ChIP BAM: $chip_path"
