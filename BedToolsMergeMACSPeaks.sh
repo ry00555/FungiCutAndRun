@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=MacsPeakCalling
+#SBATCH --job-name=MergeMacsPeaks
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=90gb
+#SBATCH --mem=30gb
 #SBATCH --time=6:00:00
-#SBATCH --output=../MacsPeakCalling.%j.out
-#SBATCH --error=../MacsPeakCalling.%j.err
+#SBATCH --output=../MergeMacsPeaks.%j.out
+#SBATCH --error=../MergeMacsPeaks.%j.err
 
 cd $SLURM_SUBMIT_DIR
 # Paths
