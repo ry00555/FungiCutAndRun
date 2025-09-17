@@ -10,13 +10,13 @@
 #SBATCH --mail-user=ry00555@uga.edu                    # Where to send mail - # replace cbergman with your myid
 #SBATCH --mail-type=ALL                            # Mail events (BEGIN, END, FAIL, ALL)
 
+
 #set input and output directory variables
 OUTDIR="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
 FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
+GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 
 cd $SLURM_SUBMIT_DIR
-
-source config.txt
 
 #if output directory doesn't exist, create it
  if [ ! -d $OUTDIR ]
@@ -39,27 +39,27 @@ SRR_IDS=(
      "SRR12614224" "SRR12614225" "SRR12614226")
 #
 # # Prefetch SRA files
-for SRR_ID in "${SRR_IDS[@]}"; do
-    prefetch -O "${OUTDIR}" "${SRR_ID}"
-done
+#for SRR_ID in "${SRR_IDS[@]}"; do
+#    prefetch -O "${OUTDIR}" "${SRR_ID}"
+#done
 
 #downloading reference genome
 #curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/genbank/fungi/Neurospora_crassa/latest_assembly_versions/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.fna.gz  | gunzip -c > ${OUTDIR}/NC12_genome.fna
 #curl -s ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/182/925/GCA_000182925.2_NC12/GCA_000182925.2_NC12_genomic.gtf.gz | gunzip -c > ${OUTDIR}/NC12_annotation.gtf
 
 #DOWNLOADING SRA
-prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
+#prefetch -O SRR9027634 SRR9027635 SRR9027636 SRR9027653 SRR9027655 SRR9027701 SRR9044213 SRR9044244 SRR9044324 SRR10916182 SRR10916183 SRR10916184 SRR10916163 SRR10916164 SRR10916165 SRR8444005 SRR8444042 SRR8443998 SRR12614222 SRR12614223 SRR12614224 SRR12614225 SRR12614226
 
 ##convert to fastq
- for SRR_ID in "${SRR_IDS[@]}"; do
- fastq-dump --split-files --gzip ${OUTDIR}/${SRR_ID}/${SRR_ID}.sra -O ${FASTQ}
- done
+ #for SRR_ID in "${SRR_IDS[@]}"; do
+ #fastq-dump --split-files --gzip ${OUTDIR}/${SRR_ID}/${SRR_ID}.sra -O ${FASTQ}
+ #done
 #single commmand
 # fastq-dump --split-files --gzip	${OUTDIR}/SRR9027634
 #
 
 #Finish the reminaing SRR's as the script was interrupted halfway due to GACRC maintainence
-ml SRA-Toolkit
+#ml SRA-Toolkit
 #fastq-dump --split-files --gzip "${OUTDIR}/SRR12614226/SRR12614226.sra" -O ${OUTDIR}/FASTQ
 #fastq-dump --split-files --gzip "${OUTDIR}/SRR12614227/SRR12614227.sra" -O ${OUTDIR}/FASTQ
 

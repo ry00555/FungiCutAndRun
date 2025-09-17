@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/RNASeqPaper/FastQ"
+OUTDIR="/scratch/ry00555/OutputRun142"
 
 # if output directory doesn't exist, create it
  if [ ! -d $OUTDIR ]
