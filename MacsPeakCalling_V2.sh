@@ -30,7 +30,7 @@ OUTLIST="${OUTDIR}/MACS_peak_files.txt"
 ml MACS3
 
 # Loop through metadata (skip header)
-tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep Input InputIndex MACS; do
+tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep ID Input InputIndex MACS; do
 
     # Build full paths
     chip_path="${BAMDIR}/${ChIPBam}"
