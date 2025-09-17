@@ -13,7 +13,7 @@
 
 #set input and output directory variables
 OUTDIR="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
-FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
+#FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
 
 #if output directory doesn't exist, create it
@@ -66,8 +66,7 @@ mkdir "${OUTDIR}/TrimmedReads"
 mkdir "$OUTDIR/Matrices"
 mkdir "$OUTDIR/Heatmaps"
 
- ml BWA
-ml SAMtools
+
 #ml Trim_Galore
  #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
  #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/SRR12614227*fastq\.gz
@@ -82,28 +81,20 @@ FILES="${OUTDIR}/TrimmedReads/*.fq.gz" #Don't forget the *
 # #Iterate over the files
 for f in $FILES
 do
-
-# 	#Examples to Get Different parts of the file name
-# 		#See here for details: http://tldp.org/LDP/abs/html/refcards.html#AEN22664
-		#${string//substring/replacement}
-# 		#dir=${f%/*}
-
-	file=${f##*/}
+file=${f##*/}
 # 	#remove ending from file name to create shorter names for bam files and other downstream output
- 	name=${file/*_1.fq.gz/}
-#
-# #
+ 	name=${file/*_1_val_1.fq.gz/}
 # # 	# File Vars
 # # 	#use sed to get the name of the second read matching the input file
- 	read2=$(echo "$f" | sed 's/_1\.fq\.gz/_2\.fq\.gz/g')
+ 	read2=$(echo "$f" | sed 's/_1_val_1\.fq\.gz/_2_val_2\.fq\.gz/g')
 # 	#variable for naming bam file
   	bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 # 	#variable name for bigwig output
  	bigwig="${OUTDIR}/BigWigs/${name}"
  QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-# #
-#
-# #
+
+ ml BWA
+ml SAMtools
  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
  samtools index "$bam"
 # #
