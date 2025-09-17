@@ -15,6 +15,9 @@
 OUTDIR="/scratch/ry00555/RNASeqBamCoverage/Eaf3"
 #FASTQ="/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ"
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"
+THREADS=12
+BIN="25"
+SMOOTH="50"
 
 #if output directory doesn't exist, create it
  if [ ! -d $OUTDIR ]
