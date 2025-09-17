@@ -16,8 +16,6 @@ cd $SLURM_SUBMIT_DIR
 META="/scratch/ry00555/RNASeqPaper/SortedBamFiles/SortedBamFiles_meta_132to149.txt"
 OUTDIR="/scratch/ry00555/RNASeqPaper/MACSPeaks"
 
-# Load modules
-ml MACS3
 ml BEDTools
 
 # Gap threshold for merging peaks (adjust as needed, e.g., 100 bp)
