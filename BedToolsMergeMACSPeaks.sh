@@ -13,67 +13,65 @@
 cd $SLURM_SUBMIT_DIR
 # Paths
 
+#!/bin/bash
+
+# ------------------------------
+# CONFIG
+# ------------------------------
 META="/scratch/ry00555/RNASeqPaper/SortedBamFiles/SortedBamFiles_meta_132to149.txt"
 OUTDIR="/scratch/ry00555/RNASeqPaper/MACSPeaks"
+OUTLIST="${OUTDIR}/consensus_peak_list.txt"
+MERGE_GAP=100  # merge nearby peaks within 100 bp
 
-ml BEDTools
+> "$OUTLIST"  # clear previous outlist
 
-# Gap threshold for merging peaks (adjust as needed, e.g., 100 bp)
-MERGE_GAP=100
-
-# Declare associative array to store peaks per ID
 declare -A id_to_peaks
 
-# ---------------------------
-# Step 1: Collect peak files per ID
-# ---------------------------
+# ------------------------------
+# BUILD ID -> peak file mapping
+# ------------------------------
 tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep ID Input InputIndex MACS; do
-    # Full path to the MACS broadPeak file
-    peakfile="${OUTDIR}/${MACS}"  # Use MACS column for exact filename
-
-    if [[ -f "$peakfile" ]]; then
-        # Append to the ID's list
-        if [[ -z "${id_to_peaks[$ID]}" ]]; then
-            id_to_peaks["$ID"]="$peakfile"
+    # Only consider broadPeak files in MACS column
+    if [[ -n "$MACS" && "$MACS" == *.broadPeak ]]; then
+        peakfile="${OUTDIR}/${MACS}"
+        if [[ -f "$peakfile" ]]; then
+            # Append to array
+            id_to_peaks["$ID"]+="$peakfile "
         else
-            id_to_peaks["$ID"]+=" $peakfile"
+            echo "⚠️ Warning: peak file not found: $peakfile"
         fi
-    else
-        echo "⚠️ Warning: peak file not found: $peakfile"
     fi
 done
 
-# ---------------------------
-# Step 2: Create consensus peak sets
-# ---------------------------
+ml BEDTools
+# ------------------------------
+# CREATE CONSENSUS PEAKS
+# ------------------------------
 for ID in "${!id_to_peaks[@]}"; do
     files=(${id_to_peaks[$ID]})
     echo "➡️ Creating consensus peaks for $ID: ${files[*]}"
 
     merged_files=()
-
-    # Sort & merge each replicate to account for shifted peaks
     for f in "${files[@]}"; do
         sorted_file="${f}.sorted"
         merged_file="${f}.merged"
 
         # Sort
         bedtools sort -i "$f" > "$sorted_file"
-
-        # Merge nearby peaks within MERGE_GAP
+        # Merge nearby peaks
         bedtools merge -i "$sorted_file" -d $MERGE_GAP > "$merged_file"
 
         merged_files+=("$merged_file")
     done
 
-    # Intersect merged replicates to get consensus
     consensus="${OUTDIR}/${ID}_consensus_peaks.broadPeak"
-    bedtools intersect -a "${merged_files[0]}" -b "${merged_files[@]:1}" > "$consensus"
+    if [ ${#merged_files[@]} -gt 1 ]; then
+        bedtools intersect -a "${merged_files[0]}" -b "${merged_files[@]:1}" > "$consensus"
+    else
+        cp "${merged_files[0]}" "$consensus"
+    fi
 
     echo "   ✅ Consensus peaks written to $consensus"
-
-    # Append to outlist
     echo "$consensus" >> "$OUTLIST"
-done
 
-echo "✅ All consensus peaks generated. List in $OUTLIST"
+done
