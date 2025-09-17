@@ -13,12 +13,8 @@
 cd $SLURM_SUBMIT_DIR
 # Paths
 
-BAMDIR="/scratch/ry00555/RNASeqPaper/SortedBamFiles"
-META="${BAMDIR}/SortedBamFiles_meta_132to149.txt"
+META="/scratch/ry00555/RNASeqPaper/SortedBamFiles/SortedBamFiles_meta_132to149.txt"
 OUTDIR="/scratch/ry00555/RNASeqPaper/MACSPeaks"
-
-# Empty outlist
-> "$OUTLIST"
 
 # Load modules
 ml MACS3
@@ -34,9 +30,18 @@ declare -A id_to_peaks
 # Step 1: Collect peak files per ID
 # ---------------------------
 tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep ID Input InputIndex MACS; do
-    peakfile="${OUTDIR}/${ID}_peaks.broadPeak"  # Adjust if MACS3 naming is different
+    # Full path to the MACS broadPeak file
+    peakfile="${OUTDIR}/${MACS}"  # Use MACS column for exact filename
+
     if [[ -f "$peakfile" ]]; then
-        id_to_peaks["$ID"]+="${peakfile} "
+        # Append to the ID's list
+        if [[ -z "${id_to_peaks[$ID]}" ]]; then
+            id_to_peaks["$ID"]="$peakfile"
+        else
+            id_to_peaks["$ID"]+=" $peakfile"
+        fi
+    else
+        echo "⚠️ Warning: peak file not found: $peakfile"
     fi
 done
 
