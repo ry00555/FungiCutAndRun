@@ -90,45 +90,49 @@ tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Re
 #     echo "   $m"
 # done
 
-MERGED_DIR="$OUT_NORM/MergedBigWigs"
+MERGED_DIR="${OUT_NORM}/MergedBigWigs"
 
 # Loop over unique IDs
-bw_files=($(ls $OUT_NORM/*.bw))
+bw_files=($(ls ${OUT_NORM}/*.bw))
 
 for id in $(for f in "${bw_files[@]}"; do
         basename "$f" .bw | sed -E 's/_R[0-9]+(_foldchange)?$//'
       done | sort | uniq); do
 
-    rep_files=($(ls "$OUT_NORM/${id}"_R*.bw "$OUT_NORM/${id}"_R*_foldchange.bw 2>/dev/null))
+    rep_files=($(ls "${OUT_NORM}/${id}"_R*.bw "${OUT_NORM}/${id}"_R*_foldchange.bw 2>/dev/null))
 
     if [ ${#rep_files[@]} -eq 0 ]; then
-        echo "No files found for $id, skipping..."
-        continue
-    fi
+      echo "No files found for $id, skipping..."
+      continue
+  fi
 
-    echo "Processing $id with ${#rep_files[@]} replicates..."
+  echo "Processing $id with ${#rep_files[@]} replicates..."
 
-    # Run multiBigwigSummary
-    multiBigwigSummary bins \
-        -b "${rep_files[@]}" \
-        --binSize 25 \
-        --outRawCounts "$MERGED_DIR/${id}_summary.tab" \
-        -o "$MERGED_DIR/${id}_summary.npz"
+  # Run multiBigwigSummary
+  multiBigwigSummary bins \
+      -b "${rep_files[@]}" \
+      --binSize 25 \
+      --outRawCounts "${MERGED_DIR}/${id}_summary.tab" \
+      -o "${MERGED_DIR}/${id}_summary.npz"
 
-    echo "Summary saved: $MERGED_DIR/${id}_summary.tab"
-    # Convert tab to BED-like bedGraph (chrom, start, end, first signal column)
-       awk 'NR>1 {print $1 "\t" $2 "\t" $3 "\t" $4}' ${MERGED_DIR}/${id}_summary.tab \
-           | sort -k1,1 -k2,2n \
-           > ${MERGED_DIR}/${id}_summary.bedGraph
+  echo "Summary saved: ${MERGED_DIR}/${id}_summary.tab"
+  # Convert tab to BEDGraph (chrom, start, end, first signal column)
+      awk 'NR>1 {print $1 "\t" $2 "\t" $3 "\t" $4}' "${MERGED_DIR}/${id}_summary.tab" \
+          | sort -k1,1 -k2,2n \
+          > "${MERGED_DIR}/${id}_summary.bedGraph"
 
-       echo "BEDGraph created and sorted: ${MERGED_DIR}/${id}_summary.bedGraph"
+      echo "BEDGraph created and sorted: ${MERGED_DIR}/${id}_summary.bedGraph"
 
-       # Optional: convert to bigWig if you have a chrom.sizes file
-ml ucsc
-bedGraphToBigWig ${MERGED_DIR}/${id}_summary.bedGraph "/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt" ${MERGED_DIR}/${id}_summary.bw
-  echo "bigWig created: ${MERGED_DIR}/${id}_summary.bw"
+      # Convert to bigWig (requires chrom sizes file)
+      bedGraphToBigWig "${MERGED_DIR}/${id}_summary.bedGraph" \
+          "/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt" \
+          "${MERGED_DIR}/${id}_summary.bw"
 
-   done
+      echo "bigWig created: ${MERGED_DIR}/${id}_summary.bw"
+
+  done
+
+  echo "All processing complete!"
 
 # multiBigwigSummary BED-file \
 #   --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
