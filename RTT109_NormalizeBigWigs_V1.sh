@@ -21,10 +21,10 @@ if [ ! -d "$OUTDIR" ]; then
     mkdir -p "$OUTDIR"
 fi
 
-PAIRFILE="${OUTDIR}/BigWigs/RTT109_meta_biwigs.txt"
+OUTDIR="/scratch/ry00555/RTT109PaperFigures"
 BW_DIR="${OUTDIR}/BigWigs"
 OUT_NORM="${BW_DIR}/NormalizedBigWigs"
-
+MERGED_DIR="${OUT_NORM}/MergedBigWigs"
 ml deepTools
 
 mkdir -p "$OUT_NORM"
@@ -90,49 +90,57 @@ tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Re
 #     echo "   $m"
 # done
 
-MERGED_DIR="${OUT_NORM}/MergedBigWigs"
+ml ucsc  # load UCSC tools
+
+# Find all bigwig files
+bw_files=($(ls "$OUT_NORM"/*.bw 2>/dev/null))
+echo "Found ${#bw_files[@]} .bw files"
 
 # Loop over unique IDs
-bw_files=($(ls ${OUT_NORM}/*.bw))
-
 for id in $(for f in "${bw_files[@]}"; do
         basename "$f" .bw | sed -E 's/_R[0-9]+(_foldchange)?$//'
       done | sort | uniq); do
 
-    rep_files=($(ls "${OUT_NORM}/${id}"_R*.bw "${OUT_NORM}/${id}"_R*_foldchange.bw 2>/dev/null))
+    echo "Processing ID: $id"
+
+    # Gather all replicates for this ID
+    rep_files=($(ls "$OUT_NORM/${id}"_R*.bw "$OUT_NORM/${id}"_R*_foldchange.bw 2>/dev/null))
+    echo "Replicates found: ${rep_files[@]}"
 
     if [ ${#rep_files[@]} -eq 0 ]; then
-      echo "No files found for $id, skipping..."
-      continue
-  fi
+        echo "No files found for $id, skipping..."
+        continue
+    fi
 
-  echo "Processing $id with ${#rep_files[@]} replicates..."
+    # Print command before running
+    echo "Running multiBigwigSummary for $id..."
+    echo "multiBigwigSummary bins -b ${rep_files[@]} --binSize 25 --outRawCounts $MERGED_DIR/${id}_summary.tab -o $MERGED_DIR/${id}_summary.npz"
 
-  # Run multiBigwigSummary
-  multiBigwigSummary bins \
-      -b "${rep_files[@]}" \
-      --binSize 25 \
-      --outRawCounts "${MERGED_DIR}/${id}_summary.tab" \
-      -o "${MERGED_DIR}/${id}_summary.npz"
+    # Uncomment when ready
+    # multiBigwigSummary bins \
+    #     -b "${rep_files[@]}" \
+    #     --binSize 25 \
+    #     --outRawCounts "$MERGED_DIR/${id}_summary.tab" \
+    #     -o "$MERGED_DIR/${id}_summary.npz"
 
-  echo "Summary saved: ${MERGED_DIR}/${id}_summary.tab"
-  # Convert tab to BEDGraph (chrom, start, end, first signal column)
-      awk 'NR>1 {print $1 "\t" $2 "\t" $3 "\t" $4}' "${MERGED_DIR}/${id}_summary.tab" \
-          | sort -k1,1 -k2,2n \
-          > "${MERGED_DIR}/${id}_summary.bedGraph"
+    # Check if .tab exists before converting
+    if [ -f "$MERGED_DIR/${id}_summary.tab" ]; then
+        echo "Converting to BEDGraph..."
+        awk 'NR>1 {print $1 "\t" $2 "\t" $3 "\t" $4}' "$MERGED_DIR/${id}_summary.tab" \
+            | sort -k1,1 -k2,2n \
+            > "$MERGED_DIR/${id}_summary.bedGraph"
 
-      echo "BEDGraph created and sorted: ${MERGED_DIR}/${id}_summary.bedGraph"
+        echo "Creating bigWig..."
+        bedGraphToBigWig "$MERGED_DIR/${id}_summary.bedGraph" \
+            "/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt" \
+            "$MERGED_DIR/${id}_summary.bw"
+    else
+        echo "Summary tab not found for $id, skipping conversion"
+    fi
 
-      # Convert to bigWig (requires chrom sizes file)
-      bedGraphToBigWig "${MERGED_DIR}/${id}_summary.bedGraph" \
-          "/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt" \
-          "${MERGED_DIR}/${id}_summary.bw"
+done
 
-      echo "bigWig created: ${MERGED_DIR}/${id}_summary.bw"
-
-  done
-
-  echo "All processing complete!"
+echo "Done!"
 
 # multiBigwigSummary BED-file \
 #   --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
