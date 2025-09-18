@@ -23,7 +23,7 @@ fi
 
 PAIRFILE="${OUTDIR}/BigWigs/RTT109_meta_biwigs.txt"
 BW_DIR="${OUTDIR}/BigWigs"
-OUT_NORM="${OUTDIR}/BigWigs/NormalizedBigWigs"
+OUT_NORM="${BW_DIR}/NormalizedBigWigs"
 
 ml deepTools
 
@@ -93,13 +93,13 @@ tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Re
 MERGED_DIR="$OUT_NORM/MergedBigWigs"
 
 # Loop over unique IDs
+bw_files=($(ls $OUT_NORM/*.bw))
+
 for id in $(for f in "${bw_files[@]}"; do
-        # Remove _R[0-9]+ and _foldchange.bw suffixes
         basename "$f" .bw | sed -E 's/_R[0-9]+(_foldchange)?$//'
       done | sort | uniq); do
 
-    # Gather all replicates for this ID
-    rep_files=($(ls "$OUT_NORM/${id}"_R*.bw 2>/dev/null))
+    rep_files=($(ls "$OUT_NORM/${id}"_R*.bw "$OUT_NORM/${id}"_R*_foldchange.bw 2>/dev/null))
 
     if [ ${#rep_files[@]} -eq 0 ]; then
         echo "No files found for $id, skipping..."
