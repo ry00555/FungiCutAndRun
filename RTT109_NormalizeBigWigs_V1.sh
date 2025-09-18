@@ -29,58 +29,38 @@ ml deepTools
 
 mkdir -p "$OUT_NORM"
 
-echo "🔍 Checking IDs listed in: $PAIRFILE"
-echo "   against files in: $BW_DIR"
+echo "🔍 Processing meta file: $PAIRFILE"
+echo "   BigWigs directory: $BW_DIR"
 echo
 
-missing_pairs=()
-processed_ids=()
+# Read header line
+read -r header < "$PAIRFILE"
+echo "Header columns: $header"
 
-declare -A chip_reps
-declare -A input_map
+# Initialize arrays
+missing_files=()
+processed=()
 
-# Read file: ID, BigWig, Input
-tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r ID BigWig Input; do
+# Skip header and loop through rows
+tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Rep BigWig Input; do
     chip_path="${BW_DIR}/${BigWig}"
     input_path="${BW_DIR}/${Input}"
 
-    # Track missing ChIP files
+    # Skip if ChIP file is missing
     if [[ ! -f "$chip_path" ]]; then
         echo "⚠️ Missing ChIP file: $chip_path"
-        missing_pairs+=("$BigWig")
+        missing_files+=("$BigWig")
         continue
     fi
 
-    chip_reps[$ID]+=" $chip_path"
+    outbase="${OUT_NORM}/${ID}_R${Rep}"
+
+    # If Input exists, normalize
     if [[ -n "$Input" && -f "$input_path" ]]; then
-        input_map[$ID]="$input_path"
-    fi
-done
-
-# Now process each ID
-for ID in "${!chip_reps[@]}"; do
-    chips="${chip_reps[$ID]}"
-    input="${input_map[$ID]}"
-    outbase="${OUT_NORM}/${ID}"
-
-    # If multiple replicates: average them
-    if [[ $(echo "$chips" | wc -w) -gt 1 ]]; then
-        echo "👉 Averaging replicates for $ID"
-        bigwigMerge $chips "${outbase}_merged.bedGraph"
-        awk '{print $1, $2, $3, $4/NR}' "${outbase}_merged.bedGraph" > "${outbase}_avg.bedGraph"
-        bedGraphToBigWig "${outbase}_avg.bedGraph" chrom.sizes "${outbase}_ChIP_avg.bw"
-        chip_final="${outbase}_ChIP_avg.bw"
-        rm "${outbase}_merged.bedGraph" "${outbase}_avg.bedGraph"
-    else
-        chip_final="$chips"
-    fi
-
-    # Normalize against Input if present
-    if [[ -n "$input" ]]; then
-        echo "Normalizing $ID: $(basename "$chip_final") vs $(basename "$input")"
+        echo "Normalizing $BigWig vs $Input → ${outbase}_foldchange.bw"
         bigwigCompare \
-          -b1 "$chip_final" \
-          -b2 "$input" \
+          -b1 "$chip_path" \
+          -b2 "$input_path" \
           --operation ratio \
           --pseudocount 1 \
           --binSize 25 \
@@ -88,23 +68,25 @@ for ID in "${!chip_reps[@]}"; do
           --skipZeroOverZero \
           --verbose
     else
-        echo "⚠️ No Input for $ID → keeping ChIP only"
-        cp "$chip_final" "${outbase}_noInput.bw"
+        # No Input → copy ChIP as normalized
+        echo "⚠️ No Input for $BigWig → copying as ${outbase}.bw"
+        cp "$chip_path" "${outbase}.bw"
     fi
 
-    processed_ids+=("$ID")
+    processed+=("$ID R$Rep")
 done
 
+# Summary
 echo
 echo "========== PROCESSING SUMMARY =========="
-echo "✅ Processed IDs: ${#processed_ids[@]}"
-for p in "${processed_ids[@]}"; do
-    echo "   $p"
+echo "✅ Processed files: ${#processed[@]}"
+for f in "${processed[@]}"; do
+    echo "   $f"
 done
 
 echo
-echo "⚠️ Missing ChIP files: ${#missing_pairs[@]}"
-for m in "${missing_pairs[@]}"; do
+echo "⚠️ Missing ChIP files: ${#missing_files[@]}"
+for m in "${missing_files[@]}"; do
     echo "   $m"
 done
 
