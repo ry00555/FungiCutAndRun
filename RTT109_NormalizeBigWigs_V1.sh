@@ -47,77 +47,116 @@ tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Re
     input_path="${BW_DIR}/${Input}"
 
     # Skip if ChIP file is missing
-    if [[ ! -f "$chip_path" ]]; then
-        echo "⚠️ Missing ChIP file: $chip_path"
-        missing_files+=("$BigWig")
+#     if [[ ! -f "$chip_path" ]]; then
+#         echo "⚠️ Missing ChIP file: $chip_path"
+#         missing_files+=("$BigWig")
+#         continue
+#     fi
+#
+#     outbase="${OUT_NORM}/${ID}_R${Rep}"
+#
+#     # If Input exists, normalize
+#     if [[ -n "$Input" && -f "$input_path" ]]; then
+#         echo "Normalizing $BigWig vs $Input → ${outbase}_foldchange.bw"
+#         bigwigCompare \
+#           -b1 "$chip_path" \
+#           -b2 "$input_path" \
+#           --operation ratio \
+#           --pseudocount 1 \
+#           --binSize 25 \
+#           -o "${outbase}_foldchange.bw" \
+#           --skipZeroOverZero \
+#           --verbose
+#     else
+#         # No Input → copy ChIP as normalized
+#         echo "⚠️ No Input for $BigWig → copying as ${outbase}.bw"
+#         cp "$chip_path" "${outbase}.bw"
+#     fi
+#
+#     processed+=("$ID R$Rep")
+# done
+#
+# # Summary
+# echo
+# echo "========== PROCESSING SUMMARY =========="
+# echo "✅ Processed files: ${#processed[@]}"
+# for f in "${processed[@]}"; do
+#     echo "   $f"
+# done
+#
+# echo
+# echo "⚠️ Missing ChIP files: ${#missing_files[@]}"
+# for m in "${missing_files[@]}"; do
+#     echo "   $m"
+# done
+
+MERGED_DIR="$BW_DIR/MergedBigWigs"
+
+# Loop over unique IDs
+for id in $(for f in "${bw_files[@]}"; do
+        # Remove _R[0-9]+ and _foldchange.bw suffixes
+        basename "$f" .bw | sed -E 's/_R[0-9]+(_foldchange)?$//'
+      done | sort | uniq); do
+
+    # Gather all replicates for this ID
+    rep_files=($(ls "$BW_DIR/${id}"_R*.bw 2>/dev/null))
+
+    if [ ${#rep_files[@]} -eq 0 ]; then
+        echo "No files found for $id, skipping..."
         continue
     fi
 
-    outbase="${OUT_NORM}/${ID}_R${Rep}"
+    echo "Processing $id with ${#rep_files[@]} replicates..."
 
-    # If Input exists, normalize
-    if [[ -n "$Input" && -f "$input_path" ]]; then
-        echo "Normalizing $BigWig vs $Input → ${outbase}_foldchange.bw"
-        bigwigCompare \
-          -b1 "$chip_path" \
-          -b2 "$input_path" \
-          --operation ratio \
-          --pseudocount 1 \
-          --binSize 25 \
-          -o "${outbase}_foldchange.bw" \
-          --skipZeroOverZero \
-          --verbose
-    else
-        # No Input → copy ChIP as normalized
-        echo "⚠️ No Input for $BigWig → copying as ${outbase}.bw"
-        cp "$chip_path" "${outbase}.bw"
-    fi
+    # Run multiBigwigSummary
+    multiBigwigSummary bins \
+        -b "${rep_files[@]}" \
+        --binSize 25 \
+        --outRawCounts "$MERGED_DIR/${id}_summary.tab" \
+        -o "$MERGED_DIR/${id}_summary.npz"
 
-    processed+=("$ID R$Rep")
-done
+    echo "Summary saved: $MERGED_DIR/${id}_summary.tab"
+    # Convert tab to BED-like bedGraph (chrom, start, end, first signal column)
+       awk 'NR>1 {print $1 "\t" $2 "\t" $3 "\t" $4}' ${MERGED_DIR}/${id}_summary.tab \
+           | sort -k1,1 -k2,2n \
+           > ${MERGED_DIR}/${id}_summary.bedGraph
 
-# Summary
-echo
-echo "========== PROCESSING SUMMARY =========="
-echo "✅ Processed files: ${#processed[@]}"
-for f in "${processed[@]}"; do
-    echo "   $f"
-done
+       echo "BEDGraph created and sorted: ${MERGED_DIR}/${id}_summary.bedGraph"
 
-echo
-echo "⚠️ Missing ChIP files: ${#missing_files[@]}"
-for m in "${missing_files[@]}"; do
-    echo "   $m"
-done
+       # Optional: convert to bigWig if you have a chrom.sizes file
+ml ucsc
+bedGraphToBigWig ${MERGED_DIR}/${id}_summary.bedGraph "/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt" ${MERGED_DIR}/${id}_summary.bw
+  echo "bigWig created: ${MERGED_DIR}/${id}_summary.bw"
 
+   done
 
-multiBigwigSummary BED-file \
-  --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
-  --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
-  -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_K27genes_signal_matrix.npz \
-  --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_K27genesonly_signal_matrix.tab
-
-  multiBigwigSummary BED-file \
-    --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
-    --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
-    -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3ChIP_K27genes_signal_matrix.npz \
-    --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigsH_3K36me3ChIP__K27genesonly_signal_matrix.tab
-
-multiBigwigSummary BED-file \
-      --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
-      --BED "/scratch/ry00555/GeneList_BedFiles/NonK27genes.bed" \
-      -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NonK27genes_signal_matrix.npz \
-      --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_NonK27genesonly_signal_matrix.tab
-
-      multiBigwigSummary BED-file \
-        --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
-        --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
-        -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_K27regions_signal_matrix.npz \
-        --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
-
-
-        multiBigwigSummary BED-file \
-          --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
-          --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
-          -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3_K27regions_signal_matrix.npz \
-          --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3_NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
+# multiBigwigSummary BED-file \
+#   --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
+#   --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
+#   -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_K27genes_signal_matrix.npz \
+#   --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_K27genesonly_signal_matrix.tab
+#
+#   multiBigwigSummary BED-file \
+#     --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
+#     --BED "/scratch/ry00555/GeneList_BedFiles/K27genes.bed" \
+#     -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3ChIP_K27genes_signal_matrix.npz \
+#     --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigsH_3K36me3ChIP__K27genesonly_signal_matrix.tab
+#
+# multiBigwigSummary BED-file \
+#       --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
+#       --BED "/scratch/ry00555/GeneList_BedFiles/NonK27genes.bed" \
+#       -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NonK27genes_signal_matrix.npz \
+#       --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_NonK27genesonly_signal_matrix.tab
+#
+#       multiBigwigSummary BED-file \
+#         --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K27me3*.bw \
+#         --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
+#         -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_K27regions_signal_matrix.npz \
+#         --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
+#
+#
+#         multiBigwigSummary BED-file \
+#           --bwfiles ${OUTDIR}/BigWigs/NormalizedBigWigs/*H3K36me3*.bw \
+#           --BED "/scratch/ry00555/Figure2G_K27regions_Scaledcenter_FileToCheckOrderFINAL.txt" \
+#           -out ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3_K27regions_signal_matrix.npz \
+#           --outRawCounts ${OUTDIR}/BigWigs/NormalizedBigWigs/RTT109_H3K36me3_NormalizedBigWigs_H3K27me3regions_signal_matrix.tab
