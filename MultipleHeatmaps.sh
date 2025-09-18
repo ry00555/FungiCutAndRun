@@ -13,11 +13,9 @@ cd $SLURM_SUBMIT_DIR
 OUTDIR="/scratch/ry00555/RTT109PaperFigures"
 GENEDIR="/home/ry00555/Research/Genomes/HeatmapGeneFiles"
 BWDIR="/scratch/ry00555/RTT109PaperFigures/BigWigs/NormalizedBigWigs/L2FCBigWigs"
-module load  deepTools/3.5.5-gfbf-2023a
+ml deepTools
 
-computeMatrix reference-point -p 12 \
--R \ "$GENEDIR/K27genes.bed" \
--S $BWDIR/WT_H3K27me3_R2_foldchange.bw $BWDIR/WT_H3K27me3_R3_foldchange.bw $BWDIR/WT_H3K27me3_R4_foldchange.bw $BWDIR/WT_H3K27me3_R5_foldchange.bw $BWDIR/rtt109_H3K27me3_R2_foldchange.bw $BWDIR/rtt109_H3K27me3_R4_foldchange.bw $BWDIR/rtt109_H3K27me3_R5_foldchange.bw $BWDIR/rtt109_H3K27me3_R6_foldchange.bw $BWDIR/rtt109_H3K27me3_R7_foldchange.bw $BWDIR/rtt109_H3K27me3_R8_foldchange.bw $BWDIR/rtt109_H3K27me3_R9_foldchange.bw	$BWDIR/rtt109flag_H3K27me3_R1_foldchange.bw $BWDIR/rtt109flag_H3K27me3_R2_foldchange.bw $BWDIR/rtt109flag_H3K27me3_R3_foldchange.bw -o $OUTDIR/Heatmaps/RTT109AllK27reps_K27genes.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
+computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S $BWDIR/WT_H3K27me3_R2_foldchange.bw $BWDIR/WT_H3K27me3_R3_foldchange.bw $BWDIR/WT_H3K27me3_R4_foldchange.bw $BWDIR/WT_H3K27me3_R5_foldchange.bw $BWDIR/rtt109_H3K27me3_R2_foldchange.bw $BWDIR/rtt109_H3K27me3_R4_foldchange.bw $BWDIR/rtt109_H3K27me3_R5_foldchange.bw $BWDIR/rtt109_H3K27me3_R6_foldchange.bw $BWDIR/rtt109_H3K27me3_R7_foldchange.bw $BWDIR/rtt109_H3K27me3_R8_foldchange.bw $BWDIR/rtt109_H3K27me3_R9_foldchange.bw	$BWDIR/rtt109flag_H3K27me3_R1_foldchange.bw $BWDIR/rtt109flag_H3K27me3_R2_foldchange.bw $BWDIR/rtt109flag_H3K27me3_R3_foldchange.bw -o $OUTDIR/Heatmaps/RTT109AllK27reps_K27genes.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
 
 plotHeatmap -m $OUTDIR/Heatmaps/RTT109AllK27reps_K27genes.mat \
 -o $OUTDIR/Heatmaps/RTT109AllK27reps_K27genes_V1.png \
@@ -34,10 +32,7 @@ plotHeatmap -m $OUTDIR/Heatmaps/RTT109AllK27reps_K27genes.mat \
 
 
 
-computeMatrix reference-point -p 12 \
--R \ "$GENEDIR/Figure2_K9_Peaks.txt" \
--S  $BWDIR/../WT_H3K9me3_R1.bw $BWDIR/../WT_H3K9me3_R2.bw  $BWDIR/../WT_H3K9me3_R3.bw               $BWDIR/WWT_H3K9me3_R4_foldchange.bw $BWDIR/rtt109_H3K9me3_R1_foldchange.bw $BWDIR/rtt109_H3K9me3_R2_foldchange.bw $BWDIR/rtt109_H3K9me3_R3_foldchange.bw  $BWDIR/rtt109_H3K9me3_R4_foldchange.bw $BWDIR/rtt109flag_H3K9me3_R1_foldchange.bw $BWDIR/rtt109flag_H3K9me3_R2_foldchange.bw -o $OUTDIR/Heatmaps/RTT109All9reps_K9Peaks.mat 	--sortRegions keep \
---missingDataAsZero -bs 10 -a 2000 -b 1000
+computeMatrix reference-point -p 12 -R "$GENEDIR/Figure2_K9_Peaks.txt" -S  $BWDIR/../WT_H3K9me3_R1.bw $BWDIR/../WT_H3K9me3_R2.bw  $BWDIR/../WT_H3K9me3_R3.bw $BWDIR/WWT_H3K9me3_R4_foldchange.bw $BWDIR/rtt109_H3K9me3_R1_foldchange.bw $BWDIR/rtt109_H3K9me3_R2_foldchange.bw $BWDIR/rtt109_H3K9me3_R3_foldchange.bw  $BWDIR/rtt109_H3K9me3_R4_foldchange.bw $BWDIR/rtt109flag_H3K9me3_R1_foldchange.bw $BWDIR/rtt109flag_H3K9me3_R2_foldchange.bw -o $OUTDIR/Heatmaps/RTT109All9reps_K9Peaks.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
 
 plotHeatmap -m $OUTDIR/Heatmaps/RTT109All9reps_K9Peaks.mat \
 -o $OUTDIR/Heatmaps/RTT109All9reps_K9Peaks_V1.png \
