@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=NormalizeBigWigs
+#SBATCH --job-name=RTT109NormalizeBigWigs
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
 #SBATCH --time=8:00:00
-#SBATCH --output=../NormalizeBigWigs.%j.out
-#SBATCH --error=../NormalizeBigWigs.%j.err
+#SBATCH --output=../RTT109NormalizeBigWigs.%j.out
+#SBATCH --error=../RTT109NormalizeBigWigs.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
