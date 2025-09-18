@@ -40,19 +40,19 @@ declare -A chip_reps
 declare -A input_map
 
 # Read file: ID, BigWig, Input
-tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r ID chip_bw input_bw; do
-    chip_path="${BW_DIR}/${chip_bw}"
-    input_path="${BW_DIR}/${input_bw}"
+tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r ID BigWig Input; do
+    chip_path="${BW_DIR}/${BigWig}"
+    input_path="${BW_DIR}/${Input}"
 
     # Track missing ChIP files
     if [[ ! -f "$chip_path" ]]; then
         echo "⚠️ Missing ChIP file: $chip_path"
-        missing_pairs+=("$chip_bw")
+        missing_pairs+=("$BigWig")
         continue
     fi
 
     chip_reps[$ID]+=" $chip_path"
-    if [[ -n "$input_bw" && -f "$input_path" ]]; then
+    if [[ -n "$Input" && -f "$input_path" ]]; then
         input_map[$ID]="$input_path"
     fi
 done
