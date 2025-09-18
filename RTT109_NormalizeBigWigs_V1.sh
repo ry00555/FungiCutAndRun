@@ -90,7 +90,7 @@ tail -n +2 "$PAIRFILE" | while IFS=$'\t' read -r RunSample ID Strain Antibody Re
 #     echo "   $m"
 # done
 
-MERGED_DIR="$BW_DIR/MergedBigWigs"
+MERGED_DIR="$OUT_NORM/MergedBigWigs"
 
 # Loop over unique IDs
 for id in $(for f in "${bw_files[@]}"; do
@@ -99,7 +99,7 @@ for id in $(for f in "${bw_files[@]}"; do
       done | sort | uniq); do
 
     # Gather all replicates for this ID
-    rep_files=($(ls "$BW_DIR/${id}"_R*.bw 2>/dev/null))
+    rep_files=($(ls "$OUT_NORM/${id}"_R*.bw 2>/dev/null))
 
     if [ ${#rep_files[@]} -eq 0 ]; then
         echo "No files found for $id, skipping..."
