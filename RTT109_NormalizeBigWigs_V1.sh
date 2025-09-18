@@ -21,7 +21,7 @@ if [ ! -d "$OUTDIR" ]; then
     mkdir -p "$OUTDIR"
 fi
 
-PAIRFILE="${OUTDIR}/RTT109_meta_biwigs.txt"
+PAIRFILE="${OUTDIR}/BigWigs/RTT109_meta_biwigs.txt"
 BW_DIR="${OUTDIR}/BigWigs"
 OUT_NORM="${OUTDIR}/BigWigs/NormalizedBigWigs"
 
