@@ -6,16 +6,16 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=90gb
-#SBATCH --time=6:00:00
+#SBATCH --time=8:00:00
 #SBATCH --output=../MacsPeakCalling.%j.out
 #SBATCH --error=../MacsPeakCalling.%j.err
 
 cd $SLURM_SUBMIT_DIR
 # Paths
 
-BAMDIR="/scratch/ry00555/RNASeqPaper/SortedBamFiles"
+BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 META="${BAMDIR}/SortedBamFiles_meta_132to149.txt"
-OUTDIR="/scratch/ry00555/RNASeqPaper/MACSPeaks"
+OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 
 for bam in $(find . -name "*.bam"); do
     bai="${bam}.bai"
@@ -30,14 +30,14 @@ OUTLIST="${OUTDIR}/MACS_peak_files.txt"
 ml MACS3
 
 # Loop through metadata (skip header)
-tail -n +2 "$META" | while IFS=$'\t' read -r ChIPBam BamIndex Strain Antibody Rep ID Input InputIndex MACS; do
+tail -n +2 "$META" | while IFS=$'\t' read -r RunID	bamReads	BamIndex	SampleID	Factor	Tissue	Condition	Replicate	bamControl	bamInputIndex	ControlID	Peaks	PeakCaller; do
 
     # Build full paths
-    chip_path="${BAMDIR}/${ChIPBam}"
+    chip_path="${BAMDIR}/${bamReads}"
     input_path=""
-    [[ -n "$Input" ]] && input_path="${BAMDIR}/${Input}"
+    [[ -n "$Input" ]] && input_path="${BAMDIR}/${bamControl}"
 
-    base=$(basename "$ChIPBam" .bam)
+    base=$(basename "$bamReads" .bam)
     prefix="${OUTDIR}/${base}"
     echo "➡️ Processing: $base"
     # Expected output files for a complete run
