@@ -14,7 +14,7 @@ cd $SLURM_SUBMIT_DIR
 # Paths
 
 BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged.csv"
+META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 
 
@@ -25,21 +25,40 @@ ml MACS3
 # Remove potential carriage returns (Mac Excel export issue)
 dos2unix "$META" 2>/dev/null || true
 
-# Skip header (tail -n +2), read CSV line by line
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller; do
-
-    # Skip empty lines
+# --- STEP 1: Rename existing peak files ---
+echo "🔄 Checking for existing peak files to rename..."
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
     [[ -z "$RunID" ]] && continue
 
-    base=$(basename "$bamReads" .bam)
+    old_base=$(basename "$bamReads" .bam)
+    new_base="$DesiredPeakName"
+
+    for ext in broadPeak gappedPeak xls; do
+        old_file="${OUTDIR}/${old_base}_peaks.${ext}"
+        new_file="${OUTDIR}/${new_base}_peaks.${ext}"
+        if [[ -f "$old_file" && ! -f "$new_file" ]]; then
+            echo "Renaming: $old_file → $new_file"
+            mv "$old_file" "$new_file"
+        fi
+    done
+done
+
+echo "✅ Renaming step complete."
+
+# --- STEP 2: Run MACS3 where needed ---
+echo "🚀 Starting MACS3 peak calling..."
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+    [[ -z "$RunID" ]] && continue
+
     chip_path="${BAMDIR}/${bamReads}"
     input_path="${BAMDIR}/${bamControl:-}"
     index_path="${BAMDIR}/${BamIndex:-}"
-    prefix="${OUTDIR}/${base}"
+    prefix="${OUTDIR}/${DesiredPeakName}"
+    peakfile="${prefix}_peaks.broadPeak"
 
-    echo "➡️ Processing: $base"
+    echo "➡️ Processing: $DesiredPeakName"
 
-    # Check BAM + BAI existence
+    # Check for BAM + BAI
     if [[ ! -f "$chip_path" ]]; then
         echo "⚠️ Missing BAM: $chip_path"
         continue
@@ -49,8 +68,34 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
         continue
     fi
 
-    # Clean up partials
-    rm -f "${prefix}_peaks.broadPeak" "${prefix}_peaks.xls" 2>/dev/null || true
+    # Define expected outputs
+    expected=(
+        "${prefix}_peaks.broadPeak"
+        "${prefix}_peaks.xls"
+        "${prefix}_peaks.gappedPeak"
+    )
+
+    # Skip if all output files exist
+    all_exist=true
+    for f in "${expected[@]}"; do
+        if [[ ! -s "$f" ]]; then
+            all_exist=false
+            break
+        fi
+    done
+
+    if $all_exist; then
+        echo "   ✅ Skipping (MACS3 output already complete)"
+        echo "$peakfile" >> "$OUTLIST"
+        continue
+    fi
+
+    echo "   ⚠️ Running MACS3 for: $DesiredPeakName"
+
+    # Cleanup any partial output
+    for f in "${expected[@]}"; do
+        [[ -f "$f" ]] && rm -f "$f"
+    done
 
     # --- Run MACS3 ---
     if [[ -n "$bamControl" && -f "$input_path" ]]; then
@@ -59,7 +104,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
             -t "$chip_path" \
             -c "$input_path" \
             -f BAMPE \
-            -n "$base" \
+            -n "$DesiredPeakName" \
             --broad \
             --broad-cutoff 0.1 \
             -g 41037538 \
@@ -71,7 +116,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
         macs3 callpeak \
             -t "$chip_path" \
             -f BAMPE \
-            -n "$base" \
+            -n "$DesiredPeakName" \
             --broad \
             --broad-cutoff 0.1 \
             -g 41037538 \
@@ -80,9 +125,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
             --max-gap 500
     fi
 
-    # Add to output list
-    echo "${prefix}_peaks.broadPeak" >> "$OUTLIST"
-
+    echo "$peakfile" >> "$OUTLIST"
 done
 
 echo "✅ Peak calling complete. Outputs listed in $OUTLIST"
