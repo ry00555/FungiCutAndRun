@@ -26,24 +26,24 @@ ml MACS3
 dos2unix "$META" 2>/dev/null || true
 
 # --- STEP 1: Rename existing peak files ---
-echo "🔄 Checking for existing peak files to rename..."
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-    [[ -z "$RunID" ]] && continue
+# echo "🔄 Checking for existing peak files to rename..."
+# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+#     [[ -z "$RunID" ]] && continue
+#
+#     old_base=$(basename "$bamReads" .bam)
+#     new_base="$DesiredPeakName"
+#
+#     for ext in broadPeak gappedPeak xls; do
+#         old_file="${OUTDIR}/${old_base}_peaks.${ext}"
+#         new_file="${OUTDIR}/${new_base}_peaks.${ext}"
+#         if [[ -f "$old_file" && ! -f "$new_file" ]]; then
+#             echo "Renaming: $old_file → $new_file"
+#             mv "$old_file" "$new_file"
+#         fi
+#     done
+# done
 
-    old_base=$(basename "$bamReads" .bam)
-    new_base="$DesiredPeakName"
-
-    for ext in broadPeak gappedPeak xls; do
-        old_file="${OUTDIR}/${old_base}_peaks.${ext}"
-        new_file="${OUTDIR}/${new_base}_peaks.${ext}"
-        if [[ -f "$old_file" && ! -f "$new_file" ]]; then
-            echo "Renaming: $old_file → $new_file"
-            mv "$old_file" "$new_file"
-        fi
-    done
-done
-
-echo "✅ Renaming step complete."
+#echo "✅ Renaming step complete."
 
 # --- STEP 2: Run MACS3 where needed ---
 echo "🚀 Starting MACS3 peak calling..."
@@ -125,7 +125,8 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
             --max-gap 500
     fi
 
-    echo "$peakfile" >> "$OUTLIST"
-done
+    # Record output
+       echo "$peakfile" >> "$OUTLIST"
+   done
 
-echo "✅ Peak calling complete. Outputs listed in $OUTLIST"
+   echo "✅ STEP 2: MACS3 peak calling complete. Outputs listed in $OUTLIST"
