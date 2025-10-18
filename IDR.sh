@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=50gb
-#SBATCH --time=8:00:00
+#SBATCH --time=4:00:00
 #SBATCH --output=../IDR.%j.out
 #SBATCH --error=../IDR.%j.err
 
@@ -29,7 +29,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     [[ -z "$Tissue" ]] && continue
 
     rep_peak="${MACSDIR}/${Peaks}"
-    consensus="${CHIPR_OUT}/${Tissue}_consensus_optimal.bed"
+    consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal.bed"
 
     if [[ ! -s "$rep_peak" ]]; then
         echo "⚠️ Missing replicate peak: $rep_peak"
