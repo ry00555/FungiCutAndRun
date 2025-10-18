@@ -5,7 +5,7 @@
 # SBATCH --mail-user=ry00555@uga.edu
 # SBATCH --ntasks=1
 # SBATCH --cpus-per-task=24
-# SBATCH --mem=90gb
+# SBATCH --mem=50gb
 # SBATCH --time=10:00:00
 # SBATCH --output=../MacsPeakCalling.%j.out
 # SBATCH --error=../MacsPeakCalling.%j.err
