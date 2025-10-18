@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=50gb
-#SBATCH --time=8:00:00
+#SBATCH --mem=30gb
+#SBATCH --time=2:00:00
 #SBATCH --output=../ChIP-R.%j.out
 #SBATCH --error=../ChIP-R.%j.err
 
@@ -62,8 +62,8 @@ for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
     echo "   Peak files: ${peak_files[*]}"
 
     prefix="${CHIPR_OUT}/${tissue}_consensus"
-    outfile="${prefix}.bed"
-    
+    outfile="${prefix}_optimal.bed"
+
     # === Skip if consensus already exists ===
       if [[ -s "$outfile" ]]; then
           num_peaks=$(wc -l < "$outfile")
