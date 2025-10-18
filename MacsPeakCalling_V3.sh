@@ -1,17 +1,17 @@
-#!/bin/bash
-#SBATCH --job-name=MacsPeakCalling
-#SBATCH --partition=batch
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24
-#SBATCH --mem=90gb
-#SBATCH --time=10:00:00
-#SBATCH --output=../MacsPeakCalling.%j.out
-#SBATCH --error=../MacsPeakCalling.%j.err
+# !/bin/bash
+# SBATCH --job-name=MacsPeakCalling
+# SBATCH --partition=batch
+# SBATCH --mail-type=ALL
+# SBATCH --mail-user=ry00555@uga.edu
+# SBATCH --ntasks=1
+# SBATCH --cpus-per-task=24
+# SBATCH --mem=90gb
+# SBATCH --time=10:00:00
+# SBATCH --output=../MacsPeakCalling.%j.out
+# SBATCH --error=../MacsPeakCalling.%j.err
 
 cd $SLURM_SUBMIT_DIR
-# Paths
+$Set Paths
 
 BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
@@ -22,30 +22,30 @@ OUTLIST="${OUTDIR}/MACS_peak_files.txt"
 > "$OUTLIST"
 ml MACS3
 
-# Remove potential carriage returns (Mac Excel export issue)
+ #Remove potential carriage returns (Mac Excel export issue)
 dos2unix "$META" 2>/dev/null || true
 
-# --- STEP 1: Rename existing peak files ---
-# echo "🔄 Checking for existing peak files to rename..."
-# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-#     [[ -z "$RunID" ]] && continue
-#
-#     old_base=$(basename "$bamReads" .bam)
-#     new_base="$DesiredPeakName"
-#
-#     for ext in broadPeak gappedPeak xls; do
-#         old_file="${OUTDIR}/${old_base}_peaks.${ext}"
-#         new_file="${OUTDIR}/${new_base}_peaks.${ext}"
-#         if [[ -f "$old_file" && ! -f "$new_file" ]]; then
-#             echo "Renaming: $old_file → $new_file"
-#             mv "$old_file" "$new_file"
-#         fi
-#     done
-# done
+ #--- STEP 1: Rename existing peak files ---
+ echo "🔄 Checking for existing peak files to rename..."
+ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+     [[ -z "$RunID" ]] && continue
 
-#echo "✅ Renaming step complete."
+     old_base=$(basename "$bamReads" .bam)
+     new_base="$DesiredPeakName"
 
-# --- STEP 2: Run MACS3 where needed ---
+     for ext in broadPeak gappedPeak xls; do
+         old_file="${OUTDIR}/${old_base}_peaks.${ext}"
+         new_file="${OUTDIR}/${new_base}_peaks.${ext}"
+         if [[ -f "$old_file" && ! -f "$new_file" ]]; then
+             echo "Renaming: $old_file → $new_file"
+             mv "$old_file" "$new_file"
+         fi
+     done
+ done
+
+echo "✅ Renaming step complete."
+
+ #--- STEP 2: Run MACS3 where needed ---
 echo "🚀 Starting MACS3 peak calling..."
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
     [[ -z "$RunID" ]] && continue
@@ -58,7 +58,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
 
     echo "➡️ Processing: $DesiredPeakName"
 
-    # Check for BAM + BAI
+     Check for BAM + BAI
     if [[ ! -f "$chip_path" ]]; then
         echo "⚠️ Missing BAM: $chip_path"
         continue
@@ -68,36 +68,36 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
         continue
     fi
 
-    # Define expected outputs
-    # expected=(
-    #     "${prefix}_peaks.broadPeak"
-    #     "${prefix}_peaks.xls"
-    #     "${prefix}_peaks.gappedPeak"
-    # )
+     Define expected outputs
+     expected=(
+         "${prefix}_peaks.broadPeak"
+         "${prefix}_peaks.xls"
+         "${prefix}_peaks.gappedPeak"
+     )
 
-    # Skip if all output files exist
-    # all_exist=true
-    # for f in "${expected[@]}"; do
-    #     if [[ ! -s "$f" ]]; then
-    #         all_exist=false
-    #         break
-    #     fi
-  #done
-    #
-    # if $all_exist; then
-    #     echo "   ✅ Skipping (MACS3 output already complete)"
-    #     echo "$peakfile" >> "$OUTLIST"
-    #     continue
-    # fi
-    #
-    # echo "   ⚠️ Running MACS3 for: $DesiredPeakName"
-    #
-    # # Cleanup any partial output
-    # for f in "${expected[@]}"; do
-    #     [[ -f "$f" ]] && rm -f "$f"
-    # done
+     Skip if all output files exist
+     all_exist=true
+     for f in "${expected[@]}"; do
+         if [[ ! -s "$f" ]]; then
+             all_exist=false
+             break
+         fi
+  done
 
-    # --- Run MACS3 ---
+     if $all_exist; then
+         echo "   ✅ Skipping (MACS3 output already complete)"
+         echo "$peakfile" >> "$OUTLIST"
+         continue
+     fi
+
+     echo "   ⚠️ Running MACS3 for: $DesiredPeakName"
+
+      Cleanup any partial output
+     for f in "${expected[@]}"; do
+         [[ -f "$f" ]] && rm -f "$f"
+     done
+
+     --- Run MACS3 ---
     if [[ -n "$bamControl" && -f "$input_path" ]]; then
         echo "   Using control: $input_path"
         macs3 callpeak \
@@ -125,7 +125,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
             --max-gap 500
     fi
 
-    # Record output
+     Record output
        echo "$peakfile" >> "$OUTLIST"
    done
 

@@ -10,64 +10,67 @@
 #SBATCH --output=../ChIP-R.%j.out
 #SBATCH --error=../ChIP-R.%j.err
 
-
+set -euo pipefail
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_OUT="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
+MIN_FRAC=0.55               # require peaks to appear in ≥55% of replicates
 
-
-module load ChIP-R/1.1.0-foss-2023a-Python-3.11.3
 dos2unix "$META" 2>/dev/null || true
 
+# --- Get column indices for Tissue and Peaks ---
 header=$(head -n 1 "$META")
+tissue_col=$(awk -F',' '{for(i=1;i<=NF;i++) if($i=="Tissue") print i}' <(echo "$header"))
+peaks_col=$(awk -F',' '{for(i=1;i<=NF;i++) if($i=="Peaks") print i}' <(echo "$header"))
 
-# Find column numbers for Tissue and DesiredPeakName
-tissue_col=$(awk -F',' '{for(i=1;i<=NF;i++){if($i=="Tissue") print i}}' <(echo "$header"))
-desired_col=$(awk -F',' '{for(i=1;i<=NF;i++){if($i=="DesiredPeakName") print i}}' <(echo "$header"))
-
-if [[ -z "$tissue_col" || -z "$desired_col" ]]; then
-    echo "❌ Could not find 'Tissue' or 'DesiredPeakName' columns in $META"
-    exit 1
+if [[ -z "$tissue_col" || -z "$peaks_col" ]]; then
+  echo "❌ ERROR: Could not detect 'Tissue' or 'Peaks' columns in $META"
+  exit 1
 fi
 
-echo "📊 Tissue column: $tissue_col | DesiredPeakName column: $desired_col"
-
-# --- Get unique tissue names ---
+# --- Loop through unique tissue groups ---
 tissues=$(tail -n +2 "$META" | cut -d',' -f"$tissue_col" | sort -u)
 
-# --- Loop over each tissue group ---
 for tissue in $tissues; do
-    echo "➡️ Processing group: $tissue"
+  echo "🧬 Processing tissue: $tissue"
 
-    # Collect all DesiredPeakNames for this tissue
-    peak_names=$(awk -F',' -v t="$tissue" -v tc="$tissue_col" -v dc="$desired_col" \
-        'NR>1 && $tc==t {print $dc}' "$META")
+  # Get all peak filenames for this tissue
+  mapfile -t peaks_list < <(awk -F',' -v t="$tissue" -v tc="$tissue_col" -v pc="$peaks_col" \
+    'NR>1 && $tc==t {print $pc}' "$META")
 
-    peak_files=()
-    for name in $peak_names; do
-        file="${MACSDIR}/${name}_peaks.broadPeak"
-        if [[ -f "$file" ]]; then
-            peak_files+=("$file")
-        else
-            echo "⚠️ Missing file: $file"
-        fi
-    done
-
-    n=${#peak_files[@]}
-    if (( n < 2 )); then
-        echo "❌ Not enough replicates for $tissue (found $n)"
-        continue
+  # Resolve full paths
+  peak_files=()
+  for peak in "${peaks_list[@]}"; do
+    peak_path="${MACSDIR}/${peak}"
+    if [[ -f "$peak_path" ]]; then
+      peak_files+=("$peak_path")
+    else
+      echo "⚠️ Missing peak file: $peak_path"
     fi
+  done
 
-    # --- Determine minentries (m) based on 55% of replicates ---
-    m=$(awk -v n="$n" 'BEGIN{printf "%d\n", int(n*0.55 + 0.999)}')  # round up
-    if (( m < 1 )); then m=1; fi
-    echo "   🧮 $n replicates → using --minentries $m (55% of replicates)"
+  num_reps=${#peak_files[@]}
+  if (( num_reps < 2 )); then
+    echo "⚠️ Not enough replicates ($num_reps) for $tissue — skipping."
+    continue
+  fi
 
-    # --- Run ChIP-R ---
-    echo "   🧬 Running ChIP-R..."
-    chipr -i "${peak_files[@]}" -m "$m" -o "${CHIPR_OUT}/${tissue}_consensus"
+  # --- Determine m dynamically (≥55% of replicates, rounded) ---
+  m=$(awk -v n="$num_reps" 'BEGIN {
+      prop = int(n * 0.55 + 0.5);
+      if (prop < 2) prop = 2;
+      if (prop > n) prop = n;
+      print prop;
+  }')
 
+  echo "   ✅ Found $num_reps replicates → using m=$m"
+  echo "   Peak files: ${peak_files[*]}"
+
+  # --- Run ChIP-R ---
+  chipr -i "${peak_files[@]}" -m "$m" -o "${CHIPR_OUT}/${tissue}_consensus"
+
+  echo "   ✅ Consensus peaks saved to: ${CHIPR_OUT}/${tissue}_consensus.bed"
+  echo
 done
 
-echo "✅ All ChIP-R consensus peak sets written to: $CHIPR_OUT"
+echo "🎯 All consensus peaks complete! Results in: $CHIPR_OUT/"
