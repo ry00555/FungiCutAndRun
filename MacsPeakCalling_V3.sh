@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=90gb
-#SBATCH --time=8:00:00
+#SBATCH --time=10:00:00
 #SBATCH --output=../MacsPeakCalling.%j.out
 #SBATCH --error=../MacsPeakCalling.%j.err
 
@@ -69,33 +69,33 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     fi
 
     # Define expected outputs
-    expected=(
-        "${prefix}_peaks.broadPeak"
-        "${prefix}_peaks.xls"
-        "${prefix}_peaks.gappedPeak"
-    )
+    # expected=(
+    #     "${prefix}_peaks.broadPeak"
+    #     "${prefix}_peaks.xls"
+    #     "${prefix}_peaks.gappedPeak"
+    # )
 
     # Skip if all output files exist
-    all_exist=true
-    for f in "${expected[@]}"; do
-        if [[ ! -s "$f" ]]; then
-            all_exist=false
-            break
-        fi
-    done
-
-    if $all_exist; then
-        echo "   ✅ Skipping (MACS3 output already complete)"
-        echo "$peakfile" >> "$OUTLIST"
-        continue
-    fi
-
-    echo "   ⚠️ Running MACS3 for: $DesiredPeakName"
-
-    # Cleanup any partial output
-    for f in "${expected[@]}"; do
-        [[ -f "$f" ]] && rm -f "$f"
-    done
+    # all_exist=true
+    # for f in "${expected[@]}"; do
+    #     if [[ ! -s "$f" ]]; then
+    #         all_exist=false
+    #         break
+    #     fi
+  done
+    #
+    # if $all_exist; then
+    #     echo "   ✅ Skipping (MACS3 output already complete)"
+    #     echo "$peakfile" >> "$OUTLIST"
+    #     continue
+    # fi
+    #
+    # echo "   ⚠️ Running MACS3 for: $DesiredPeakName"
+    #
+    # # Cleanup any partial output
+    # for f in "${expected[@]}"; do
+    #     [[ -f "$f" ]] && rm -f "$f"
+    # done
 
     # --- Run MACS3 ---
     if [[ -n "$bamControl" && -f "$input_path" ]]; then
