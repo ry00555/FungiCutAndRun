@@ -20,73 +20,71 @@ SUMMARY="${CHIPR_OUT}/consensus_summary.tsv"
 dos2unix "$META" 2>/dev/null || true
 ml ChIP-R/1.1.0-foss-2023a-Python-3.11.3
 
-echo -e "Tissue\tNumReps\tm_value\tOutputFile\tPeakFiles" > "$SUMMARY"
+echo -e "Tissue\tNumReps\tm_value\tNumPeaks\tOutputFile\tValidPeakFiles\tSkippedPeakFiles" > "$SUMMARY"
 
-# === STEP 1: Collect Tissue + Peaks columns ===
-# Expecting columns: RunID,...,Tissue,...,Peaks,...
-# Adjust field positions if needed (Tissue=$?, Peaks=$?)
+# --- STEP 1: Extract Tissue + Peaks ---
+# Adjust field positions if needed (Tissue=$6, Peaks=$12)
 tail -n +2 "$META" | awk -F',' '{print $6 "\t" $12}' > tmp_peaks_by_tissue.tsv
 
-# === STEP 2: Loop over each unique tissue ===
+# --- STEP 2: Loop over tissues ---
 for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
     echo "🔍 Processing tissue: $tissue"
-    peak_files=()
 
-    # Gather all .broadPeak files for this tissue
+    peak_files=()
+    skipped_files=()
+
+    # Collect valid .broadPeak files
     while IFS=$'\t' read -r t peak; do
         [[ "$t" != "$tissue" ]] && continue
 
-        # Add full path if only filename is provided
-        if [[ ! "$peak" =~ / ]]; then
-            peak="${MACSDIR}/${peak}"
-        fi
+        # Prepend full path if needed
+        [[ ! "$peak" =~ / ]] && peak="${MACSDIR}/${peak}"
 
-        # Confirm existence
-        if [[ -f "$peak" ]]; then
+        if [[ -f "$peak" && -s "$peak" ]]; then
             peak_files+=("$peak")
         else
-            echo "⚠️ Missing peak file: $peak"
+            echo "⚠️ Skipping missing or empty peak file: $peak"
+            skipped_files+=("$peak")
         fi
     done < tmp_peaks_by_tissue.tsv
 
     n=${#peak_files[@]}
     if (( n < 2 )); then
-        echo "⚠️ Skipping $tissue (only $n valid replicates)"
+        echo "⚠️ Skipping $tissue: fewer than 2 valid replicates ($n)"
         continue
     fi
 
-    # === Compute m = max(2, floor(0.55 * n)) ===
-    m=$(echo "scale=0; n=$n; val=(n*0.55)/1; if (val<2) val=2; val" | bc)
-
-    echo "🧬 Running ChIPR for $tissue ($n replicates, m=$m)"
-    echo "   Peak files: ${peak_files[*]}"
+    # --- Compute m = max(2, floor(MIN_FRAC * n)) ---
+    m=$(echo "scale=0; val=int($n * $MIN_FRAC); if(val<2) val=2; val" | bc)
 
     prefix="${CHIPR_OUT}/${tissue}_consensus"
     outfile="${prefix}_optimal.bed"
 
-    # === Skip if consensus already exists ===
-      if [[ -s "$outfile" ]]; then
-          num_peaks=$(wc -l < "$outfile")
-          echo "✅ Skipping $tissue (consensus already exists, $num_peaks peaks)"
-          echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}" >> "$SUMMARY"
-          continue
-      fi
-    # === Run ChIPR ===
+    # --- Skip if consensus already exists ---
+    if [[ -s "$outfile" ]]; then
+        num_peaks=$(wc -l < "$outfile")
+        echo "✅ Skipping $tissue (consensus exists, $num_peaks peaks)"
+        echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}\t${skipped_files[*]}" >> "$SUMMARY"
+        continue
+    fi
+
+    # --- Run ChIPR ---
+    echo "🧬 Running ChIPR for $tissue ($n replicates, m=$m)"
+    echo "   Valid peak files: ${peak_files[*]}"
     chipr -i "${peak_files[@]}" -m "$m" -o "$prefix"
 
-    if [[ -f "$outfile" ]]; then
-          num_peaks=$(wc -l < "$outfile")
-          echo "   📊 $num_peaks consensus peaks retained for $tissue"
-      else
-          num_peaks=0
-          echo "   ⚠️ No output found for $tissue"
-      fi
+    # --- Record results ---
+    if [[ -f "$outfile" && -s "$outfile" ]]; then
+        num_peaks=$(wc -l < "$outfile")
+        echo "   📊 $num_peaks consensus peaks retained for $tissue"
+    else
+        num_peaks=0
+        echo "   ⚠️ No output found for $tissue"
+    fi
 
-      # === Save summary line ===
-      echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}" >> "$SUMMARY"
-  done
+    echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}\t${skipped_files[*]}" >> "$SUMMARY"
+done
 
 rm -f tmp_peaks_by_tissue.tsv
-
 echo "✅ ChIPR consensus generation complete!"
 echo "📄 Summary written to: $SUMMARY"
