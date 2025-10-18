@@ -1,14 +1,14 @@
-# !/bin/bash
-# SBATCH --job-name=MacsPeakCalling
-# SBATCH --partition=batch
-# SBATCH --mail-type=ALL
-# SBATCH --mail-user=ry00555@uga.edu
-# SBATCH --ntasks=1
-# SBATCH --cpus-per-task=24
-# SBATCH --mem=50gb
-# SBATCH --time=10:00:00
-# SBATCH --output=../MacsPeakCalling.%j.out
-# SBATCH --error=../MacsPeakCalling.%j.err
+#!/bin/bash
+#SBATCH --job-name=MacsPeakCalling
+#SBATCH --partition=batch
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=50gb
+#SBATCH --time=10:00:00
+#SBATCH --output=../MacsPeakCalling.%j.out
+#SBATCH --error=../MacsPeakCalling.%j.err
 
 cd $SLURM_SUBMIT_DIR
 #Set Paths
