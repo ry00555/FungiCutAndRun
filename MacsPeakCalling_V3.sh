@@ -82,7 +82,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     #         all_exist=false
     #         break
     #     fi
-  done
+  #done
     #
     # if $all_exist; then
     #     echo "   ✅ Skipping (MACS3 output already complete)"
