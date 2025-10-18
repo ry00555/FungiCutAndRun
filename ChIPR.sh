@@ -62,12 +62,29 @@ for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
     echo "   Peak files: ${peak_files[*]}"
 
     prefix="${CHIPR_OUT}/${tissue}_consensus"
-
+    outfile="${prefix}.bed"
+    
+    # === Skip if consensus already exists ===
+      if [[ -s "$outfile" ]]; then
+          num_peaks=$(wc -l < "$outfile")
+          echo "✅ Skipping $tissue (consensus already exists, $num_peaks peaks)"
+          echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}" >> "$SUMMARY"
+          continue
+      fi
     # === Run ChIPR ===
     chipr -i "${peak_files[@]}" -m "$m" -o "$prefix"
 
-    echo -e "${tissue}\t${n}\t${m}\t${prefix}.bed\t${peak_files[*]}" >> "$SUMMARY"
-done
+    if [[ -f "$outfile" ]]; then
+          num_peaks=$(wc -l < "$outfile")
+          echo "   📊 $num_peaks consensus peaks retained for $tissue"
+      else
+          num_peaks=0
+          echo "   ⚠️ No output found for $tissue"
+      fi
+
+      # === Save summary line ===
+      echo -e "${tissue}\t${n}\t${m}\t${num_peaks}\t${outfile}\t${peak_files[*]}" >> "$SUMMARY"
+  done
 
 rm -f tmp_peaks_by_tissue.tsv
 
