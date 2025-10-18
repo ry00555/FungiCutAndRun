@@ -55,7 +55,9 @@ for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
     fi
 
     # --- Compute m = max(2, floor(MIN_FRAC * n)) ---
-    m=$(echo "scale=0; val=int($n * $MIN_FRAC); if(val<2) val=2; val" | bc)
+    # === Compute m = max(2, floor(MIN_FRAC * n)) ===
+    m=$(printf "%.0f" "$(echo "$n * $MIN_FRAC" | bc)")
+    if (( m < 2 )); then m=2; fi
 
     prefix="${CHIPR_OUT}/${tissue}_consensus"
     outfile="${prefix}_optimal.bed"
