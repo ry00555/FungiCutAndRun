@@ -20,6 +20,16 @@ MIN_FRAC=0.55               # require peaks to appear in ≥55% of replicates
 IDR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
 SUMMARY="${IDR}/replicate_vs_CHIPRconsensus.tsv"
 
+echo "Converting all consensus BED files to broadPeak format..."
+for bed in "${CHIPR_DIR}"/*_consensus_optimal.bed; do
+    [[ ! -f "$bed" ]] && continue
+    out="${CHIPR_DIR}/$(basename "${bed%.bed}_peaks.broadPeak")"
+    awk 'BEGIN{OFS="\t"} {print $0, -1}' "$bed" > "$out"
+    echo "Converted: $(basename "$bed") → $(basename "$out")"
+done
+echo "✅ Conversion complete."
+
+
 # Remove carriage returns
 dos2unix "$META" 2>/dev/null || true
 echo -e "Tissue\tReplicate\tPeakFile\tNumPeaks\tNumOverlapWithConsensus\tFractionOverlap\tIDR_Passing" > "$SUMMARY"
@@ -29,7 +39,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     [[ -z "$Tissue" ]] && continue
 
     rep_peak="${MACSDIR}/${Peaks}"
-    consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal.bed"
+    consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
     if [[ ! -s "$rep_peak" ]]; then
         echo "⚠️ Missing replicate peak: $rep_peak"
