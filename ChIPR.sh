@@ -13,8 +13,8 @@
 set -euo pipefail
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
-CHIPR_OUT="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
-SUMMARY="${CHIPR_OUT}/consensus_summary.tsv"
+CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
+SUMMARY="${CHIPR_DIR}/ChIPR_consensus_summary.tsv"
 
 dos2unix "$META" 2>/dev/null || true
 ml ChIP-R/1.1.0-foss-2023a-Python-3.11.3
@@ -62,7 +62,7 @@ for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
         (( m < 2 )) && m=2
         echo "→ n=$n | using frac=$frac → m=$m"
 
-    prefix="${CHIPR_OUT}/${tissue}_consensus"
+    prefix="${CHIPR_DIR}/${tissue}_consensus"
     outfile="${prefix}_optimal.bed"
 
     # --- Skip if consensus already exists ---
@@ -93,3 +93,10 @@ done
 rm -f tmp_peaks_by_tissue.tsv
 echo "✅ ChIPR consensus generation complete!"
 echo "📄 Summary written to: $SUMMARY"
+
+echo "Converting all consensus BED files to broadPeak format..."
+for bed in "${CHIPR_DIR}"/*_consensus_optimal.bed; do
+      out="${bed%.bed}_peaks.broadPeak"
+      cp "$bed" "$out"
+      echo "🟢 Copied: $bed → $out"
+  done
