@@ -50,7 +50,7 @@ echo "🧮 Calculating FRiP for each replicate..."
 while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
     [[ -z "$SampleID" || -z "$Tissue" ]] && continue
 
-    bam="${BAMDIR}/${SampleID}.bam"
+    bam="${BAMDIR}/${bamReads}"
     peaks="${MACSDIR}/${Peaks}"
 
     if [[ ! -s "$bam" ]]; then
