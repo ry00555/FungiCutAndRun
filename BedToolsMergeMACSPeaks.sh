@@ -20,9 +20,6 @@ BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
 
 MERGE_GAP=100  # bp gap allowed between merged peaks
-
-mkdir -p "$OUTDIR"
-
 SUMMARY="${OUTDIR}/replicate_vs_consensus.tsv"
 OUTLIST="${OUTDIR}/consensus_peak_list.txt"
 FRiP_summary="/scratch/ry00555/RNASeqPaper/Oct2025/FRiP_summary.tsv"
@@ -86,7 +83,7 @@ for tissue in "${!tissue_to_peaks[@]}"; do
         merged_files+=("$merged")
     done
 
-    consensus="${OUTDIR}/${tissue}_consensus_peaks.broadPeak"
+    consensus="${CHIPR_DIR}/${tissue}_consensus_peaks.broadPeak"
     if (( n == 1 )); then
         cp "${merged_files[0]}" "$consensus"
     else
