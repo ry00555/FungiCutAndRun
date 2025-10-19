@@ -49,18 +49,16 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     frac=$(awk "BEGIN {printf \"%.3f\", ($num_peaks>0)?$num_overlap/$num_peaks:0}")
 
     # === True IDR Analysis ===
-    idr_output="${IDR}/${SampleID}_vs_consensus.idr.txt"
-    idr_plot="${IDR}/${SampleID}_vs_consensus.png"
-
     idr --samples "$rep_peak" "$consensus" \
         --input-file-type broadPeak \
         --rank p.value \
-        --output-file "$idr_output" \
+        --output-file "${IDR}/${SampleID}_vs_consensus" \
         --plot \
         --log-output-file "${IDR}/${SampleID}_vs_consensus.log" 2>/dev/null
 
-    idr_pass=$(awk '($12 < 0.05){c++} END{print c+0}' "$idr_output" 2>/dev/null || echo 0)
+  #  idr_pass=$(awk '($12 < 0.05){c++} END{print c+0}' "$idr_output" 2>/dev/null || echo 0)
 
-    echo -e "${Tissue}\t${Replicate}\t${rep_peak}\t${num_peaks}\t${num_overlap}\t${frac}\t${idr_pass}" >> "$SUMMARY"
+    echo -e "${Tissue}\t${Replicate}\t${rep_peak}\t${num_peaks}\t${num_overlap}\t${frac}" >> "$SUMMARY"
+  #  echo -e "${Tissue}\t${Replicate}\t${rep_peak}\t${num_peaks}\t${num_overlap}\t${frac}\t${idr_pass}" >> "$SUMMARY"
 
 done
