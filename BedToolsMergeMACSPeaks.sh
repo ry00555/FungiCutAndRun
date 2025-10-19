@@ -28,7 +28,7 @@ FRiP_summary="/scratch/ry00555/RNASeqPaper/Oct2025/FRiP_summary.tsv"
 > "$OUTLIST"
 > "FRiP_summary"
 
-ml BEDTools/2.31.1-GCC-13.3.0 Samtools/1.20-GCC-13.3.0
+ml BEDTools/2.31.1-GCC-13.3.0 SAMtools/1.21-GCC-13.3.0
 
 echo -e "Tissue\tReplicate\tRepPeakFile\tNumPeaks\tNumOverlap\tFracOverlap\tConsensusFile\tNumConsensusPeaks" > "$SUMMARY"
 echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRiP_summary"
