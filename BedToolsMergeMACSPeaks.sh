@@ -9,61 +9,100 @@
 #SBATCH --time=6:00:00
 #SBATCH --output=../MergeMacsPeaks.%j.out
 #SBATCH --error=../MergeMacsPeaks.%j.err
-set -euo pipefail
-set -x  # debug trace
 
-# === Paths ===
+#!/usr/bin/env bash
+set -euo pipefail
+
+# -----------------------------
+# Path configuration
+# -----------------------------
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
 BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
+MERGE_GAP=100
 
-MERGE_GAP=100  # bp gap allowed between merged peaks
 SUMMARY="${OUTDIR}/replicate_vs_consensus.tsv"
 OUTLIST="${OUTDIR}/consensus_peak_list.txt"
-FRiP_summary="/scratch/ry00555/RNASeqPaper/Oct2025/FRiP_summary.tsv"
+FRIP_SUMMARY="${OUTDIR}/FRiP_summary.tsv"
 
-> "$SUMMARY"
-> "$OUTLIST"
-> "FRiP_summary"
+# -----------------------------
+# Setup
+# -----------------------------
+mkdir -p "$OUTDIR"
+
+# Initialize output files
+echo -e "Tissue\tReplicate\tRepPeakFile\tNumPeaks\tNumOverlap\tFracOverlap\tConsensusFile\tNumConsensusPeaks" > "$SUMMARY"
+echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_SUMMARY"
+: > "$OUTLIST"
 
 ml BEDTools/2.31.1-GCC-13.3.0 SAMtools/1.21-GCC-13.3.0
 
-echo -e "Tissue\tReplicate\tRepPeakFile\tNumPeaks\tNumOverlap\tFracOverlap\tConsensusFile\tNumConsensusPeaks" > "$SUMMARY"
-echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRiP_summary"
-
+# Normalize CSV line endings (just in case)
 dos2unix "$META" 2>/dev/null || true
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+
+# -----------------------------
+# Step 1: Calculate FRiP per replicate
+# -----------------------------
+echo "🧮 Calculating FRiP for each replicate..."
+
+while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+    [[ -z "$SampleID" || -z "$Tissue" ]] && continue
+
     bam="${BAMDIR}/${SampleID}.bam"
     peaks="${MACSDIR}/${Peaks}"
 
-    [[ ! -s "$bam" || ! -s "$peaks" ]] && continue
+    if [[ ! -s "$bam" ]]; then
+        echo "⚠️ Missing BAM file: $bam"
+        continue
+    fi
+    if [[ ! -s "$peaks" ]]; then
+        echo "⚠️ Missing peak file: $peaks"
+        continue
+    fi
 
-    total=$(samtools view -c -F 260 "$bam")
-    inpeaks=$(bedtools intersect -u -a "$bam" -b "$peaks" | wc -l)
-    frip=$(awk "BEGIN{printf \"%.3f\", ($total>0)?$inpeaks/$total:0}")
+    total_reads=$(samtools view -c -F 260 "$bam")
+    reads_in_peaks=$(bedtools intersect -u -a "$bam" -b "$peaks" | wc -l)
+    frip=$(awk "BEGIN{printf \"%.4f\", ($total_reads>0)?$reads_in_peaks/$total_reads:0}")
 
-    echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total}\t${inpeaks}\t${frip}" >> "$FRiP_summary"
-done
+    echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_SUMMARY"
+done < <(tail -n +2 "$META")
 
-echo "✅ FRiP summary saved to $FRiP_summary"
+echo "✅ FRiP summary saved to: $FRIP_SUMMARY"
 
-# ---------------------------------------------
-# Step 1: Collect replicate peak files per Tissue
-# ---------------------------------------------
+# -----------------------------
+# Step 2: Build associative array of peak files per Tissue
+# -----------------------------
+declare -A tissue_to_peaks
+
 while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
     [[ -z "$Tissue" ]] && continue
     peak="${MACSDIR}/${Peaks}"
+
     if [[ -s "$peak" ]]; then
         tissue_to_peaks["$Tissue"]+="$peak "
     else
         echo "⚠️ Skipping missing peak file: $peak"
     fi
-done < <(awk -F',' 'NR>1' "$META")
+done < <(tail -n +2 "$META")
+
+# -----------------------------
+# Step 3: Optional consensus peak listing
+# -----------------------------
+echo "🧩 Collecting consensus peak sets per tissue..."
+for tissue in "${!tissue_to_peaks[@]}"; do
+    echo "$tissue ${tissue_to_peaks[$tissue]}" >> "$OUTLIST"
+done
+
+echo "✅ Consensus peak file list saved to: $OUTLIST"
+echo "✅ Summary outputs:"
+echo "   - FRiP summary: $FRIP_SUMMARY"
+echo "   - Peak list: $OUTLIST"
+echo "   - Replicate summary: $SUMMARY"
 
 # ---------------------------------------------
-# Step 2: Loop through tissues to build consensus + overlaps
+# Step4: Loop through tissues to build consensus + overlaps
 # ---------------------------------------------
 for tissue in "${!tissue_to_peaks[@]}"; do
     files=(${tissue_to_peaks[$tissue]})
@@ -95,7 +134,7 @@ for tissue in "${!tissue_to_peaks[@]}"; do
     echo "$consensus" >> "$OUTLIST"
 
     # ---------------------------------------------
-    # Step 3: Compute overlap for each replicate
+    # Step 5: Compute overlap for each replicate
     # ---------------------------------------------
     for f in "${files[@]}"; do
         rep_name=$(basename "$f")
