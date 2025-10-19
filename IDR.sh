@@ -22,12 +22,10 @@ SUMMARY="${IDR}/replicate_vs_CHIPRconsensus.tsv"
 
 echo "Converting all consensus BED files to broadPeak format..."
 for bed in "${CHIPR_DIR}"/*_consensus_optimal.bed; do
-    [[ ! -f "$bed" ]] && continue
-    out="${CHIPR_DIR}/$(basename "${bed%.bed}_peaks.broadPeak")"
-    awk 'BEGIN{OFS="\t"} {print $0, -1}' "$bed" > "$out"
-    echo "Converted: $(basename "$bed") → $(basename "$out")"
-done
-echo "✅ Conversion complete."
+      out="${bed%.bed}_peaks.broadPeak"
+      cp "$bed" "$out"
+      echo "🟢 Copied: $bed → $out"
+  done
 
 
 # Remove carriage returns
@@ -62,9 +60,10 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     idr --samples "$rep_peak" "$consensus" \
         --input-file-type broadPeak \
         --rank p.value \
-        --output-file "${IDR}/${SampleID}_vs_consensus" \
+        --output-file "${IDR}/${SampleID}_vs_consensus_reproducible" \
+        --output-file-type broadPeak \
         --plot \
-        --log-output-file "${IDR}/${SampleID}_vs_consensus.log" 2>/dev/null
+        --log-output-file "${IDR}/${SampleID}_vs_consensus_reproducible.log" 2>/dev/null
 
   #  idr_pass=$(awk '($12 < 0.05){c++} END{print c+0}' "$idr_output" 2>/dev/null || echo 0)
 
