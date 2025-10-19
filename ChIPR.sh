@@ -14,7 +14,6 @@ set -euo pipefail
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_OUT="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
-MIN_FRAC=0.55               # require peaks to appear in ≥55% of replicates
 SUMMARY="${CHIPR_OUT}/consensus_summary.tsv"
 
 dos2unix "$META" 2>/dev/null || true
@@ -54,10 +53,14 @@ for tissue in $(cut -f1 tmp_peaks_by_tissue.tsv | sort | uniq); do
         continue
     fi
 
-    # --- Compute m = max(2, floor(MIN_FRAC * n)) ---
-    # === Compute m = max(2, floor(MIN_FRAC * n)) ===
-    m=$(printf "%.0f" "$(echo "$n * $MIN_FRAC" | bc)")
-    if (( m < 2 )); then m=2; fi
+    if (( n <= 5 )); then
+            frac=0.55
+        else
+            frac=0.45
+        fi
+        m=$(printf "%.0f" "$(echo "$n * $frac" | bc)")
+        (( m < 2 )) && m=2
+        echo "→ n=$n | using frac=$frac → m=$m"
 
     prefix="${CHIPR_OUT}/${tissue}_consensus"
     outfile="${prefix}_optimal.bed"
