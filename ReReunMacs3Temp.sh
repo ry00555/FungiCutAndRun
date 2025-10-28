@@ -11,103 +11,118 @@
 #SBATCH --error=../Macs3_Rerun.%j.err
 
 # --- Paths ---
-BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
-OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
-
-ml MACS3
+BAMDIR=/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles
+OUTDIR=/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks
+GENOME_SIZE=41037538
+ml MACS3/3.0.1-gfbf-2023a
 
 # Convert potential Windows line endings
 dos2unix "$META" 2>/dev/null || true
+echo "🚀 Recalling MACS3 for missing peak files individually..."
 
-# --- Targeted rerun list ---
-declare -a MISSING_PEAKS=(
-"131-72_WT_H3K36me2_rep1_peaks.broadPeak"
-"142-105_swd-1_Input_rep1_peaks.broadPeak"
-"131-54_WT_H3K36me3_rep2_peaks.broadPeak"
-"134-12_cdp-6_H3K36me3_rep1_peaks.broadPeak"
-"134-15_cdp-6_H3K36me3_rep2_peaks.broadPeak"
-"142-106_swd-1_H3K27me3_rep1_peaks.broadPeak"
-"132-29_rco-1_Input_rep1_peaks.broadPeak"
-"148-130_nst4_H3K4ac_rep1_peaks.broadPeak"
-"149-32_set-7_H3K36me3_rep8_peaks.broadPeak"
-"137-27_WT_H3K27me3_rep5_peaks.broadPeak"
-"131-37_WT_Input_rep3_peaks.broadPeak"
-"133-78_WT_H3K27me3_rep2_peaks.broadPeak"
-)
+# 1. 131-72_WT_H3K36me2_rep1
+macs3 callpeak \
+    -t "${BAMDIR}/131-72_ChIP_WT_H3K36me2_Rep1.bam" \
+    -c "${BAMDIR}/131-37_ChIP_WT_input_Rep1_S27_L001_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "131-72_WT_H3K36me2_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-echo "🚀 Recalling MACS3 for ${#MISSING_PEAKS[@]} missing peak files..."
+# 2. 142-105_swd-1_Input_rep1 (no control)
+macs3 callpeak \
+    -t "${BAMDIR}/142-105_ChIP_swd1_Input__Q30.bam" \
+    -f BAMPE \
+    -n "142-105_swd-1_Input_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-declare -a MISSING_BAMS=()
+# 3. 131-54_WT_H3K36me3_rep2
+macs3 callpeak \
+    -t "${BAMDIR}/131-54_ChIP_WT_H3K36me3_Rep2.bam" \
+    -c "${BAMDIR}/131-37_ChIP_WT_input_Rep1_S27_L001_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "131-54_WT_H3K36me3_rep2" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-    [[ -z "$RunID" ]] && continue
-    peakfile=$(basename "$Peaks")
+# 4. 134-12_cdp-6_H3K36me3_rep1
+macs3 callpeak \
+    -t "${BAMDIR}/134-12_ChIP_ncu06787_H3K36me3_Rep2_S9_L001_R1_001_val_1.fq.gz.bam" \
+    -c "${BAMDIR}/134-13_ChIP_ncu06788_Input_Rep2.bam" \
+    -f BAMPE \
+    -n "134-12_cdp-6_H3K36me3_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-    # Only process missing peaks
-    if printf '%s\n' "${MISSING_PEAKS[@]}" | grep -qx "$peakfile"; then
-        echo "➡️  Recalling peaks for: $DesiredPeakName"
+# 5. 134-15_cdp-6_H3K36me3_rep2
+macs3 callpeak \
+    -t "${BAMDIR}/134-15_ChIP_ncu06787_H3K36me3_Rep3_S10_L001_R1_001_val_1.fq.gz.bam" \
+    -c "${BAMDIR}/134-13_ChIP_ncu06788_Input_Rep2.bam" \
+    -f BAMPE \
+    -n "134-15_cdp-6_H3K36me3_rep2" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        chip_path="${BAMDIR}/${bamReads}"
-        input_path="${BAMDIR}/${bamControl:-}"
-        prefix="${OUTDIR}/${DesiredPeakName}"
+# 6. 142-106_swd-1_H3K27me3_rep1
+macs3 callpeak \
+    -t "${BAMDIR}/142-106_ChIP_swd1_H3K27me3__Q30.bam" \
+    -c "${BAMDIR}/142-105_ChIP_swd1_Input__Q30.bam" \
+    -f BAMPE \
+    -n "142-106_swd-1_H3K27me3_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        # Check if BAM exists and is not empty
-        if [[ ! -s "$chip_path" ]]; then
-            echo "⚠️ Missing or empty BAM file: $chip_path"
-            MISSING_BAMS+=("$chip_path")
-            continue
-        fi
+# 7. 132-29_rco-1_Input_rep1 (no control)
+macs3 callpeak \
+    -t "${BAMDIR}/132-29_ChIP_rco1_Input_Rep1.bam" \
+    -f BAMPE \
+    -n "132-29_rco-1_Input_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        # Optional: Check control BAM if present
-        if [[ -n "$bamControl" && ! -s "$input_path" ]]; then
-            echo "⚠️ Missing or empty control BAM: $input_path"
-            MISSING_BAMS+=("$input_path")
-            continue
-        fi
+# 8. 148-130_nst4_H3K4ac_rep1
+macs3 callpeak \
+    -t "${BAMDIR}/148-130_ChIP_nst4_H3K4ac_Rep1_Q30.bam" \
+    -c "${BAMDIR}/148-130_ChIP_nst4_H3K4ac_Rep1_Q30.bam" \
+    -f BAMPE \
+    -n "148-130_nst4_H3K4ac_rep1" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        # Clean up old output (if any)
-        rm -f "${prefix}_peaks."* 2>/dev/null || true
+# 9. 149-32_set-7_H3K36me3_rep8
+macs3 callpeak \
+    -t "${BAMDIR}/149-32_ChIP_set7_H3K36me3_Rep8.bam" \
+    -c "${BAMDIR}/149-23__set1set7_Input_Rep1_S23_L004_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "149-32_set-7_H3K36me3_rep8" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        # Run MACS3
-        if [[ -n "$bamControl" && -s "$input_path" ]]; then
-            echo "   Using control: $input_path"
-            macs3 callpeak \
-                -t "$chip_path" \
-                -c "$input_path" \
-                -f BAMPE \
-                -n "$DesiredPeakName" \
-                --broad \
-                --broad-cutoff 0.1 \
-                -g 41037538 \
-                --outdir "$OUTDIR" \
-                --min-length 800 \
-                --max-gap 500
-        else
-            echo "   No control found → running without input"
-            macs3 callpeak \
-                -t "$chip_path" \
-                -f BAMPE \
-                -n "$DesiredPeakName" \
-                --broad \
-                --broad-cutoff 0.1 \
-                -g 41037538 \
-                --outdir "$OUTDIR" \
-                --min-length 800 \
-                --max-gap 500
-        fi
+# 10. 137-27_WT_H3K27me3_rep5
+macs3 callpeak \
+    -t "${BAMDIR}/137-27_ChIP_WT_H3K27me3_Rep5.bam" \
+    -c "${BAMDIR}/131-37_ChIP_WT_input_Rep1_S27_L001_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "137-27_WT_H3K27me3_rep5" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-        echo "✅ Finished: $DesiredPeakName"
-    fi
-done
+# 11. 131-37_WT_Input_rep3 (no control)
+macs3 callpeak \
+    -t "${BAMDIR}/131-37_ChIP_WT_input_Rep1_S27_L001_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "131-37_WT_Input_rep3" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-# After loop finishes
-echo "🎯 All targeted MACS3 re-runs complete."
-echo "--------------------------------------"
+# 12. 133-78_WT_H3K27me3_rep2
+macs3 callpeak \
+    -t "${BAMDIR}/133-78_ChIP_WT_H3K27me3_Rep2.bam" \
+    -c "${BAMDIR}/131-37_ChIP_WT_input_Rep1_S27_L001_R1_001_val_1.fq.gz_Q30.bam" \
+    -f BAMPE \
+    -n "133-78_WT_H3K27me3_rep2" \
+    --broad --broad-cutoff 0.1 \
+    -g $GENOME_SIZE --outdir "$OUTDIR" --min-length 800 --max-gap 500
 
-if [[ ${#MISSING_BAMS[@]} -gt 0 ]]; then
-    echo "⚠️ Missing or empty BAM files detected (${#MISSING_BAMS[@]}):"
-    printf '%s\n' "${MISSING_BAMS[@]}"
-else
-    echo "✅ No missing or empty BAMs detected!"
-fi
+echo "🎯 All individual MACS3 peak calls complete!"
