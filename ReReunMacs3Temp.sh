@@ -22,26 +22,29 @@ dos2unix "$META" 2>/dev/null || true
 
 # --- Targeted rerun list ---
 declare -a MISSING_PEAKS=(
+"131-72_WT_H3K36me2_rep1_peaks.broadPeak"
+"142-105_swd-1_Input_rep1_peaks.broadPeak"
+"131-54_WT_H3K36me3_rep2_peaks.broadPeak"
 "134-12_cdp-6_H3K36me3_rep1_peaks.broadPeak"
 "134-15_cdp-6_H3K36me3_rep2_peaks.broadPeak"
-"147-35_H3K56R_H3K27me3_rep7_peaks.broadPeak"
-"147-36_H3K56R_H3K36me3_rep7_peaks.broadPeak"
-"147-33_H3K56R_Input_rep7_peaks.broadPeak"
-"148-130_nst4_H3K4ac_rep1_peaks.broadPeak"
+"142-106_swd-1_H3K27me3_rep1_peaks.broadPeak"
 "132-29_rco-1_Input_rep1_peaks.broadPeak"
-"131-55_rtt109_Input_rep3_peaks.broadPeak"
+"148-130_nst4_H3K4ac_rep1_peaks.broadPeak"
 "149-32_set-7_H3K36me3_rep8_peaks.broadPeak"
-"149-19_set-7_H3K9me3_rep1_peaks.broadPeak"
+"137-27_WT_H3K27me3_rep5_peaks.broadPeak"
+"131-37_WT_Input_rep3_peaks.broadPeak"
+"133-78_WT_H3K27me3_rep2_peaks.broadPeak"
 )
 
 echo "🚀 Recalling MACS3 for ${#MISSING_PEAKS[@]} missing peak files..."
 
-# Loop through META, matching only entries in the missing list
+declare -a MISSING_BAMS=()
+
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
     [[ -z "$RunID" ]] && continue
     peakfile=$(basename "$Peaks")
 
-    # Check if this row is one of the missing ones
+    # Only process missing peaks
     if printf '%s\n' "${MISSING_PEAKS[@]}" | grep -qx "$peakfile"; then
         echo "➡️  Recalling peaks for: $DesiredPeakName"
 
@@ -49,17 +52,25 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
         input_path="${BAMDIR}/${bamControl:-}"
         prefix="${OUTDIR}/${DesiredPeakName}"
 
-        # Check BAM
-        if [[ ! -f "$chip_path" ]]; then
-            echo "⚠️ Missing BAM file: $chip_path"
+        # Check if BAM exists and is not empty
+        if [[ ! -s "$chip_path" ]]; then
+            echo "⚠️ Missing or empty BAM file: $chip_path"
+            MISSING_BAMS+=("$chip_path")
+            continue
+        fi
+
+        # Optional: Check control BAM if present
+        if [[ -n "$bamControl" && ! -s "$input_path" ]]; then
+            echo "⚠️ Missing or empty control BAM: $input_path"
+            MISSING_BAMS+=("$input_path")
             continue
         fi
 
         # Clean up old output (if any)
         rm -f "${prefix}_peaks."* 2>/dev/null || true
 
-        # Run MACS3 (with or without control)
-        if [[ -n "$bamControl" && -f "$input_path" ]]; then
+        # Run MACS3
+        if [[ -n "$bamControl" && -s "$input_path" ]]; then
             echo "   Using control: $input_path"
             macs3 callpeak \
                 -t "$chip_path" \
@@ -90,4 +101,13 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     fi
 done
 
+# After loop finishes
 echo "🎯 All targeted MACS3 re-runs complete."
+echo "--------------------------------------"
+
+if [[ ${#MISSING_BAMS[@]} -gt 0 ]]; then
+    echo "⚠️ Missing or empty BAM files detected (${#MISSING_BAMS[@]}):"
+    printf '%s\n' "${MISSING_BAMS[@]}"
+else
+    echo "✅ No missing or empty BAMs detected!"
+fi
