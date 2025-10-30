@@ -13,11 +13,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ml BEDTools/2.30.0-GCC-11.3.0 deepTools/3.5.5-gfbf-2023a
+ml BEDTools/2.30.0-GCC-11.3.0 deepTools/3.5.5-gfbf-2023a SAMtools/1.21-GCC-13.3.0
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
+BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
 SUMMARY="${OUTDIR}/replicate_vs_CHIPRconsensus.tsv"
 COMBINED="${OUTDIR}/all_combined.tsv"
