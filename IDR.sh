@@ -10,64 +10,91 @@
 #SBATCH --output=../IDR.%j.out
 #SBATCH --error=../IDR.%j.err
 
-#ml R/4.4.2-gfbf-2024a
-ml IDR/2.0.3-foss-2023a BEDTools/2.31.1-GCC-13.3.0
+#!/usr/bin/env bash
+set -euo pipefail
+
+ml BEDTools/2.31.1-GCC-13.3.0
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
-MIN_FRAC=0.55               # require peaks to appear in ≥55% of replicates
-IDR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
-SUMMARY="${IDR}/replicate_vs_CHIPRconsensus.tsv"
-
-echo "Converting all consensus BED files to broadPeak format..."
-for bed in "${CHIPR_DIR}"/*_consensus_optimal.bed; do
-      out="${bed%.bed}_peaks.broadPeak"
-      cp "$bed" "$out"
-      echo "🟢 Copied: $bed → $out"
-  done
+OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
+SUMMARY="${OUTDIR}/replicate_vs_CHIPRconsensus.tsv"
+COMBINED="${OUTDIR}/all_combined.tsv"
 
 
-# Remove carriage returns
-dos2unix "$META" 2>/dev/null || true
-echo -e "Tissue\tReplicate\tPeakFile\tNumPeaks\tNumOverlapWithConsensus\tFractionOverlap\tIDR_Passing" > "$SUMMARY"
+FRIP_TSV="${OUTDIR}/frip_metrics.tsv"
+OVERLAP_TSV="${OUTDIR}/replicate_overlap.tsv"
+JACCARD_TSV="${OUTDIR}/pairwise_jaccard.tsv"
+BAM_CORR_NPZ="${OUTDIR}/bam_corr.npz"
+CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 
-# Output TSV
+
+echo "---- Calculating FRiP and overlap ----"
+echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
+echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
+
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-    [[ -z "$Tissue" ]] && continue
+  [[ -z "$SampleID" || -z "$Tissue" ]] && continue
 
-    rep_peak="${MACSDIR}/${Peaks}"
-    consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
+  bam="${BAMDIR}/${bamReads}"
+  peak="${MACSDIR}/${SampleID}_${Factor}_${Replicate}_peaks.broadPeak"
+  consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
-    if [[ ! -s "$rep_peak" ]]; then
-        echo "⚠️ Missing replicate peak: $rep_peak"
-        continue
-    fi
-    if [[ ! -s "$consensus" ]]; then
-        echo "⚠️ Missing consensus peak: $consensus"
-        continue
-    fi
+  [[ ! -s "$bam" || ! -s "$peak" ]] && continue
 
-    num_peaks=$(wc -l < "$rep_peak")
+  total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
+  reads_in_peaks=$(bedtools coverage -a "$peak" -b "$bam" -counts | awk '{sum += $7} END{print sum+0}')
+  num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
 
-    # === BEDTOOLS overlap fraction ===
-    overlap_file="${IDR}/${SampleID}_vs_consensus_overlap.bed"
-    bedtools intersect -u -a "$rep_peak" -b "$consensus" > "$overlap_file"
-    num_overlap=$(wc -l < "$overlap_file")
-    frac=$(awk "BEGIN {printf \"%.3f\", ($num_peaks>0)?$num_overlap/$num_peaks:0}")
+  if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
+    num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
+    frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
+  else
+    num_overlap=0; frac_overlap=0
+  fi
 
-    # === True IDR Analysis ===
-    idr --samples "$rep_peak" "$consensus" \
-        --input-file-type broadPeak \
-        --rank p.value \
-        --output-file "${IDR}/${SampleID}_vs_consensus_reproducible" \
-        --output-file-type broadPeak \
-        --plot \
-        --log-output-file "${IDR}/${SampleID}_vs_consensus_reproducible.log" 2>/dev/null
-
-  #  idr_pass=$(awk '($12 < 0.05){c++} END{print c+0}' "$idr_output" 2>/dev/null || echo 0)
-
-    echo -e "${Tissue}\t${Replicate}\t${rep_peak}\t${num_peaks}\t${num_overlap}\t${frac}" >> "$SUMMARY"
-  #  echo -e "${Tissue}\t${Replicate}\t${rep_peak}\t${num_peaks}\t${num_overlap}\t${frac}\t${idr_pass}" >> "$SUMMARY"
-
+  frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
+  echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
+  echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
 done
+
+# ================================
+# 5. JACCARD SIMILARITY
+# ================================
+echo "---- Calculating Jaccard similarity ----"
+echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
+
+PEAK_FILES=( $(awk -F'\t' 'NR>1{print $3}' "$OVERLAP_TSV" | sort -u) )
+for ((i=0;i<${#PEAK_FILES[@]};i++)); do
+  for ((j=i+1;j<${#PEAK_FILES[@]};j++)); do
+    f1="${PEAK_FILES[i]}"
+    f2="${PEAK_FILES[j]}"
+    if [[ -s "$f1" && -s "$f2" ]]; then
+      jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
+      echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
+    fi
+  done
+done
+
+# ================================
+# 6. MULTIBAMSUMMARY + PLOT CORRELATION
+# ================================
+BAMLIST="${OUTDIR}/bamlist.txt"
+awk -F, 'NR>1{print $2}' "$META" | while read -r b; do
+  bampath="${BAMDIR}/${b}"
+  [[ -s "$bampath" ]] && echo "$bampath"
+done > "$BAMLIST"
+
+if [[ -s "$BAMLIST" ]]; then
+  echo "---- Running deeptools correlation ----"
+  multiBamSummary bins --bamfiles $(paste -sd ' ' "$BAMLIST") \
+    -o "$BAM_CORR_NPZ" --binSize 50000 --regionSamples 100000
+  plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --corMethod pearson \
+    --plotFileName "$CORR_HEAT" --plotNumbers
+  echo "✅ Correlation heatmap saved: $CORR_HEAT"
+else
+  echo "⚠️ No BAMs found for correlation step"
+fi
+
+echo "🎉 All steps complete!"
