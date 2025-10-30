@@ -13,7 +13,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ml BEDTools/2.31.1-GCC-13.3.0
+ml BEDTools/2.30.0-GCC-11.3.0 deepTools/3.5.5-gfbf-2023a
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
