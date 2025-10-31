@@ -143,32 +143,14 @@ mkdir -p "$OUTDIR"
 
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
-# ================================
-# ================================
-# MULTIBAMSUMMARY + PLOT CORRELATION
-# ================================
-BAMLIST="${OUTDIR}/bamlist.txt"
-> "$BAMLIST"
-
-# Loop over BAM files in BAMDIR
-for bam in "$BAMDIR"/*.bam; do
-    # Skip index files
-    [[ "$bam" == *.bai ]] && continue
-
-    # Add to BAMLIST
-    echo "$bam" >> "$BAMLIST"
-
-    done
-
-# Read BAMs and labels into arrays
-mapfile -t BAMS < "$BAMLIST"
+BAMS=("$BAMDIR"/*.bam)
 
 if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
     multiBamSummary bins \
         --bamfiles "${BAMS[@]}" \
-        -o "$BAM_CORR_NPZ" \
         --smartLabels \
+        -o "$BAM_CORR_NPZ" \
         --binSize 10000
 
     plotCorrelation -in "$BAM_CORR_NPZ" \
