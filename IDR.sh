@@ -13,7 +13,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ml BEDTools/2.30.0-GCC-11.3.0 deepTools/3.5.5-gfbf-2023a SAMtools/1.21-GCC-13.3.0
+ml BEDTools/2.30.0-GCC-11.3.0 deepTools/3.5.5-gfbf-2023a SAMtools/1.21-GCC-13.3.0 BamTools/2.5.2-GCC-11.3.0
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
@@ -90,7 +90,7 @@ done > "$BAMLIST"
 if [[ -s "$BAMLIST" ]]; then
   echo "---- Running deeptools correlation ----"
   multiBamSummary bins --bamfiles $(paste -sd ' ' "$BAMLIST") \
-    -o "$BAM_CORR_NPZ" --binSize 50000 --regionSamples 100000
+    -o "$BAM_CORR_NPZ" --binSize 5000
   plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --corMethod pearson \
     --plotFileName "$CORR_HEAT" --plotNumbers
   echo "✅ Correlation heatmap saved: $CORR_HEAT"
