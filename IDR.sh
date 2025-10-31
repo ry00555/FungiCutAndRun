@@ -11,7 +11,6 @@
 #SBATCH --error=../IDR.%j.err
 
 set -euo pipefail
-module load GCC/12.3.0
 ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/1.16.1-GCC-11.3.0 BamTools/2.5.2-GCC-11.3.0
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
@@ -38,7 +37,7 @@ for b in "${BAMDIR}"/*.bam; do
     samtools index -@ 4 "$b"
 done
 
-
+dos2unix "$META" 2>/dev/null || true
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
   [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
