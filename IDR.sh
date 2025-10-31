@@ -61,11 +61,11 @@ done
 # FRiP and peak overlap
 # ================================
 echo "---- Calculating FRiP and overlap ----"
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName Extra1 Extra2; do
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
     bam="${BAMDIR}/${bamReads}"
-peak="${DesiredPeakName}_peaks.broadPeak"
+peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
     [[ ! -s "$bam" ]] && { echo "Skipping $bam, file missing"; continue; }
