@@ -144,28 +144,45 @@ done
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
+# ================================
+# MULTIBAMSUMMARY + PLOT CORRELATION
+# ================================
 BAMLIST="${OUTDIR}/bamlist.txt"
+LABELLIST="${OUTDIR}/labellist.txt"
 > "$BAMLIST"
+> "$LABELLIST"
 
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    # Remove any .fq.gz remnants and whitespace
+    # Clean BAM filename
     clean_bam=$(echo "$bamReads" | sed -E 's/\.fq\.gz//g' | tr -d '\r[:space:]')
     bam="${BAMDIR}/${clean_bam}"
     if [[ -s "$bam" ]]; then
         echo "$bam" >> "$BAMLIST"
+        echo "$SampleID" >> "$LABELLIST"
     else
         echo "⚠️ Missing BAM: $bam"
     fi
 done
 
-if [[ -s "$BAMLIST" ]]; then
+# Read BAMs and labels into arrays
+mapfile -t BAMS < "$BAMLIST"
+mapfile -t LABELS < "$LABELLIST"
+
+if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
-    multiBamSummary bins --bamfiles $(paste -sd ' ' "$BAMLIST") -o "$BAM_CORR_NPZ" --binSize 5000
-    plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --corMethod pearson \
-        --plotFileName "$CORR_HEAT" --plotNumbers
+    multiBamSummary bins \
+        --bamfiles "${BAMS[@]}" \
+        --labels "${LABELS[@]}" \
+        -o "$BAM_CORR_NPZ" \
+        --binSize 10000
+
+    plotCorrelation -in "$BAM_CORR_NPZ" \
+        -c pearson \
+        --corMethod pearson \
+        --plotFileName "$CORR_HEAT" \
+        --plotNumbers
+
     echo "✅ Correlation heatmap saved: $CORR_HEAT"
 else
     echo "⚠️ No BAMs found for correlation step"
 fi
-
-echo "🎉 All steps complete! Master summary is: $MASTER_SUMMARY"
