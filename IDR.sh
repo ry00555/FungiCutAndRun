@@ -142,30 +142,45 @@ mkdir -p "$OUTDIR"
 # done
 
 # ================================
-# MULTIBAMSUMMARY + PLOT CORRELATION
-mapfile -t BAMFILES < <(ls "$BAMDIR"/*.bam)
+SKIPPED_BAMS="/tmp/skipped_bams.txt"
 
-if [ ${#BAMFILES[@]} -lt 2 ]; then
-    echo "⚠️ Need at least 2 BAMs for correlation. Found ${#BAMFILES[@]}."
+# Clear old skipped BAMs log
+> "$SKIPPED_BAMS"
+
+# Collect BAMs
+BAMS=()
+for bam in "$BAMDIR"/*.bam; do
+    # Skip empty files and .bai
+    if [[ ! -s "$bam" ]] || [[ "$bam" == *.bai ]]; then
+        continue
+    fi
+
+    # Optional: test if file is readable
+    if ! samtools quickcheck "$bam" 2>/dev/null; then
+        echo "⚠️ Skipping unreadable BAM: $bam" | tee -a "$SKIPPED_BAMS"
+        continue
+    fi
+
+    BAMS+=("$bam")
+done
+
+NUM_BAMS=${#BAMS[@]}
+echo "Found $NUM_BAMS usable BAMs"
+
+if [[ $NUM_BAMS -lt 2 ]]; then
+    echo "⚠️ Need at least 2 BAMs for correlation. Exiting."
     exit 1
 fi
 
-echo "Found ${#BAMFILES[@]} BAM files. Running multiBamSummary..."
+echo "Running multiBamSummary..."
+multiBamSummary bins --bamfiles "${BAMS[@]}" -o "$BAM_CORR_NPZ" --binSize 10000 --smartLabels
 
-multiBamSummary bins \
-    --bamfiles "${BAMFILES[@]}" \
-    -o "$BAM_CORR_NPZ" \
-    --smartLabels \
-    --binSize 10000
-
-plotCorrelation -in "$BAM_CORR_NPZ" \
-    -c pearson \
-    --corMethod pearson \
-    --plotFileName "$CORR_HEAT" \
-    --plotNumbers
+echo "Generating correlation heatmap..."
+plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --plotFileName "$CORR_HEAT" --plotNumbers
 
 echo "✅ Correlation heatmap saved: $CORR_HEAT"
 
-# Optional: report BAMs used
-echo "BAM files included in correlation:"
-printf '%s\n' "${BAMFILES[@]}"
+if [[ -s "$SKIPPED_BAMS" ]]; then
+    echo "⚠️ The following BAMs were skipped:"
+    cat "$SKIPPED_BAMS"
+fi
