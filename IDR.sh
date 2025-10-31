@@ -148,8 +148,14 @@ BAMLIST="${OUTDIR}/bamlist.txt"
 > "$BAMLIST"
 
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    bam="${BAMDIR}/${bamReads}"
-    [[ -s "$bam" ]] && echo "$bam" >> "$BAMLIST"
+    # Remove any .fq.gz remnants and whitespace
+    clean_bam=$(echo "$bamReads" | sed -E 's/\.fq\.gz//g' | tr -d '\r[:space:]')
+    bam="${BAMDIR}/${clean_bam}"
+    if [[ -s "$bam" ]]; then
+        echo "$bam" >> "$BAMLIST"
+    else
+        echo "⚠️ Missing BAM: $bam"
+    fi
 done
 
 if [[ -s "$BAMLIST" ]]; then
