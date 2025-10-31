@@ -148,10 +148,12 @@ BAMLIST="${OUTDIR}/bamlist.txt"
 LABELLIST="${OUTDIR}/labellist.txt"
 > "$BAMLIST"
 > "$LABELLIST"
+clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
+bam="${BAMDIR}/${clean_bam}"
 
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
     # Clean BAM filename
-    clean_bam=$(echo "$bamReads" | sed -E 's/\.fq\.gz//g' | tr -d '\r[:space:]')
+    clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
     bam="${BAMDIR}/${clean_bam}"
     if [[ -s "$bam" ]]; then
         echo "$bam" >> "$BAMLIST"
