@@ -49,9 +49,9 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
 
     mapped=$(samtools view -c -F 4 "$bam")
     if [[ $mapped -gt 0 ]]; then
-        echo "Extracting FASTQ from $bam (SampleID: $SampleID, mapped reads: $mapped)..."
-        samtools fastq -1 "$FASTQDIR/${SampleID}_R1.fastq" \
-                       -2 "$FASTQDIR/${SampleID}_R2.fastq" \
+        echo "Extracting FASTQ from $bam (SampleID: $DesiredPeakName, mapped reads: $mapped)..."
+        samtools fastq -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
+                       -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
                        -0 /dev/null -s /dev/null -n "$bam"
     else
         echo "⚠️ $bam has no mapped reads, skipping."
