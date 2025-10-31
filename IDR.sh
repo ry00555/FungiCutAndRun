@@ -144,19 +144,36 @@ mkdir -p "$OUTDIR"
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
+BAMLIST="${OUTDIR}/bamlist.txt"
+LABELLIST="${OUTDIR}/labellist.txt"
+MISSING_LIST="${OUTDIR}/missing_bams.txt"
+
+> "$BAMLIST"
+> "$LABELLIST"
+> "$MISSING_LIST"
+
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+    # Clean BAM filename
+    clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
+    bam="${BAMDIR}/${clean_bam}"
+    if [[ -s "$bam" ]]; then
+        echo "$bam" >> "$BAMLIST"
+        echo "$SampleID" >> "$LABELLIST"
+    else
+        echo "$bam" >> "$MISSING_LIST"
+        echo "⚠️ Missing BAM: $bam"
+    fi
+done
+
 # Read BAMs and labels into arrays
 mapfile -t BAMS < "$BAMLIST"
 mapfile -t LABELS < "$LABELLIST"
 
 if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
-
-    # Convert LABELS array into a space-separated string
-    LABELS_STR=$(printf "%s " "${LABELS[@]}")
-
     multiBamSummary bins \
         --bamfiles "${BAMS[@]}" \
-        --labels $LABELS_STR \
+        --labels "${LABELS[@]}" \
         -o "$BAM_CORR_NPZ" \
         --binSize 10000
 
@@ -169,4 +186,10 @@ if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "✅ Correlation heatmap saved: $CORR_HEAT"
 else
     echo "⚠️ No BAMs found for correlation step"
+fi
+
+# Report missing BAMs
+if [[ -s "$MISSING_LIST" ]]; then
+    echo "⚠️ The following BAMs were not included because they were missing:"
+    cat "$MISSING_LIST"
 fi
