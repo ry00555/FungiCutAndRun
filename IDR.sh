@@ -126,28 +126,31 @@ done
 # ================================
 # JACCARD SIMILARITY
 # ================================
-echo "---- Calculating Jaccard similarity ----"
-echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
-
-PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
-for ((i=0;i<${#PEAK_FILES[@]};i++)); do
-    for ((j=i+1;j<${#PEAK_FILES[@]};j++)); do
-        f1="${PEAK_FILES[i]}"
-        f2="${PEAK_FILES[j]}"
-        if [[ -s "$f1" && -s "$f2" ]]; then
-            jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
-            echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
-        fi
-    done
-done
+# echo "---- Calculating Jaccard similarity ----"
+# echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
+#
+# PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
+# for ((i=0;i<${#PEAK_FILES[@]};i++)); do
+#     for ((j=i+1;j<${#PEAK_FILES[@]};j++)); do
+#         f1="${PEAK_FILES[i]}"
+#         f2="${PEAK_FILES[j]}"
+#         if [[ -s "$f1" && -s "$f2" ]]; then
+#             jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
+#             echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
+#         fi
+#     done
+# done
 
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
 BAMLIST="${OUTDIR}/bamlist.txt"
-awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | while read -r bam; do
-    [[ -s "$bam" ]] && echo "$bam"
-done > "$BAMLIST"
+> "$BAMLIST"
+
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+    bam="${BAMDIR}/${bamReads}"
+    [[ -s "$bam" ]] && echo "$bam" >> "$BAMLIST"
+done
 
 if [[ -s "$BAMLIST" ]]; then
     echo "---- Running deeptools correlation ----"
