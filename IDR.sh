@@ -65,7 +65,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
     bam="${BAMDIR}/${bamReads}"
-    peak="${MACSDIR}/${SampleID}_${Factor}_${Replicate}_peaks.broadPeak"
+peak="${DesiredPeakName}_peaks.broadPeak"
     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
     [[ ! -s "$bam" ]] && { echo "Skipping $bam, file missing"; continue; }
