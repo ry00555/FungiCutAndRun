@@ -144,44 +144,31 @@ mkdir -p "$OUTDIR"
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
+# ================================
+# MULTIBAMSUMMARY + PLOT CORRELATION
+# ================================
 BAMLIST="${OUTDIR}/bamlist.txt"
-LABELLIST="${OUTDIR}/labellist.txt"
-MISSINGLIST="${OUTDIR}/missing_bams.txt"
-
 > "$BAMLIST"
-> "$LABELLIST"
-> "$MISSINGLIST"
 
-# Process meta file
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    # Remove whitespace and carriage returns
-    clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
-    bam="${BAMDIR}/${clean_bam}"
+# Loop over BAM files in BAMDIR
+for bam in "$BAMDIR"/*.bam; do
+    # Skip index files
+    [[ "$bam" == *.bai ]] && continue
 
-    if [[ -s "$bam" ]]; then
-        echo "$bam" >> "$BAMLIST"
-        echo "$SampleID" >> "$LABELLIST"
-    else
-        echo "$bam" >> "$MISSINGLIST"
-        echo "⚠️ Missing BAM: $bam"
-    fi
-done
+    # Add to BAMLIST
+    echo "$bam" >> "$BAMLIST"
 
-# Strip any residual carriage returns in BAMLIST and LABELLIST
-tr -d '\r' < "$BAMLIST" > /tmp/bamlist_clean.txt && mv /tmp/bamlist_clean.txt "$BAMLIST"
-tr -d '\r' < "$LABELLIST" > /tmp/labellist_clean.txt && mv /tmp/labellist_clean.txt "$LABELLIST"
+    done
 
 # Read BAMs and labels into arrays
 mapfile -t BAMS < "$BAMLIST"
-mapfile -t LABELS < "$LABELLIST"
 
-# Only run if we have BAMs
 if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
     multiBamSummary bins \
         --bamfiles "${BAMS[@]}" \
-        --labels "${LABELS[@]}" \
         -o "$BAM_CORR_NPZ" \
+        --smartLabels \
         --binSize 10000
 
     plotCorrelation -in "$BAM_CORR_NPZ" \
@@ -192,12 +179,5 @@ if [[ ${#BAMS[@]} -gt 0 ]]; then
 
     echo "✅ Correlation heatmap saved: $CORR_HEAT"
 else
-    echo "⚠️ No valid BAMs found. Skipping correlation step."
-fi
-
-# Report missing BAMs
-if [[ -s "$MISSINGLIST" ]]; then
-    echo "⚠️ Some BAMs were missing and not included in analysis. See $MISSINGLIST"
-else
-    echo "✅ All BAMs found."
+    echo "⚠️ No BAMs found for correlation step"
 fi
