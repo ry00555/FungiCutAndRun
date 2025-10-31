@@ -28,6 +28,7 @@ BIGWIGDIR="/scratch/ry00555/RNASeqPaper/Oct2025/Remapped/BigWigs"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025"
 META="${OUTDIR}/BAM_File_Metadata_with_index_merged_V2.csv"
 mkdir -p "$REMAPPED_BAMDIR" "$FASTQDIR" "$REMAPPED_BAMDIR/tempReps" "$BIGWIGDIR"
+dos2unix "$META" 2>/dev/null || true
 
 # ================================
 # Load modules
@@ -37,34 +38,26 @@ ml BWA/0.7.17-GCCcore-11.3.0
 ml deepTools
 
 # ================================
-# Build BAM -> SampleID map from meta
-# ================================
-declare -A sampleMap
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads _ SampleID _; do
-    cleanBam=$(echo "$bamReads" | tr -d '\r[:space:]')
-    sampleMap["$cleanBam"]="$SampleID"
-done
-
-# ================================
 # Extract FASTQ from BAMs with mapped reads
 # ================================
-for bam in "$BAMDIR"/*.bam; do
-    base=$(basename "$bam")
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+    bam="${BAMDIR}/${bamReads}"
+    if [[ ! -f "$bam" ]]; then
+        echo "⚠️ BAM file not found: $bam"
+        continue
+    fi
+
     mapped=$(samtools view -c -F 4 "$bam")
-
-    # Determine sample name
-    sample=${sampleMap[$base]:-$base}  # fallback to original filename
-
     if [[ $mapped -gt 0 ]]; then
-        echo "Extracting FASTQ from $bam (mapped reads: $mapped)..."
-        samtools fastq -1 "$FASTQDIR/${sample}_R1.fastq" \
-                       -2 "$FASTQDIR/${sample}_R2.fastq" \
+        echo "Extracting FASTQ from $bam (SampleID: $SampleID, mapped reads: $mapped)..."
+        samtools fastq -1 "$FASTQDIR/${SampleID}_R1.fastq" \
+                       -2 "$FASTQDIR/${SampleID}_R2.fastq" \
                        -0 /dev/null -s /dev/null -n "$bam"
     else
         echo "⚠️ $bam has no mapped reads, skipping."
-        echo "$bam" >> "$OUTDIR/skipped_no_mapped_reads.log"
     fi
 done
+
 
 # ================================
 # Remap FASTQs to genome

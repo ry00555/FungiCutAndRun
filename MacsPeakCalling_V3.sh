@@ -24,6 +24,34 @@ ml MACS3
 
  #Remove potential carriage returns (Mac Excel export issue)
  dos2unix "$META" 2>/dev/null || true
+ #### run this in command line before starting to make sure bam files have reads and they were not truncated / are not missing EOF
+
+ for bam in "$BAMDIR"/*.bam; do
+     base=$(basename "$bam")
+     mapped=$(samtools view -c -F 4 "$bam")
+     echo -e "$base\t$mapped"
+ done
+
+ echo -e "BAM_File\tMapped_Reads\tEOF_OK"
+
+ for bam in "$BAMDIR"/*.bam; do
+     base=$(basename "$bam")
+
+     # Check EOF
+     EOF_OK="OK"
+     if ! samtools quickcheck -v "$bam" &>/dev/null; then
+         EOF_OK="MISSING_EOF"
+     fi
+
+     # Count mapped reads
+     if [[ "$EOF_OK" == "OK" ]]; then
+         mapped=$(samtools view -c -F 4 "$bam")
+     else
+         mapped="NA"
+     fi
+
+     echo -e "${base}\t${mapped}\t${EOF_OK}"
+ done
 
  #--- STEP 1: Rename existing peak files ---
  echo "🔄 Checking for existing peak files to rename..."
