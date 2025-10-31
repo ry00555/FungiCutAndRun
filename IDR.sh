@@ -29,15 +29,21 @@ BAM_CORR_NPZ="${OUTDIR}/bam_corr.npz"
 CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 
 
-echo "---- Calculating FRiP and overlap ----"
 echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
 echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
 echo "---- Checking and reindexing BAMs ----"
 for b in "${BAMDIR}"/*.bam; do
-    samtools index -@ 4 "$b"
+    bai="${b}.bai"
+    if [[ ! -f "$bai" || "$b" -nt "$bai" ]]; then
+        echo "🧩 Indexing: $(basename "$b")"
+        samtools index -@ 4 "$b"
+    else
+        echo "✅ Up to date: $(basename "$b")"
+    fi
 done
 
 dos2unix "$META" 2>/dev/null || true
+
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
   [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
@@ -47,6 +53,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
   consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
   [[ ! -s "$bam" || ! -s "$peak" ]] && continue
+  echo "---- Calculating FRiP and overlap ----"
 
   total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
   reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
