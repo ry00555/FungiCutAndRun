@@ -64,7 +64,7 @@ echo "---- Calculating FRiP and overlap ----"
 # Reprocess only the last N processed samples
 #############################################
 
-REPROCESS_LAST_N=3
+REPROCESS_LAST_N=2
 
 # If MASTER_SUMMARY doesn't exist or is empty, create empty lists
 if [[ ! -s "$MASTER_SUMMARY" ]]; then
