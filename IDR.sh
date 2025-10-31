@@ -12,7 +12,7 @@
 
 set -euo pipefail
 module load GCC/12.3.0
-ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/0.1.20-GCC-11.3.0 BamTools/2.5.2-GCC-11.3.0
+ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/1.16.1-GCC-11.3.0 BamTools/2.5.2-GCC-11.3.0
 
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
@@ -33,23 +33,24 @@ CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 echo "---- Calculating FRiP and overlap ----"
 echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
 echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
+echo "---- Checking and reindexing BAMs ----"
+for b in "${BAMDIR}"/*.bam; do
+    samtools index -@ 4 "$b"
+done
+
 
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-  [[ -z "$SampleID" || -z "$Tissue" ]] && continue
+  [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
 
   bam="${BAMDIR}/${bamReads}"
-  for bam in /scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles/*.bam; do
-      samtools index -@ 4 "$bam"
-  done
-
   peak="${MACSDIR}/${SampleID}_${Factor}_${Replicate}_peaks.broadPeak"
   consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
   [[ ! -s "$bam" || ! -s "$peak" ]] && continue
 
   total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
-  reads_in_peaks=$(bedtools coverage -a "$peak" -b "$bam" -counts | awk '{sum += $7} END{print sum+0}')
+  reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
   num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
 
   if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
