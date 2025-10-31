@@ -144,32 +144,19 @@ mkdir -p "$OUTDIR"
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
-BAMLIST="${OUTDIR}/bamlist.txt"
-LABELLIST="${OUTDIR}/labellist.txt"
-> "$BAMLIST"
-> "$LABELLIST"
-
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    # Clean BAM filename
-    clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
-    bam="${BAMDIR}/${clean_bam}"
-    if [[ -s "$bam" ]]; then
-        echo "$bam" >> "$BAMLIST"
-        echo "$SampleID" >> "$LABELLIST"
-    else
-        echo "⚠️ Missing BAM: $bam"
-    fi
-done
-
 # Read BAMs and labels into arrays
 mapfile -t BAMS < "$BAMLIST"
 mapfile -t LABELS < "$LABELLIST"
 
 if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
+
+    # Convert LABELS array into a space-separated string
+    LABELS_STR=$(printf "%s " "${LABELS[@]}")
+
     multiBamSummary bins \
         --bamfiles "${BAMS[@]}" \
-        --labels "${LABELS[@]}" \
+        --labels $LABELS_STR \
         -o "$BAM_CORR_NPZ" \
         --binSize 10000
 
