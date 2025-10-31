@@ -146,29 +146,36 @@ mkdir -p "$OUTDIR"
 # ================================
 BAMLIST="${OUTDIR}/bamlist.txt"
 LABELLIST="${OUTDIR}/labellist.txt"
-MISSING_LIST="${OUTDIR}/missing_bams.txt"
+MISSINGLIST="${OUTDIR}/missing_bams.txt"
 
 > "$BAMLIST"
 > "$LABELLIST"
-> "$MISSING_LIST"
+> "$MISSINGLIST"
 
+# Process meta file
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    # Clean BAM filename
+    # Remove whitespace and carriage returns
     clean_bam=$(echo "$bamReads" | tr -d '\r[:space:]')
     bam="${BAMDIR}/${clean_bam}"
+
     if [[ -s "$bam" ]]; then
         echo "$bam" >> "$BAMLIST"
         echo "$SampleID" >> "$LABELLIST"
     else
-        echo "$bam" >> "$MISSING_LIST"
+        echo "$bam" >> "$MISSINGLIST"
         echo "⚠️ Missing BAM: $bam"
     fi
 done
+
+# Strip any residual carriage returns in BAMLIST and LABELLIST
+tr -d '\r' < "$BAMLIST" > /tmp/bamlist_clean.txt && mv /tmp/bamlist_clean.txt "$BAMLIST"
+tr -d '\r' < "$LABELLIST" > /tmp/labellist_clean.txt && mv /tmp/labellist_clean.txt "$LABELLIST"
 
 # Read BAMs and labels into arrays
 mapfile -t BAMS < "$BAMLIST"
 mapfile -t LABELS < "$LABELLIST"
 
+# Only run if we have BAMs
 if [[ ${#BAMS[@]} -gt 0 ]]; then
     echo "---- Running deeptools correlation ----"
     multiBamSummary bins \
@@ -185,11 +192,12 @@ if [[ ${#BAMS[@]} -gt 0 ]]; then
 
     echo "✅ Correlation heatmap saved: $CORR_HEAT"
 else
-    echo "⚠️ No BAMs found for correlation step"
+    echo "⚠️ No valid BAMs found. Skipping correlation step."
 fi
 
 # Report missing BAMs
-if [[ -s "$MISSING_LIST" ]]; then
-    echo "⚠️ The following BAMs were not included because they were missing:"
-    cat "$MISSING_LIST"
+if [[ -s "$MISSINGLIST" ]]; then
+    echo "⚠️ Some BAMs were missing and not included in analysis. See $MISSINGLIST"
+else
+    echo "✅ All BAMs found."
 fi
