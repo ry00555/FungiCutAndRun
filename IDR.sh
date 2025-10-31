@@ -59,67 +59,67 @@ mkdir -p "$OUTDIR"
 # ================================
 # FRiP and peak overlap
 # ================================
-echo "---- Calculating FRiP and overlap ----"
+#echo "---- Calculating FRiP and overlap ----"
 #############################################
 # Reprocess only the last N processed samples
 #############################################
 
-REPROCESS_LAST_N=1
-
-# If MASTER_SUMMARY doesn't exist or is empty, create empty lists
-if [[ ! -s "$MASTER_SUMMARY" ]]; then
-    echo "" > /tmp/processed_ids.txt
-    echo "" > /tmp/lastN_ids.txt
-else
-    # All processed SampleIDs
-    awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
-
-    # Last N SampleIDs
-    tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
-fi
+# REPROCESS_LAST_N=1
+#
+# # If MASTER_SUMMARY doesn't exist or is empty, create empty lists
+# if [[ ! -s "$MASTER_SUMMARY" ]]; then
+#     echo "" > /tmp/processed_ids.txt
+#     echo "" > /tmp/lastN_ids.txt
+# else
+#     # All processed SampleIDs
+#     awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
+#
+#     # Last N SampleIDs
+#     tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
+# fi
 
 #############################################
 # Main metadata loop (with skip logic)
 #############################################
 
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
-
-    # Skip if already processed AND not one of the re-run entries
-    if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
-        echo "Skipping (already processed): $SampleID"
-        continue
-    fi
-
-    echo "Reprocessing: $SampleID"
-
-    bam="${BAMDIR}/${bamReads}"
-    peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
-    consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
-
-    [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
-    [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
-
-    # FRiP calculation
-    total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
-    reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
-    frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
-
-    # Peak overlap
-    num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
-    if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
-        num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
-        frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
-    else
-        num_overlap=0
-        frac_overlap=0
-    fi
-
-    # Append to outputs
-    echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
-    echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
-    echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
-done
+# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+#     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
+#
+#     # Skip if already processed AND not one of the re-run entries
+#     if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
+#         echo "Skipping (already processed): $SampleID"
+#         continue
+#     fi
+#
+#     echo "Reprocessing: $SampleID"
+#
+#     bam="${BAMDIR}/${bamReads}"
+#     peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
+#     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
+#
+#     [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
+#     [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
+#
+#     # FRiP calculation
+#     total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
+#     reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
+#     frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
+#
+#     # Peak overlap
+#     num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
+#     if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
+#         num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
+#         frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
+#     else
+#         num_overlap=0
+#         frac_overlap=0
+#     fi
+#
+#     # Append to outputs
+#     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
+#     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
+#     echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
+# done
 
 
 
@@ -141,9 +141,6 @@ done
 #     done
 # done
 
-# ================================
-# MULTIBAMSUMMARY + PLOT CORRELATION
-# ================================
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
 # ================================
