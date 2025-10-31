@@ -143,23 +143,29 @@ mkdir -p "$OUTDIR"
 
 # ================================
 # MULTIBAMSUMMARY + PLOT CORRELATION
-BAMS=("$BAMDIR"/*.bam)
+mapfile -t BAMFILES < <(ls "$BAMDIR"/*.bam)
 
-if [[ ${#BAMS[@]} -gt 0 ]]; then
-    echo "---- Running deeptools correlation ----"
-    multiBamSummary bins \
-        --bamfiles "${BAMS[@]}" \
-        --smartLabels \
-        -o "$BAM_CORR_NPZ" \
-        --binSize 10000
-
-    plotCorrelation -in "$BAM_CORR_NPZ" \
-        -c pearson \
-        --corMethod pearson \
-        --plotFileName "$CORR_HEAT" \
-        --plotNumbers
-
-    echo "✅ Correlation heatmap saved: $CORR_HEAT"
-else
-    echo "⚠️ No BAMs found for correlation step"
+if [ ${#BAMFILES[@]} -lt 2 ]; then
+    echo "⚠️ Need at least 2 BAMs for correlation. Found ${#BAMFILES[@]}."
+    exit 1
 fi
+
+echo "Found ${#BAMFILES[@]} BAM files. Running multiBamSummary..."
+
+multiBamSummary bins \
+    --bamfiles "${BAMFILES[@]}" \
+    -o "$BAM_CORR_NPZ" \
+    --smartLabels \
+    --binSize 10000
+
+plotCorrelation -in "$BAM_CORR_NPZ" \
+    -c pearson \
+    --corMethod pearson \
+    --plotFileName "$CORR_HEAT" \
+    --plotNumbers
+
+echo "✅ Correlation heatmap saved: $CORR_HEAT"
+
+# Optional: report BAMs used
+echo "BAM files included in correlation:"
+printf '%s\n' "${BAMFILES[@]}"
