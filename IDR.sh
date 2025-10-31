@@ -46,26 +46,36 @@ echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVER
 # ================================
 # Index BAMs only if needed
 # ================================
-echo "---- Checking and reindexing BAMs ----"
-for bam in "${BAMDIR}"/*.bam; do
-    bai="${bam}.bai"
-    if [[ ! -f "$bai" || "$bam" -nt "$bai" ]]; then
-        echo "Indexing BAM: $bam"
-        samtools index -@ 4 "$bam"
-    else
-        echo "BAM index up-to-date: $bai"
-    fi
-done
+# echo "---- Checking and reindexing BAMs ----"
+# for bam in "${BAMDIR}"/*.bam; do
+#     bai="${bam}.bai"
+#     if [[ ! -f "$bai" || "$bam" -nt "$bai" ]]; then
+#         echo "Indexing BAM: $bam"
+#         samtools index -@ 4 "$bam"
+#     else
+#         echo "BAM index up-to-date: $bai"
+#     fi
+# done
 
 # ================================
 # FRiP and peak overlap
 # ================================
 echo "---- Calculating FRiP and overlap ----"
+
+# Read a list of already processed BAMs from the master summary
+PROCESSED=$(awk '{print $1}' "$MASTER_SUMMARY")
+
 tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
 
+    # Skip if SampleID is already processed
+    if echo "$PROCESSED" | grep -qx "$SampleID"; then
+        echo "Skipping already processed sample: $SampleID"
+        continue
+    fi
+
     bam="${BAMDIR}/${bamReads}"
-peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
+    peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
 
     [[ ! -s "$bam" ]] && { echo "Skipping $bam, file missing"; continue; }
@@ -93,6 +103,7 @@ peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
     echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
 done
+
 
 # ================================
 # JACCARD SIMILARITY
