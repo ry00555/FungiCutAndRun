@@ -44,6 +44,17 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
 
     bam="${BAMDIR}/${bamReads}"
 
+    # Output FASTQs
+    fq1="$FASTQDIR/${DesiredPeakName}_R1.fastq"
+    fq2="$FASTQDIR/${DesiredPeakName}_R2.fastq"
+
+    # ✅ If FASTQs already exist AND are non-empty → skip
+    if [[ -s "$fq1" && -s "$fq2" ]]; then
+        echo "✅ FASTQs already exist for $DesiredPeakName → skipping."
+        continue
+    fi
+
+    # ✅ Skip if BAM missing
     if [[ ! -f "$bam" ]]; then
         echo "⚠️ BAM not found: $bam"
         continue
@@ -52,8 +63,8 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     echo "Extracting ALL reads from $bam → $DesiredPeakName ..."
 
     samtools fastq \
-        -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
-        -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
+        -1 "$fq1" \
+        -2 "$fq2" \
         -0 /dev/null \
         -s /dev/null \
         -n \
