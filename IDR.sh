@@ -172,7 +172,7 @@ echo "Running multiBamSummary..."
 #multiBamSummary bins --bamfiles "${BAMS[@]}"  -p max -o "$BAM_CORR_NPZ" --binSize 50000 --smartLabels --outRawCounts ${OUTDIR}/readCounts.tab
 
 echo "Generating correlation heatmap..."
-plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --whatToPlot heatmap --plotFileName "$CORR_HEAT" --plotNumbers --skipZeros --outFileCorMatrix  PearsonCorr_BamScores.tab
+plotCorrelation -in "$BAM_CORR_NPZ" -c pearson --whatToPlot heatmap --plotFile "$CORR_HEAT" --plotNumbers --skipZeros --outFileCorMatrix  PearsonCorr_BamScores.tab
 
 echo "✅ Correlation heatmap saved: $CORR_HEAT"
 
