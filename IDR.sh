@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=200gb
+#SBATCH --mem=300gb
 #SBATCH --time=6:00:00
 #SBATCH --output=../BamQC.%j.out
 #SBATCH --error=../BamQC.%j.err
@@ -66,7 +66,7 @@ echo "---- Calculating FRiP and overlap ----"
 if [[ ! -s "$MASTER_SUMMARY" ]]; then
     echo "" > /tmp/processed_ids.txt
 else
-    awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
+  awk 'NR>1 {print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
 fi
 
 # Main metadata loop
