@@ -40,23 +40,23 @@ ml deepTools
 # ================================
 # Extract FASTQ from BAMs with mapped reads
 # ================================
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    bam="${BAMDIR}/${bamReads}"
-    if [[ ! -f "$bam" ]]; then
-        echo "⚠️ BAM file not found: $bam"
-        continue
-    fi
-
-    mapped=$(samtools view -c -F 4 "$bam")
-    if [[ $mapped -gt 0 ]]; then
-        echo "Extracting FASTQ from $bam (SampleID: $DesiredPeakName, mapped reads: $mapped)..."
-        samtools fastq -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
-                       -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
-                       -0 /dev/null -s /dev/null -n "$bam"
-    else
-        echo "⚠️ $bam has no mapped reads, skipping."
-    fi
-done
+# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+#     bam="${BAMDIR}/${bamReads}"
+#     if [[ ! -f "$bam" ]]; then
+#         echo "⚠️ BAM file not found: $bam"
+#         continue
+#     fi
+#
+#     mapped=$(samtools view -c -F 4 "$bam")
+#     if [[ $mapped -gt 0 ]]; then
+#         echo "Extracting FASTQ from $bam (SampleID: $DesiredPeakName, mapped reads: $mapped)..."
+#         samtools fastq -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
+#                        -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
+#                        -0 /dev/null -s /dev/null -n "$bam"
+#     else
+#         echo "⚠️ $bam has no mapped reads, skipping."
+#     fi
+# done
 
 
 # ================================
@@ -79,15 +79,9 @@ for f in $FILES; do
 
     samtools index "$bam"
 
-    samtools view -b -q 30 "$bam" > "$QualityBam"
-    samtools index "$QualityBam"
-
     echo "Generating BigWigs for $sample..."
     bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 \
         --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
-
-    bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 \
-        --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
 done
 
 echo "✅ Remapping and BigWig generation complete."

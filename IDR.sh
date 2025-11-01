@@ -1,25 +1,25 @@
-#!/bin/bash
-#SBATCH --job-name=IDR
-#SBATCH --partition=batch
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=24
-#SBATCH --mem=400gb
-#SBATCH --time=4:00:00
-#SBATCH --output=../IDR.%j.out
-#SBATCH --error=../IDR.%j.err
+# !/bin/bash
+# SBATCH --job-name=IDR
+# SBATCH --partition=batch
+# SBATCH --mail-type=ALL
+# SBATCH --mail-user=ry00555@uga.edu
+# SBATCH --ntasks=1
+# SBATCH --cpus-per-task=24
+# SBATCH --mem=400gb
+# SBATCH --time=8:00:00
+# SBATCH --output=../IDR.%j.out
+# SBATCH --error=../IDR.%j.err
 
 set -euo pipefail
 
-# ================================
-# Load modules
-# ================================
+ #================================
+ #Load modules
+ ================================
 ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/1.16.1-GCC-11.3.0 BamTools/2.5.2-GCC-11.3.0
 
-# ================================
-# Paths
-# ================================
+ #================================
+ #Paths
+ #================================
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
 CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
@@ -35,127 +35,123 @@ CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 
 mkdir -p "$OUTDIR"
 
-# ================================
-# Initialize master summary
-# ================================
-#echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP\tPeakFile\tConsensusPeak\tNumPeaks\tNumOverlap\tFracOverlap" > "$MASTER_SUMMARY"
-#echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
-#echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
+ #================================
+ #Initialize master summary
+ #================================
+echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP\tPeakFile\tConsensusPeak\tNumPeaks\tNumOverlap\tFracOverlap" > "$MASTER_SUMMARY"
+echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
+echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
 
-# ================================
-# Index BAMs only if needed
-# ================================
-# echo "---- Checking and reindexing BAMs ----"
-# for bam in "${BAMDIR}"/*.bam; do
-#     bai="${bam}.bai"
-#     if [[ ! -f "$bai" || "$bam" -nt "$bai" ]]; then
-#         echo "Indexing BAM: $bam"
-#         samtools index -@ 4 "$bam"
-#     else
-#         echo "BAM index up-to-date: $bai"
-#     fi
-# done
+ #================================
+ #Index BAMs only if needed
+ #================================
+ echo "---- Checking and reindexing BAMs ----"
+ for bam in "${BAMDIR}"/*.bam; do
+     bai="${bam}.bai"
+     if [[ ! -f "$bai" || "$bam" -nt "$bai" ]]; then
+         echo "Indexing BAM: $bam"
+         samtools index -@ 4 "$bam"
+     else
+         echo "BAM index up-to-date: $bai"
+     fi
+ done
 
 # ================================
 # FRiP and peak overlap
 # ================================
-#echo "---- Calculating FRiP and overlap ----"
-#############################################
+echo "---- Calculating FRiP and overlap ----"
+
 # Reprocess only the last N processed samples
-#############################################
+ REPROCESS_LAST_N=1
 
-# REPROCESS_LAST_N=1
-#
-# # If MASTER_SUMMARY doesn't exist or is empty, create empty lists
-# if [[ ! -s "$MASTER_SUMMARY" ]]; then
-#     echo "" > /tmp/processed_ids.txt
-#     echo "" > /tmp/lastN_ids.txt
-# else
-#     # All processed SampleIDs
-#     awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
-#
-#     # Last N SampleIDs
-#     tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
-# fi
+#  If MASTER_SUMMARY doesn't exist or is empty, create empty lists
+ if [[ ! -s "$MASTER_SUMMARY" ]]; then
+     echo "" > /tmp/processed_ids.txt
+     echo "" > /tmp/lastN_ids.txt
+ else
+      All processed SampleIDs
+     awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
 
-#############################################
-# Main metadata loop (with skip logic)
-#############################################
+      Last N SampleIDs
+     tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
+ fi
 
-# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-#     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
-#
-#     # Skip if already processed AND not one of the re-run entries
-#     if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
-#         echo "Skipping (already processed): $SampleID"
-#         continue
-#     fi
-#
-#     echo "Reprocessing: $SampleID"
-#
-#     bam="${BAMDIR}/${bamReads}"
-#     peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
-#     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
-#
-#     [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
-#     [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
-#
-#     # FRiP calculation
-#     total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
-#     reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
-#     frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
-#
-#     # Peak overlap
-#     num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
-#     if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
-#         num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
-#         frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
-#     else
-#         num_overlap=0
-#         frac_overlap=0
-#     fi
-#
-#     # Append to outputs
-#     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
-#     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
-#     echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
-# done
+
+ #Main metadata loop (with skip logic)
+ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
+
+  #    Skip if already processed AND not one of the re-run entries
+     if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
+         echo "Skipping (already processed): $SampleID"
+         continue
+     fi
+
+     echo "Reprocessing: $SampleID"
+
+     bam="${BAMDIR}/${bamReads}"
+     peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
+     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
+
+     [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
+     [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
+
+  #    FRiP calculation
+     total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
+     reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
+     frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
+
+  #    Peak overlap
+     num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
+     if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
+         num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
+         frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
+     else
+         num_overlap=0
+         frac_overlap=0
+     fi
+
+    #  Append to outputs
+     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
+     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
+     echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
+ done
 
 
 
-# ================================
-# JACCARD SIMILARITY
-# ================================
-# echo "---- Calculating Jaccard similarity ----"
-# echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
-#
-# PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
-# for ((i=0;i<${#PEAK_FILES[@]};i++)); do
-#     for ((j=i+1;j<${#PEAK_FILES[@]};j++)); do
-#         f1="${PEAK_FILES[i]}"
-#         f2="${PEAK_FILES[j]}"
-#         if [[ -s "$f1" && -s "$f2" ]]; then
-#             jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
-#             echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
-#         fi
-#     done
-# done
+ #================================
+ #JACCARD SIMILARITY
+ #================================
+ echo "---- Calculating Jaccard similarity ----"
+ echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
 
-# ================================
+ PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
+ for ((i=0;i<${PEAK_FILES[@]};i++)); do
+     for ((j=i+1;j<${PEAK_FILES[@]};j++)); do
+         f1="${PEAK_FILES[i]}"
+         f2="${PEAK_FILES[j]}"
+         if [[ -s "$f1" && -s "$f2" ]]; then
+             jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
+             echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
+         fi
+     done
+ done
+
+ #================================
 SKIPPED_BAMS="/tmp/skipped_bams.txt"
 
 # Clear old skipped BAMs log
 > "$SKIPPED_BAMS"
 
-# Collect BAMs
+ #Collect BAMs
 BAMS=()
 for bam in "$BAMDIR"/*.bam; do
-    # Skip empty files and .bai
+#     Skip empty files and .bai
     if [[ ! -s "$bam" ]] || [[ "$bam" == *.bai ]]; then
         continue
     fi
 
-    # Optional: test if file is readable
+  #   Optional: test if file is readable
     if ! samtools quickcheck "$bam" 2>/dev/null; then
         echo "⚠️ Skipping unreadable BAM: $bam" | tee -a "$SKIPPED_BAMS"
         continue
@@ -164,7 +160,7 @@ for bam in "$BAMDIR"/*.bam; do
     BAMS+=("$bam")
 done
 
-NUM_BAMS=${#BAMS[@]}
+NUM_BAMS=${BAMS[@]}
 echo "Found $NUM_BAMS usable BAMs"
 
 if [[ $NUM_BAMS -lt 2 ]]; then
