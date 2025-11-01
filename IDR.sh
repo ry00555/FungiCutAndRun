@@ -5,7 +5,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=300gb
+#SBATCH --mem=400gb
 #SBATCH --time=6:00:00
 #SBATCH --output=../BamQC.%j.out
 #SBATCH --error=../BamQC.%j.err
