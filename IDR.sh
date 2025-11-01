@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=400gb
-#SBATCH --time=8:00:00
+#SBATCH --mem=200gb
+#SBATCH --time=6:00:00
 #SBATCH --output=../IDR.%j.out
 #SBATCH --error=../IDR.%j.err
 
