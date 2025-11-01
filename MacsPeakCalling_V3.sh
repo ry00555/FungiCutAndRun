@@ -13,10 +13,10 @@
 cd $SLURM_SUBMIT_DIR
 #Set Paths
 
-BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
-OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
-
+BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/Remapped/SortedBamFiles"
+META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V3.csv"
+OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/Remapped/MACSPeaks"
+mkdir -p "$OUTDIR"
 
 OUTLIST="${OUTDIR}/MACS_peak_files.txt"
 > "$OUTLIST"
@@ -26,56 +26,36 @@ ml MACS3
  dos2unix "$META" 2>/dev/null || true
  #### run this in command line before starting to make sure bam files have reads and they were not truncated / are not missing EOF
 
- for bam in "$BAMDIR"/*.bam; do
-     base=$(basename "$bam")
-     mapped=$(samtools view -c -F 4 "$bam")
-     echo -e "$base\t$mapped"
- done
+ # for bam in "$BAMDIR"/*.bam; do
+ #     base=$(basename "$bam")
+ #     mapped=$(samtools view -c -F 4 "$bam")
+ #     echo -e "$base\t$mapped"
+ # done
+ #
+ # echo -e "BAM_File\tMapped_Reads\tEOF_OK"
+ #
+ # for bam in "$BAMDIR"/*.bam; do
+ #     base=$(basename "$bam")
+ #
+ #     # Check EOF
+ #     EOF_OK="OK"
+ #     if ! samtools quickcheck -v "$bam" &>/dev/null; then
+ #         EOF_OK="MISSING_EOF"
+ #     fi
+ #
+ #     # Count mapped reads
+ #     if [[ "$EOF_OK" == "OK" ]]; then
+ #         mapped=$(samtools view -c -F 4 "$bam")
+ #     else
+ #         mapped="NA"
+ #     fi
+ #
+ #     echo -e "${base}\t${mapped}\t${EOF_OK}"
+ # done
 
- echo -e "BAM_File\tMapped_Reads\tEOF_OK"
-
- for bam in "$BAMDIR"/*.bam; do
-     base=$(basename "$bam")
-
-     # Check EOF
-     EOF_OK="OK"
-     if ! samtools quickcheck -v "$bam" &>/dev/null; then
-         EOF_OK="MISSING_EOF"
-     fi
-
-     # Count mapped reads
-     if [[ "$EOF_OK" == "OK" ]]; then
-         mapped=$(samtools view -c -F 4 "$bam")
-     else
-         mapped="NA"
-     fi
-
-     echo -e "${base}\t${mapped}\t${EOF_OK}"
- done
-
- #--- STEP 1: Rename existing peak files ---
- echo "🔄 Checking for existing peak files to rename..."
- tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
-     [[ -z "$RunID" ]] && continue
-
-     old_base=$(basename "$bamReads" .bam)
-     new_base="$DesiredPeakName"
-
-     for ext in broadPeak gappedPeak xls; do
-         old_file="${OUTDIR}/${old_base}_peaks.${ext}"
-         new_file="${OUTDIR}/${new_base}_peaks.${ext}"
-         if [[ -f "$old_file" && ! -f "$new_file" ]]; then
-             echo "Renaming: $old_file → $new_file"
-             mv "$old_file" "$new_file"
-         fi
-     done
- done
-
- echo "✅ Renaming step complete."
-
- #--- STEP 2: Run MACS3 where needed ---
+ #--- STEP 1: Run MACS3 where needed ---
  echo "🚀 Starting MACS3 peak calling..."
- tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName; do
+ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
      [[ -z "$RunID" ]] && continue
 
      chip_path="${BAMDIR}/${bamReads}"
@@ -146,8 +126,8 @@ ml MACS3
              --broad-cutoff 0.1 \
              -g 41037538 \
              --outdir "$OUTDIR" \
-             --min-length 800 \
-             --max-gap 500
+             --min-length "$MACS3minlength" \
+             --max-gap "$MACS3maxgap"
      else
          echo "   No control found → running without input"
          macs3 callpeak \
@@ -158,8 +138,8 @@ ml MACS3
              --broad-cutoff 0.1 \
              -g 41037538 \
              --outdir "$OUTDIR" \
-             --min-length 800 \
-             --max-gap 500
+             --min-length "$MACS3minlength" \
+             --max-gap "$MACS3maxgap"
      fi
 
      # Record output

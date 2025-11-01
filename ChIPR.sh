@@ -11,9 +11,9 @@
 #SBATCH --error=../ChIP-R.%j.err
 
 set -euo pipefail
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
-MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
-CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
+META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V3.csv"
+MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/Remapped/MACSPeaks"
+CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/Remapped/ChIPR"
 SUMMARY="${CHIPR_DIR}/ChIPR_consensus_summary.tsv"
 
 dos2unix "$META" 2>/dev/null || true
