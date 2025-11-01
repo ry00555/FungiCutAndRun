@@ -39,9 +39,9 @@ mkdir -p "$OUTDIR"
  #================================
  #Initialize master summary
  #================================
-echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP\tPeakFile\tConsensusPeak\tNumPeaks\tNumOverlap\tFracOverlap" > "$MASTER_SUMMARY"
-echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
-echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
+#echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP\tPeakFile\tConsensusPeak\tNumPeaks\tNumOverlap\tFracOverlap" > "$MASTER_SUMMARY"
+#echo -e "SampleID\tTissue\tFactor\tTotalReads\tReadsInPeaks\tFRiP" > "$FRIP_TSV"
+#echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVERLAP_TSV"
 
  #================================
  #Index BAMs only if needed
