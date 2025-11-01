@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=200gb
-#SBATCH --time=5:00:00
+#SBATCH --mem=100gb
+#SBATCH --time=2:00:00
 #SBATCH --output=../BAMtoFASTQ.%j.out
 #SBATCH --error=../BAMtoFASTQ.%j.err
 
