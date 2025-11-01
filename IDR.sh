@@ -59,83 +59,83 @@ echo -e "Tissue\tSampleID\tPeakFile\tNumPeaks\tNumOverlap\tFracOverlap" > "$OVER
 # ================================
 # FRiP and peak overlap
 # ================================
-# echo "---- Calculating FRiP and overlap ----"
+echo "---- Calculating FRiP and overlap ----"
 #
 # # Reprocess only the last N processed samples
 #  REPROCESS_LAST_N=1
 #
 # #  If MASTER_SUMMARY doesn't exist or is empty, create empty lists
-#  if [[ ! -s "$MASTER_SUMMARY" ]]; then
-#      echo "" > /tmp/processed_ids.txt
+if [[ ! -s "$MASTER_SUMMARY" ]]; then
+      echo "" > /tmp/processed_ids.txt
 #      echo "" > /tmp/lastN_ids.txt
-#  else
+  else
 #       All processed SampleIDs
-#      awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
+      awk '{print $1}' "$MASTER_SUMMARY" > /tmp/processed_ids.txt
 #
 #       Last N SampleIDs
-#      tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
-#  fi
+    #  tail -n "$REPROCESS_LAST_N" "$MASTER_SUMMARY" | awk '{print $1}' > /tmp/lastN_ids.txt
+  fi
 
 
  #Main metadata loop (with skip logic)
- # tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
- #     [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
+  tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+      [[ -z "$SampleID" || -z "$Tissue" || -z "$bamReads" ]] && continue
  #
  #  #    Skip if already processed AND not one of the re-run entries
- #     if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
- #         echo "Skipping (already processed): $SampleID"
- #         continue
- #     fi
+      if grep -qx "$SampleID" /tmp/processed_ids.txt && ! grep -qx "$SampleID" /tmp/lastN_ids.txt; then
+         echo "Skipping (already processed): $SampleID"
+          continue
+     fi
+
+      echo "Reprocessing: $SampleID"
  #
- #     echo "Reprocessing: $SampleID"
- #
- #     bam="${BAMDIR}/${bamReads}"
- #     peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
- #     consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
- #
- #     [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
- #     [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
+      bam="${BAMDIR}/${bamReads}"
+     peak="${MACSDIR}/${DesiredPeakName}_peaks.broadPeak"
+      consensus="${CHIPR_DIR}/${Tissue}_consensus_optimal_peaks.broadPeak"
+
+      [[ ! -s "$bam" ]] && { echo "Missing BAM → skipping $SampleID"; continue; }
+     [[ ! -s "$peak" ]] && { echo "Missing peak file → skipping $SampleID"; continue; }
  #
  #  #    FRiP calculation
- #     total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
- #     reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
- #     frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
+      total_reads=$(samtools view -c -F 260 "$bam" 2>/dev/null || echo 0)
+      reads_in_peaks=$(bedtools intersect -a "$peak" -b "$bam" -c | awk '{sum+=$NF} END{print sum+0}')
+      frip=$(awk "BEGIN{printf \"%.4f\", ($reads_in_peaks/$total_reads)}")
  #
  #  #    Peak overlap
- #     num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
- #     if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
- #         num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
- #         frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
- #     else
- #         num_overlap=0
- #         frac_overlap=0
- #     fi
+      num_peaks=$(wc -l < "$peak" | tr -d '[:space:]')
+      if [[ -s "$consensus" && "$num_peaks" -gt 0 ]]; then
+         num_overlap=$(bedtools intersect -u -a "$peak" -b "$consensus" | wc -l | tr -d '[:space:]')
+          frac_overlap=$(awk "BEGIN{printf \"%.4f\", ($num_overlap/$num_peaks)}")
+      else
+          num_overlap=0
+          frac_overlap=0
+      fi
  #
  #    #  Append to outputs
- #     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
- #     echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
- #     echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
- # done
+      echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}\t${peak}\t${consensus}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$MASTER_SUMMARY"
+      echo -e "${SampleID}\t${Tissue}\t${Factor}\t${total_reads}\t${reads_in_peaks}\t${frip}" >> "$FRIP_TSV"
+      echo -e "${Tissue}\t${SampleID}\t${peak}\t${num_peaks}\t${num_overlap}\t${frac_overlap}" >> "$OVERLAP_TSV"
+  done
 
 
 
  #================================
  #JACCARD SIMILARITY
  #================================
- # echo "---- Calculating Jaccard similarity ----"
- # echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
+  echo "---- Calculating Jaccard similarity ----"
+  echo -e "fileA\tfileB\tjaccard" > "$JACCARD_TSV"
  #
- # PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
- # for ((i=0;i<${PEAK_FILES[@]};i++)); do
- #     for ((j=i+1;j<${PEAK_FILES[@]};j++)); do
- #         f1="${PEAK_FILES[i]}"
- #         f2="${PEAK_FILES[j]}"
- #         if [[ -s "$f1" && -s "$f2" ]]; then
- #             jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
- #             echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
- #         fi
- #     done
- # done
+  PEAK_FILES=( $(awk -F'\t' 'NR>1{print $7}' "$MASTER_SUMMARY" | sort -u) )
+  for ((i=0;i<${PEAK_FILES[@]};i++)); do
+      for ((j=i+1;j<${PEAK_FILES[@]};j++)); do
+                f1="${PEAK_FILES[i]}"
+    f2="${PEAK_FILES[j]}"
+        if [[ -s "$f1" && -s "$f2" ]]; then
+             jacc=$(bedtools jaccard -a "$f1" -b "$f2" | awk 'NR==2{print $3}')
+              echo -e "$(basename "$f1")\t$(basename "$f2")\t${jacc:-0}" >> "$JACCARD_TSV"
+          fi
+      done
+  done
 
  #================================
 SKIPPED_BAMS="/tmp/skipped_bams.txt"
