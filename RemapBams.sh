@@ -83,7 +83,7 @@ for f in $FILES; do
     read2="${f/_R1.fastq/_R2.fastq}"
 
     bam="${REMAPPED_BAMDIR}/${sample}.bam"
-    QualityBam="${REMAPPED_BAMDIR}/${sample}_Q30.bam"
+  #  QualityBam="${REMAPPED_BAMDIR}/${sample}_Q30.bam"
     bigwig="${BIGWIGDIR}/${sample}"
 
     echo "Mapping $sample..."
