@@ -40,23 +40,26 @@ ml deepTools
 # ================================
 # Extract FASTQ from BAMs with mapped reads
 # ================================
-# tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-#     bam="${BAMDIR}/${bamReads}"
-#     if [[ ! -f "$bam" ]]; then
-#         echo "⚠️ BAM file not found: $bam"
-#         continue
-#     fi
-#
-#     mapped=$(samtools view -c -F 4 "$bam")
-#     if [[ $mapped -gt 0 ]]; then
-#         echo "Extracting FASTQ from $bam (SampleID: $DesiredPeakName, mapped reads: $mapped)..."
-#         samtools fastq -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
-#                        -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
-#                        -0 /dev/null -s /dev/null -n "$bam"
-#     else
-#         echo "⚠️ $bam has no mapped reads, skipping."
-#     fi
-# done
+tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+
+    bam="${BAMDIR}/${bamReads}"
+
+    if [[ ! -f "$bam" ]]; then
+        echo "⚠️ BAM not found: $bam"
+        continue
+    fi
+
+    echo "Extracting ALL reads from $bam → $DesiredPeakName ..."
+
+    samtools fastq \
+        -1 "$FASTQDIR/${DesiredPeakName}_R1.fastq" \
+        -2 "$FASTQDIR/${DesiredPeakName}_R2.fastq" \
+        -0 /dev/null \
+        -s /dev/null \
+        -n \
+        "$bam"
+
+done
 
 
 # ================================
