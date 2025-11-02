@@ -35,10 +35,6 @@ CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 SKIPPED_BAMS="/tmp/skipped_bams.txt"
 > "$SKIPPED_BAMS"
 
-declare -A groups   # associative array
-
-echo "Grouping BAMs by Tissue from META file..."
-
 # Build tissue → bam list
 declare -A groups
 echo "Grouping BAMs by Tissue from META file..."
