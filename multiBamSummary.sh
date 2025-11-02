@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=400gb
-#SBATCH --time=6:00:00
+#SBATCH --time=4:00:00
 #SBATCH --output=../multiBamSummary.%j.out
 #SBATCH --error=../multiBamSummary.%j.err
 
@@ -21,16 +21,10 @@ ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/1.16.1-GCC-11.3.0 BamTools/2.5.
  #Paths
  #================================
 META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
-MACSDIR="/scratch/ry00555/RNASeqPaper/Oct2025/MACSPeaks"
-CHIPR_DIR="/scratch/ry00555/RNASeqPaper/Oct2025/ChIPR"
 BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
 dos2unix "$META" 2>/dev/null || true
 
-MASTER_SUMMARY="${OUTDIR}/master_summary.tsv"
-FRIP_TSV="${OUTDIR}/frip_metrics.tsv"
-OVERLAP_TSV="${OUTDIR}/replicate_overlap.tsv"
-JACCARD_TSV="${OUTDIR}/pairwise_jaccard.tsv"
 BAM_CORR_NPZ="${OUTDIR}/bam_corr.npz"
 CORR_HEAT="${OUTDIR}/bam_correlation_heatmap.pdf"
 
@@ -46,7 +40,10 @@ declare -A groups   # associative array
 echo "Grouping BAMs by Tissue from META file..."
 
 # Build tissue → bam list
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+tdeclare -A groups
+echo "Grouping BAMs by Tissue from META file..."
+
+while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
 
     bam="$BAMDIR/${bamReads}"
 
@@ -62,7 +59,8 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
 
     groups["$Tissue"]+="$bam "
 
-done
+done < <(tail -n +2 "$META")
+
 
 echo "✅ Finished grouping BAMs by Tissue."
 
