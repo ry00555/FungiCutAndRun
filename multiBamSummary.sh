@@ -40,7 +40,7 @@ declare -A groups   # associative array
 echo "Grouping BAMs by Tissue from META file..."
 
 # Build tissue → bam list
-tdeclare -A groups
+declare -A groups
 echo "Grouping BAMs by Tissue from META file..."
 
 while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
