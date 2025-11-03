@@ -27,7 +27,7 @@ BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
 BIGWIGDIR="/scratch/ry00555/RNASeqPaper/Oct2025/BigWigs"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025"
 META="${OUTDIR}/BAM_File_Metadata_with_index_merged_V2.csv"
-mkdir -p "$REMAPPED_BAMDIR" "$FASTQDIR" "$REMAPPED_BAMDIR/tempReps" "$BIGWIGDIR"
+#mkdir -p "$REMAPPED_BAMDIR" "$FASTQDIR" "$REMAPPED_BAMDIR/tempReps" "$BIGWIGDIR"
 dos2unix "$META" 2>/dev/null || true
 
 # ================================
@@ -40,9 +40,9 @@ ml deepTools
 # ================================
 # Extract FASTQ from BAMs with mapped reads
 # ================================
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+#tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
 
-    bam="${BAMDIR}/${bamReads}"
+#    bam="${BAMDIR}/${bamReads}"
 
     # Output FASTQs
   #  fq1="$FASTQDIR/${DesiredPeakName}_R1.fastq"
