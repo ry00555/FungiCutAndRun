@@ -104,8 +104,16 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
 
     bam="${BAMDIR}/${bamReads}"
 
+    # Skip missing BAMs
     if [[ ! -f "$bam" ]]; then
         echo "❌ BAM not found: $bam"
+        continue
+    fi
+
+    # Skip empty BAMs
+    read_count=$(samtools view -c "$bam")
+    if [[ "$read_count" -eq 0 ]]; then
+        echo "⚠️ BAM is empty, skipping: $bam"
         continue
     fi
 
