@@ -29,7 +29,20 @@ PUBLIC_DB="/db/AlphaFold3/20241114"                # Sapelo2 path for public dat
           --bind ${PUBLIC_DB}:/root/public_databases \
           /apps/singularity-images/alphafold-3.0.0.sif \
           python /app/alphafold/run_alphafold.py \
-          --json_path=/root/af_input/AF3_Rtt109_naf2.json \
+          --json_path=/root/af_input/AF_3_RTT109_H3H3HeteroDimer.json \
           --model_dir=/root/models \
           --db_dir=/root/public_databases \
           --output_dir=/root/af_output
+
+          singularity exec \
+               --nv \
+               --bind ${INPUT_DIR}:/root/af_input \
+               --bind ${OUTPUT_DIR}:/root/af_output \
+               --bind ${MODEL_DIR}:/root/models \
+               --bind ${PUBLIC_DB}:/root/public_databases \
+               /apps/singularity-images/alphafold-3.0.0.sif \
+               python /app/alphafold/run_alphafold.py \
+               --json_path=/root/af_input/AF3_RTT109_NAF2_H3H4tetramer.json \
+               --model_dir=/root/models \
+               --db_dir=/root/public_databases \
+               --output_dir=/root/af_output
