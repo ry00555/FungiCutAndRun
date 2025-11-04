@@ -120,6 +120,12 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     # Output name
     bigwig="${BIGWIGDIR}/${DesiredPeakName}.bin_${BIN}.smooth_${SMOOTH}.bw"
 
+    # ✅ Skip if BigWig already exists and is non-empty
+    if [[ -s "$bigwig" ]]; then
+        echo "⏭️ BigWig already exists, skipping: $bigwig"
+        continue
+    fi
+
     echo "→ Generating BigWig for sample: $DesiredPeakName"
 
     bamCoverage \
