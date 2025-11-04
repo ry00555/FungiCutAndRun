@@ -20,44 +20,6 @@ OUTPUT_DIR="/scratch/ry00555/AlphaFold/output"
 MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"        # where your AlphaFold3 parameters live
 PUBLIC_DB="/db/AlphaFold3/20241114"                # Sapelo2 path for public database
 
-singularity exec \
-     --nv \
-     --bind ${INPUT_DIR}:/root/af_input \
-     --bind ${OUTPUT_DIR}:/root/af_output \
-     --bind ${MODEL_DIR}:/root/models \
-     --bind ${PUBLIC_DB}:/root/public_databases \
-     /apps/singularity-images/alphafold-3.0.0.sif \
-     python /app/alphafold/run_alphafold.py \
-     --json_path=/root/af_input/RTT109_D145A_DD304_5AA_H3H4heterodimer.json \
-     --model_dir=/root/models \
-     --db_dir=/root/public_databases \
-     --output_dir=/root/af_output
-
-     singularity exec \
-          --nv \
-          --bind ${INPUT_DIR}:/root/af_input \
-          --bind ${OUTPUT_DIR}:/root/af_output \
-          --bind ${MODEL_DIR}:/root/models \
-          --bind ${PUBLIC_DB}:/root/public_databases \
-          /apps/singularity-images/alphafold-3.0.0.sif \
-          python /app/alphafold/run_alphafold.py \
-          --json_path=/root/af_input/RTT109D145A_H3H4heterodimer.json \
-          --model_dir=/root/models \
-          --db_dir=/root/public_databases \
-          --output_dir=/root/af_output
-
-     singularity exec \
-          --nv \
-          --bind ${INPUT_DIR}:/root/af_input \
-          --bind ${OUTPUT_DIR}:/root/af_output \
-          --bind ${MODEL_DIR}:/root/models \
-          --bind ${PUBLIC_DB}:/root/public_databases \
-          /apps/singularity-images/alphafold-3.0.0.sif \
-          python /app/alphafold/run_alphafold.py \
-          --json_path=/root/af_input/AF_3_RTT109_H3H3HeteroDimer.json \
-          --model_dir=/root/models \
-          --db_dir=/root/public_databases \
-          --output_dir=/root/af_output
 
           singularity exec \
                --nv \
@@ -67,7 +29,7 @@ singularity exec \
                --bind ${PUBLIC_DB}:/root/public_databases \
                /apps/singularity-images/alphafold-3.0.0.sif \
                python /app/alphafold/run_alphafold.py \
-               --json_path=/root/af_input/AF3_RTT109_NAF2_H3H4tetramer.json \
+               --json_path=/root/af_input/AF3_RTT109_NAF2_H3H4heterodimer.json \
                --model_dir=/root/models \
                --db_dir=/root/public_databases \
                --output_dir=/root/af_output
