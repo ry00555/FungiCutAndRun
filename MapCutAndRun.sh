@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=20gb
-#SBATCH --time=2:00:00
+#SBATCH --mem=60gb
+#SBATCH --time=5:00:00
 #SBATCH --output=../MapCutAndRun134.%j.out
 #SBATCH --error=../MapCutAndRun134.%j.err
 
