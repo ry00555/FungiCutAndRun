@@ -1,38 +1,36 @@
 #!/bin/bash
-#SBATCH --job-name=Run151ChIP
+#SBATCH --job-name=Run152ChIP
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=60gb
-#SBATCH --time=5:00:00
-#SBATCH --output=../MapCutAndRun134.%j.out
-#SBATCH --error=../MapCutAndRun134.%j.err
+#SBATCH --time=8:00:00
+#SBATCH --output=../MapCutAndRun152.%j.out
+#SBATCH --error=../MapCutAndRun152.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/scratch/ry00555/Run150"
+OUTDIR="/scratch/ry00555/Run152"
 
 # if output directory doesn't exist, create it
- if [ ! -d $OUTDIR ]
- then
-     mkdir -p $OUTDIR
-     mkdir -p "${OUTDIR}/TrimmedReads"
-     mkdir -p "${OUTDIR}/BigWigs"
-    mkdir -p "$OUTDIR/HomerTagDirectories"
+  mkdir -p $OUTDIR
+   mkdir -p "${OUTDIR}/TrimmedReads"
+      mkdir -p "${OUTDIR}/BigWigs"
+  mkdir -p "$OUTDIR/HomerTagDirectories"
 #    mkdir -p "$OUTDIR/TdfFiles"
-   mkdir -p "$OUTDIR/SortedBamFiles"
- fi
+ mkdir -p "$OUTDIR/SortedBamFiles"
+
  TAGDIR="${OUTDIR}/HomerTagDirectories"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
- #ml Trim_Galore
- #trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+ ml Trim_Galore
+ trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 #
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #
@@ -49,14 +47,14 @@ OUTDIR="/scratch/ry00555/Run150"
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
- name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}
+ name=${file/%_S[1-150]*_L006_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
- read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+ read2=$(echo "$f" | sed 's/_L006_R1_001_val_1\.fq\.gz/_L006_R2_001_val_2\.fq\.gz/g')
 #
 #   	 File Vars
 #   	use sed to get the name of the second read matching the input file
@@ -100,25 +98,25 @@ ml MACS3
   macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 -c $Input
   done
 
-# HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
-#   ml Homer
-#   ml Perl
-#   ml SAMtools
-#    ml BEDTools
-#    for bam_file in "${BAMDIR}"/*_Q30.bam; do
+HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
+   ml Homer
+   ml Perl
+  ml SAMtools
+    ml BEDTools
+    for bam_file in "${BAMDIR}"/*_Q30.bam; do
 #       Get the sample ID from the BAM file name
-#  sample_id=$(basename "${bam_file}" _Q30.bam)
+  sample_id=$(basename "${bam_file}" _Q30.bam)
 #       Remove everything after "Rep_1" in the sample ID
-#  HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
+  HOMERINPUT="${TAGDIR}/${sample_id}_Input*"
 #
 #
-#  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
+  makeTagDirectory "${TAGDIR}/${sample_id}" "${bam_file}"
 #
 # #       Call peaks
 #
-#   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
+   findPeaks "${TAGDIR}/${sample_id}" -style histone -region -size 150 -minDist 530 -o "${HOMERPEAKSDIR}/${sample_id}_Homerpeaks.txt" -i $HOMERINPUT
 #
-#    done
+    done
 #  changing peak txt files to bed files to input into chipr
 #ml ChIP-R
 
