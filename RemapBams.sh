@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
-#SBATCH --time=2:00:00
+#SBATCH --time=8:00:00
 #SBATCH --output=../BAMtoFASTQ.%j.out
 #SBATCH --error=../BAMtoFASTQ.%j.err
 
