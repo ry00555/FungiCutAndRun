@@ -29,9 +29,54 @@ OUTDIR="/scratch/ry00555/Run152"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
- ml Trim_Galore
- trim_galore --illumina --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-#
+module load Trim_Galore
+#Original commandtrim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+echo "---- Checking for FASTQs to re-trim ----"
+
+# Find newest R1 FASTQ
+latest_R1=$(ls -t ${FASTQ}/*_R1.fastq.gz | head -n 1)
+latest_R2="${latest_R1/_R1.fastq.gz/_R2.fastq.gz}"
+
+if [[ ! -f "$latest_R2" ]]; then
+    echo "❌ Matching R2 missing for: $latest_R1"
+else
+    sample=$(basename "$latest_R1" _R1.fastq.gz)
+    echo "🔁 Re-trimming most recent FASTQ pair:"
+    echo "   SAMPLE = $sample"
+    echo "   R1     = $latest_R1"
+    echo "   R2     = $latest_R2"
+
+    trim_galore   --illumina --paired --length 20         --fastqc --gzip -o ${OUTDIR}/TrimmedReads "$latest_R1" "$latest_R2"
+fi
+
+echo "---- Checking for any FASTQs NOT yet trimmed ----"
+
+# Trim the remaining FASTQs that have no trimmed version
+for R1 in ${FASTQ}/*_R1.fastq.gz; do
+    R2="${R1/_R1.fastq.gz/_R2.fastq.gz}"
+    sample=$(basename "$R1" _R1.fastq.gz)
+
+    trimmed_R1="${OUTDIR}/TrimmedReads/${sample}_R1_val_1.fq.gz"
+    trimmed_R2="${OUTDIR}/TrimmedReads/${sample}_R2_val_2.fq.gz"
+
+    # Skip if trimmed already exists
+    if [[ -f "$trimmed_R1" && -f "$trimmed_R2" ]]; then
+        echo "⏭️ Already trimmed → skipping $sample"
+        continue
+    fi
+
+    # Check for missing pairs
+    if [[ ! -f "$R2" ]]; then
+        echo "❌ Missing R2 for: $R1"
+        continue
+    fi
+
+    echo "✂️ Trimming untrimmed sample: $sample"
+    trim_galore         --illumina --paired --length 20         --fastqc --gzip         -o "${OUTDIR}/TrimmedReads" "$R1" "$R2"
+
+done
+echo "✅ All trimming complete."
+
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
 #
 #
