@@ -18,7 +18,7 @@ mkdir -p "$OUTDIR/Heatmaps"
 
 ml deepTools
 
- computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S $BWDIR/148-116_WT_H3K27me3_rep11.bin_25.smooth_50.bw $BWDIR/138-57_WT_H3K27me3_rep6.bin_25.smooth_50.bw $BWDIR/147-3_WT_H3K27me3_rep9.bin_25.smooth_50.bw $BWDIR/r111-3_rtt109_H3K27me3_rep1.bin_25.smooth_50.bw $BWDIR/135-83_rtt109_H3K27me3_rep2.bin_25.smooth_50.bw $BWDIR/147-59_rtt109_H3K27me3_rep9.bin_25.smooth_50.bw $BWDIR/150-65_rtt109_H3K27me3_rep11.bin_25.smooth_50.bw $BWDIR/142-88_rtt109flag_H3K27me3_rep1.bin_25.smooth_50.bw   $BWDIR/150-81_rtt109flag_H3K27me3_rep3.bin_25.smooth_50.bw $BWDIR/150-77_rtt109flag_H3K27me3_rep2.bin_25.smooth_50.bw	-o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
+ computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S $BWDIR/148-116_WT_H3K27me3_rep11.bin_25.smooth_50.bw $BWDIR/138-57_WT_H3K27me3_rep6.bin_25.smooth_50.bw $BWDIR/147-3_WT_H3K27me3_rep9.bin_25.smooth_50.bw $BWDIR/111-3_rtt109_H3K27me3_rep1.bin_25.smooth_50.bw $BWDIR/135-83_rtt109_H3K27me3_rep2.bin_25.smooth_50.bw $BWDIR/147-59_rtt109_H3K27me3_rep9.bin_25.smooth_50.bw $BWDIR/150-65_rtt109_H3K27me3_rep11.bin_25.smooth_50.bw $BWDIR/142-88_rtt109flag_H3K27me3_rep1.bin_25.smooth_50.bw   $BWDIR/150-81_rtt109flag_H3K27me3_rep3.bin_25.smooth_50.bw $BWDIR/150-77_rtt109flag_H3K27me3_rep2.bin_25.smooth_50.bw	-o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
 
  plotHeatmap -m $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes.mat \
  -o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_V1.png \
