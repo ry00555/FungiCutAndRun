@@ -24,7 +24,7 @@ ml deepTools
 
  computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S  "$BWDIR/147-3_WT_H3K27me3_rep9.bin_25.smooth_50.bw" "$BWDIR/147-47_rtt109_H3K27me3_rep7.bin_25.smooth_50.bw"  "$BWDIR/150-81_rtt109flag_H3K27me3_rep3.bin_25.smooth_50.bw" "$BWDIR/142-88_rtt109flag_H3K27me3_rep1.bin_25.smooth_50.bw" "$BWDIR/150-77_rtt109flag_H3K27me3_rep2.bin_25.smooth_50.bw" -o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.mat --sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
 
-plotHeatmap -m $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.mat -o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT K27me3"  "∆rtt109 K27me3" "∆rtt109 K27me3" "rtt109-3xflag K27me3" "rtt109-3xflag K27me3" "rtt109-3xflag K27me3"  --colorMap 'Greens'
+plotHeatmap -m $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.mat -o $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/Heatmaps/RTT109_H3K27me3_K27genes_FilteredReps_V3.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT K27me3" "∆rtt109 K27me3" "rtt109-3xflag K27me3" "rtt109-3xflag K27me3" "rtt109-3xflag K27me3"  --colorMap 'Greens'
 
 
 
