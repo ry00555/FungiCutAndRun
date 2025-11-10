@@ -29,43 +29,16 @@ OUTDIR="/scratch/ry00555/Run152"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-module load Trim_Galore
-#Original commandtrim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
-echo "---- Checking for any FASTQs NOT yet trimmed ----"
-
-# Trim the remaining FASTQs that have no trimmed version
-for R1 in ${FASTQ}/*_R1_001.fastq.gz; do
-    R2="${R1/_R1_001.fastq.gz/_R2_001.fastq.gz}"
-    sample=$(basename "$R1" _R1_001.fastq.gzz)
-    trimmed_R1="${OUTDIR}/TrimmedReads/${sample}_R1_001_val_1.fq.gz"
-    trimmed_R2="${OUTDIR}/TrimmedReads/${sample}_R2_001_val_2.fq.gz"
-
-    # Skip if trimmed already exists
-    if [[ -f "$trimmed_R1" && -f "$trimmed_R2" ]]; then
-        echo "⏭️ Already trimmed → skipping $sample"
-        continue
-    fi
-
-    # Check for missing pairs
-    if [[ ! -f "$R2" ]]; then
-        echo "❌ Missing R2 for: $R1"
-        continue
-    fi
-
-    echo "✂️ Trimming untrimmed sample: $sample"
-    trim_galore   --illumina --paired --length 20  --fastqc --gzip -o "${OUTDIR}/TrimmedReads" "$R1" "$R2"
-
-done
-echo "✅ All trimming complete."
+#module load Trim_Galore
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
  FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
-#
-#
-#
+
+
 #  Iterate over the files
  for f in $FILES
  do
-#
+
 #   	Examples to Get Different parts of the file name
 #   		See here for details: http://tldp.org/LDP/abs/html/refcards.htmlAEN22664
 #  		${string//substring/replacement}
