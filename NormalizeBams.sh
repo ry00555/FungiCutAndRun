@@ -13,7 +13,7 @@
 ml deepTools
 
 BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V3.csv"
+META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
 OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles/DeepToolsNormalized"
 
 mkdir -p "$OUTDIR"
