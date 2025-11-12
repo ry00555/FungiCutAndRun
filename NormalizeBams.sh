@@ -34,6 +34,13 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
     # Output basename
     if [[ -f "$input_path" ]]; then
         outname="${DesiredPeakName}_log2FC.bw"
+        outfile="${OUTDIR}/${outname}"
+
+        # ✅ Skip if already exists
+        if [[ -f "$outfile" ]]; then
+            echo "✅ Skipping (already exists): $outfile"
+            continue
+        fi
         echo "📌 Normalizing: $chip_path  vs  $input_path"
 
         bamCompare \
