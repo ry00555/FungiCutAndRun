@@ -32,3 +32,16 @@ singularity exec \
      --model_dir=/root/models \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output
+
+     singularity exec \
+          --nv \
+          --bind ${INPUT_DIR}:/root/af_input \
+          --bind ${OUTPUT_DIR}:/root/af_output \
+          --bind ${MODEL_DIR}:/root/models \
+          --bind ${PUBLIC_DB}:/root/public_databases \
+          /apps/singularity-images/alphafold-3.0.0.sif \
+          python /app/alphafold/run_alphafold.py \
+          --json_path=/root/af_input/RTT109_ISW_H3H4heterodimer.json \
+          --model_dir=/root/models \
+          --db_dir=/root/public_databases \
+          --output_dir=/root/af_output
