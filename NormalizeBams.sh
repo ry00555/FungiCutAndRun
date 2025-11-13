@@ -60,7 +60,7 @@ tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor
         bamCoverage \
             -b "$chip_path" \
             --binSize 25 \
-            --normalizeUsing RPGC \
+            --normalizeUsing BPM \
             -o "${OUTDIR}/${outname}"
     fi
 done
