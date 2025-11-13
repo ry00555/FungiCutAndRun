@@ -18,10 +18,10 @@ OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles/DeepToolsNormalized"
 
 mkdir -p "$OUTDIR"
 
-echo "🚀 Starting deepTools normalization..."
+#echo "🚀 Starting deepTools normalization..."
 
-tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
-    [[ -z "$RunID" ]] && continue
+#tail -n +2 "$META" | while IFS=, read -r RunID bamReads BamIndex SampleID Factor Tissue Condition Replicate bamControl bamInputIndex ControlID Peaks PeakCaller DesiredPeakName MACS3minlength MACS3maxgap; do
+#    [[ -z "$RunID" ]] && continue
 #
 #     chip_path="${BAMDIR}/${bamReads}"
 #     input_path="${BAMDIR}/${bamControl}"
