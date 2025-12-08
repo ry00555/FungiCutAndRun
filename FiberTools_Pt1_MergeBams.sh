@@ -33,7 +33,7 @@ done
 # ---------------------------
 # Step 1-2: Filter, sort, and merge BAMs
 # ---------------------------
-for BARCODE_DIR in "$BASE_DIR"/barcode*/; do
+for BARCODE_DIR in "$BASE_DIR"/ONT9_barcode*/; do
     BARCODE_NAME=$(basename "$BARCODE_DIR")
     SORTED_DIR="${BARCODE_DIR}sorted_q9"
     mkdir -p "$SORTED_DIR"
