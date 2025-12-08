@@ -17,23 +17,10 @@ META="/lustre2/scratch/ry00555/ONTRun9/ONTRun9.txt"
 
 mkdir -p "$OUT_DIR"
 
-# ---------------------------
-# Step 0: Rename barcode folders based on sample sheet
-# ---------------------------
-echo "🔄 Renaming barcode folders based on sample sheet..."
-tail -n +2 "$META" | while IFS=$'\t' read -r SAMPLE_ID EXPERIMENT_ID INDEX_KIT INDEX OWNER STRAIN EXP_TYPE ANTIBODY GDNA_KIT ELUTION_CONC ELUTION_VOL TOTAL_DNA NOTES FINAL_CONC FINAL_ELUTION UL_200NG H2O_TO_ADD; do
-    # Extract the barcode from SAMPLE_ID (assumes format ONT9_barcodeXX_...)
-    BARCODE=$(echo "$SAMPLE_ID" | cut -d'_' -f2)
-    if [ -d "$BASE_DIR/$BARCODE" ]; then
-        echo "Renaming $BARCODE --> $SAMPLE_ID"
-        mv "$BASE_DIR/$BARCODE" "$BASE_DIR/$SAMPLE_ID"
-    fi
-done
+mkdir -p "$OUT_DIR"
 
-# ---------------------------
 # Step 1-2: Filter, sort, and merge BAMs
-# ---------------------------
-for BARCODE_DIR in "$BASE_DIR"/ONT9_barcode*/; do
+for BARCODE_DIR in "$BASE_DIR"/barcode*/; do
     BARCODE_NAME=$(basename "$BARCODE_DIR")
     SORTED_DIR="${BARCODE_DIR}sorted_q9"
     mkdir -p "$SORTED_DIR"
@@ -49,8 +36,12 @@ for BARCODE_DIR in "$BASE_DIR"/ONT9_barcode*/; do
     done
 
     # Merge all sorted BAMs at once
-    FINAL_BAM="$OUT_DIR/${BARCODE_NAME}_merged.bam"
     if [ ${#SORTED_BAMS[@]} -gt 0 ]; then
+        # Find the sample_id corresponding to this barcode
+        SAMPLE_ID=$(awk -v barcode="$BARCODE_NAME" -F'\t' '$1 ~ barcode {print $1}' "$META")
+        [ -z "$SAMPLE_ID" ] && SAMPLE_ID="$BARCODE_NAME"  # fallback if not found
+
+        FINAL_BAM="$OUT_DIR/${SAMPLE_ID}_merged.bam"
         samtools merge "$FINAL_BAM" "${SORTED_BAMS[@]}"
         samtools index "$FINAL_BAM"
         echo "✅ Merged and indexed: $FINAL_BAM"
