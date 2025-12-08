@@ -11,53 +11,52 @@
 
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
-BASE_DIR="/lustre2/scratch/ry00555/ONTRun9/bam_pass"
+BASE_DIR="/lustre2/scratch/ry00555/ONTRun10/bam_pass"
 OUT_DIR="$BASE_DIR/merged_bams_passed"
+META="/lustre2/scratch/ry00555/ONTRun9/ONTRun9.txt"
+
 mkdir -p "$OUT_DIR"
 
-MAX_FILES_PER_BATCH=100  # adjust as needed
+# ---------------------------
+# Step 0: Rename barcode folders based on sample sheet
+# ---------------------------
+echo "🔄 Renaming barcode folders based on sample sheet..."
+tail -n +2 "$META" | while IFS=$'\t' read -r SAMPLE_ID EXPERIMENT_ID INDEX_KIT INDEX OWNER STRAIN EXP_TYPE ANTIBODY GDNA_KIT ELUTION_CONC ELUTION_VOL TOTAL_DNA NOTES FINAL_CONC FINAL_ELUTION UL_200NG H2O_TO_ADD; do
+    # Extract the barcode from SAMPLE_ID (assumes format ONT9_barcodeXX_...)
+    BARCODE=$(echo "$SAMPLE_ID" | cut -d'_' -f2)
+    if [ -d "$BASE_DIR/$BARCODE" ]; then
+        echo "Renaming $BARCODE --> $SAMPLE_ID"
+        mv "$BASE_DIR/$BARCODE" "$BASE_DIR/$SAMPLE_ID"
+    fi
+done
 
+# ---------------------------
+# Step 1-2: Filter, sort, and merge BAMs
+# ---------------------------
 for BARCODE_DIR in "$BASE_DIR"/barcode*/; do
     BARCODE_NAME=$(basename "$BARCODE_DIR")
     SORTED_DIR="${BARCODE_DIR}sorted_q9"
     mkdir -p "$SORTED_DIR"
 
-    # Step 1: Filter + Sort
+    # Filter + Sort each BAM
+    SORTED_BAMS=()
     for BAM in "$BARCODE_DIR"/*.bam; do
+        [ -f "$BAM" ] || continue  # skip if no BAMs
         BAM_BASENAME=$(basename "$BAM" .bam)
-        samtools view -b -q 9 "$BAM" | samtools sort -o "$SORTED_DIR/${BAM_BASENAME}_q9_sorted.bam"
+        SORTED_BAM="$SORTED_DIR/${BAM_BASENAME}_q9_sorted.bam"
+        samtools view -b -q 9 "$BAM" | samtools sort -@ 4 -o "$SORTED_BAM"
+        SORTED_BAMS+=("$SORTED_BAM")
     done
 
-    # Step 2: Batch merge
-    TMP_MERGED_LIST=()
-    BATCH_INDEX=0
-    FILE_COUNT=0
-    BATCH_FILES=()
-
-    for FILE in "$SORTED_DIR"/*.bam; do
-        BATCH_FILES+=("$FILE")
-        FILE_COUNT=$((FILE_COUNT + 1))
-
-        if [[ $FILE_COUNT -eq $MAX_FILES_PER_BATCH ]]; then
-            BATCH_OUT="$SORTED_DIR/batch_${BATCH_INDEX}.bam"
-            samtools merge "$BATCH_OUT" "${BATCH_FILES[@]}"
-            TMP_MERGED_LIST+=("$BATCH_OUT")
-            BATCH_INDEX=$((BATCH_INDEX + 1))
-            FILE_COUNT=0
-            BATCH_FILES=()
-        fi
-    done
-
-    # Merge remaining files (last batch)
-    if [[ ${#BATCH_FILES[@]} -gt 0 ]]; then
-        BATCH_OUT="$SORTED_DIR/batch_${BATCH_INDEX}.bam"
-        samtools merge "$BATCH_OUT" "${BATCH_FILES[@]}"
-        TMP_MERGED_LIST+=("$BATCH_OUT")
+    # Merge all sorted BAMs at once
+    FINAL_BAM="$OUT_DIR/${BARCODE_NAME}_merged.bam"
+    if [ ${#SORTED_BAMS[@]} -gt 0 ]; then
+        samtools merge "$FINAL_BAM" "${SORTED_BAMS[@]}"
+        samtools index "$FINAL_BAM"
+        echo "✅ Merged and indexed: $FINAL_BAM"
+    else
+        echo "⚠️ No BAM files found for $BARCODE_NAME, skipping..."
     fi
-
-    # Step 3: Merge all batches into final BAM
-    samtools merge "$OUT_DIR/${BARCODE_NAME}_merged.bam" "${TMP_MERGED_LIST[@]}"
-    samtools index "$OUT_DIR/${BARCODE_NAME}_merged.bam"
 done
 
-echo "✅ Done! Batches merged and indexed at: $OUT_DIR"
+echo "🎉 All barcodes processed! Merged BAMs at: $OUT_DIR"
