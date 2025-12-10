@@ -32,7 +32,7 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 #  samtools index "$NUCS_BAM"
 
     # 3) Make decorated BED/track files
-    ft track-decorators --bed12 "$SAMPLE_DIR/tracks" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decoratedtracks" || echo "track-decorators failed for $SAMPLE"
+    ft track-decorators --bed12 "$SAMPLE_DIR/${SAMPLE}.nuctracks.bed" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decorated_${SAMPLE}.nuctracks.bed" || echo "track-decorators failed for $SAMPLE"
 
     # 4) Make pileup (per-base or per-feature aggregation)
     ft pileup --m6a --cpg --fiber-coverage "$NUCS_BAM" "$SAMPLE_DIR/${SAMPLE}.pileup.bedgraph" || echo "pileup failed for $SAMPLE"
