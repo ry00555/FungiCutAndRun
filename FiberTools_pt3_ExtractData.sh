@@ -17,7 +17,8 @@ WORKDIR="/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 THREADS=8
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
-
+ml ucsc
+ml deepTools
 find "$WORKDIR" -maxdepth 2 -type f -name "*_merged.nucs.bam" | while read -r BAM; do
     SAMPLE=$(basename "$BAM" _merged.nucs.bam)
     SAMPLE_DIR=$(dirname "$BAM")
