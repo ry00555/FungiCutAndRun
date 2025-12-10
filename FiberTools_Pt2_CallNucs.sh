@@ -28,23 +28,15 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 
     # 1) Add nucleosomes (consumes predicted BAM)
     NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
-    ft add-nucleosomes \
-        --input "$BAM" \
-        --output "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
+    ft add-nucleosomes "$BAM" "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
 
     # 3) Make decorated BED/track files
-    ft track-decorators \
-        --input "$NUCS_BAM" \
-        --outdir "$SAMPLE_DIR/tracks" || echo "track-decorators failed for $SAMPLE"
+    ft track-decorators --bed12 "$SAMPLE_DIR/tracks" "$NUCS_BAM" --decorator || echo "track-decorators failed for $SAMPLE"
 
     # 4) Make pileup (per-base or per-feature aggregation)
-    ft pileup \
-        --input "$NUCS_BAM" \
-        --out "$SAMPLE_DIR/${SAMPLE}.pileup.bedgraph" || echo "pileup failed for $SAMPLE"
+    ft pileup --m6a --cpg --fiber-coverage "$NUCS_BAM" --out "$SAMPLE_DIR/${SAMPLE}.pileup.bedgraph" || echo "pileup failed for $SAMPLE"
 
-ft qc \
---input "$NUCS_BAM" \
---out "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
+ft qc --m6a-per-msp "$NUCS_BAM" --out "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
 
     # Index the final BAM
     samtools index "$NUCS_BAM"
