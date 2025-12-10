@@ -26,19 +26,10 @@ for BAM in "$IN_DIR"/*_merged.bam; do
     mkdir -p "$SAMPLE_DIR"
     echo "Processing $SAMPLE ..."
 
-    # 1) Predict m6A (adds MM/ML tags)
-    PRED="${SAMPLE_DIR}/${SAMPLE}.predicted.bam"
-    ft predict-m6a \
-        --threads $THREADS \
-        --ml 125 \
-        --keep \
-        "$BAM" \
-        "$PRED" || { echo "predict-m6a failed for $SAMPLE"; continue; }
-
-    # 2) Add nucleosomes (consumes predicted BAM)
+    # 1) Add nucleosomes (consumes predicted BAM)
     NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
     ft add-nucleosomes \
-        --input "$PRED" \
+        --input "$BAM" \
         --output "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
 
     # 3) Make decorated BED/track files
