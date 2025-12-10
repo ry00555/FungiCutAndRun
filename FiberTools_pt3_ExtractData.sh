@@ -13,95 +13,100 @@
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-#!/bin/bash
-#SBATCH --job-name=fibertools_TSSplots
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=40G
-#SBATCH --time=24:00:00
-#SBATCH --output=TSSplots.out
-#SBATCH --error=TSSplots.err
-
-module load Miniforge3/24.11.3-0
-source activate /home/ry00555/fibertools
-
 WORKDIR="/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 THREADS=8
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
 
-echo "Starting analysis..."
-echo "WORKDIR: $WORKDIR"
-echo "GENOME: $GENOME"
-echo "TSS BED: $TSS_BED"
-echo ""
+# iterate through all BAMs inside subdirectories
+for BAM in "$WORKDIR"/*/*.nucs.bam; do
+    DIR=$(dirname "$BAM")
+    FILE=$(basename "$BAM")
 
-### ─────────────────────────────────────────────
-### FIND ALL BAMs (subdirectories included)
-### ─────────────────────────────────────────────
-find "$WORKDIR" -maxdepth 2 -type f -name "*_merged.nucs.bam" | while read -r BAM; do
-    SAMPLE=$(basename "$BAM" _merged.nucs.bam)
-    SAMPLE_DIR=$(dirname "$BAM")
+    SAMPLE=${FILE%.nucs.bam}
 
     echo "────────────────────────────────────────"
-    echo " Processing sample: $SAMPLE"
-    echo " Directory: $SAMPLE_DIR"
+    echo " Processing: $SAMPLE"
+    echo " Directory : $DIR"
     echo "────────────────────────────────────────"
 
-    ### ─────────────────────────────────────────
-    ### 1. Identify existing pileups
-    ###    (nucs and m6A and 5mC)
-    ### ─────────────────────────────────────────
-    NUCPU="${SAMPLE_DIR}/${SAMPLE}.nucspileup.bedgraph"
-    M6APU="${SAMPLE_DIR}/${SAMPLE}.m6Apileup.bedgraph"
-    MCPPU="${SAMPLE_DIR}/${SAMPLE}.5mcpileup.bedgraph"
+    # ----- Expected pileup files -----
+    NUC_BED="$DIR/${SAMPLE}.nucspileup.bedgraph"
+    M6A_BED="$DIR/${SAMPLE}.m6Apileup.bedgraph"
+    CPG_BED="$DIR/${SAMPLE}.5mcpileup.bedgraph"
 
-    ### ─────────────────────────────────────────
-    ### 2. Convert BEDGRAPH → BigWig (if exists)
-    ### ─────────────────────────────────────────
-    for PU in "$NUCPU" "$M6APU" "$MCPPU"; do
-        if [ -f "$PU" ]; then
-            BW="${PU%.bedgraph}.bw"
-            echo "Converting to bigwig: $PU → $BW"
-            bedGraphToBigWig "$PU" "$GENOME" "$BW" || echo "BigWig conversion failed for $PU"
+    # ---------- BigWig Conversion ----------
+    for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
+        if [ -f "$BEDGRAPH" ]; then
+            BW="${BEDGRAPH%.bedgraph}.bw"
+            if [ ! -f "$BW" ]; then
+                echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
+                bedGraphToBigWig "$BEDGRAPH" "$GENOME" "$BW"
+            fi
         else
-            echo "Pileup not found: $PU (skipping)"
+            echo "Pileup not found: $BEDGRAPH (skipping)"
         fi
     done
 
-    ### ─────────────────────────────────────────
-    ### 3. TSS computeMatrix + plotProfile
-    ###    (run for each available bigwig)
-    ### ─────────────────────────────────────────
-    for BW in "${SAMPLE_DIR}/${SAMPLE}.nucspileup.bw" \
-              "${SAMPLE_DIR}/${SAMPLE}.m6Apileup.bw" \
-              "${SAMPLE_DIR}/${SAMPLE}.5mcpileup.bw"; do
+    NUC_BW="${NUC_BED%.bedgraph}.bw"
+    M6A_BW="${M6A_BED%.bedgraph}.bw"
+    CPG_BW="${CPG_BED%.bedgraph}.bw"
 
-        if [ -f "$BW" ]; then
-            FEATURE=$(basename "$BW" .bw | sed 's/^.*\.//')   # nucspileup / m6Apileup / 5mcpileup
+    # ---------- Generate TSS matrices ----------
+    # 1. nucleosome-only
+    if [ -f "$NUC_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.nuc.TSS.matrix.gz"
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 1000 \
+            -R "$TSS_BED" \
+            -S "$NUC_BW" \
+            -o "$MATRIX" \
+            --skipZeros \
+            --numberOfProcessors "$THREADS"
 
-            MATRIX="${SAMPLE_DIR}/${SAMPLE}.${FEATURE}.TSS.matrix.gz"
-            PNG="${SAMPLE_DIR}/${SAMPLE}.${FEATURE}.TSS_profile.png"
+        plotProfile \
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.nuc.TSS_profile.png" \
+            --plotTitle "${SAMPLE} Nucleosomes" --colorMap 'Reds'
+    fi
 
-            echo "Running computeMatrix for $BW ..."
-            computeMatrix reference-point \
-                --referencePoint TSS \
-                -b 2000 -a 1000 \
-                -R "$TSS_BED" \
-                -S "$BW" \
-                -o "$MATRIX" \
-                --skipZeros \
-                --numberOfProcessors $THREADS
+    # 2. m6A-only
+    if [ -f "$M6A_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.m6A.TSS.matrix.gz"
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 1000 \
+            -R "$TSS_BED" \
+            -S "$M6A_BW" \
+            -o "$MATRIX" \
+            --skipZeros \
+            --numberOfProcessors "$THREADS"
 
-            echo "Plotting profile: $PNG"
-            plotProfile -m "$MATRIX" \
-                -out "$PNG" \
-                --perGroup \
-                --plotTitle "${SAMPLE} ${FEATURE} TSS Profile"
-        fi
-    done
+        plotProfile \
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.m6A.TSS_profile.png" \
+            --plotTitle "${SAMPLE} m6A" --colorMap 'Greens'
+    fi
 
-    echo "Done with sample: $SAMPLE"
-    echo ""
+    # 3. 5mC-only
+    if [ -f "$CPG_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.5mC.TSS.matrix.gz"
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 1000 \
+            -R "$TSS_BED" \
+            -S "$CPG_BW" \
+            -o "$MATRIX" \
+            --skipZeros \
+            --numberOfProcessors "$THREADS"
+
+        plotProfile \
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.5mC.TSS_profile.png" \
+            --plotTitle "${SAMPLE} 5mC" --colorMap 'Blues'
+
+
+          fi
+
 done
-
-echo "All samples completed!"
