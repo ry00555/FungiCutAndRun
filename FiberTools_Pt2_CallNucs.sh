@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=ft_run_all
 #SBATCH --partition=batch
-#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -43,7 +43,8 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 
 #ft pileup --m6a --cpg --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.totalinfo_pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 
-ft extract -allow1bpOverlap "$NUCS_BAM" --m6a "$SAMPLE_DIR"/"$SAMPLE"_m6a.bed --cpg "$SAMPLE_DIR"/"$SAMPLE"_cpg.bed --nuc  "$SAMPLE_DIR"/"$SAMPLE"_nucleosome.bed --all "$SAMPLE_DIR"/"$SAMPLE"_totalinfo.bed --threads $THREADS || echo "extract failed for $SAMPLE"
+ft extract -allow1bpOverlap "$NUCS_BAM" --m6a "$SAMPLE_DIR"/"$SAMPLE"_m6a.bed --cpg "$SAMPLE_DIR"/"$SAMPLE"_cpg.bed --nuc "$SAMPLE_DIR"/"$SAMPLE"_nucleosome.bed --threads $THREADS || echo "extract failed for $SAMPLE"
+ft extract -allow1bpOverlap "$NUCS_BAM" --all "$SAMPLE_DIR"/"$SAMPLE"_totalinfo.bed --threads $THREADS || echo "extract failed for $SAMPLE"
 
 
     echo "Done $SAMPLE"
