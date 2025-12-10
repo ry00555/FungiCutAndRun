@@ -28,22 +28,22 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 
     # 1) Add nucleosomes (consumes predicted BAM)
     NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
-  # ft add-nucleosomes "$BAM" "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
- #samtools index "$NUCS_BAM"
+ft add-nucleosomes "$BAM" "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
+ samtools index "$NUCS_BAM"
 
     # 3) Make decorated BED/track files
-#ft track-decorators --bed12 "$SAMPLE_DIR/${SAMPLE}.nuctracks.bed" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decorated_${SAMPLE}.nuctracks.bed" || echo "track-decorators failed for $SAMPLE"
+ft track-decorators --bed12 "$SAMPLE_DIR/${SAMPLE}.nuctracks.bed" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decorated_${SAMPLE}.nuctracks.bed" || echo "track-decorators failed for $SAMPLE"
 #4) run qc
-#ft qc --m6a-per-msp "$NUCS_BAM" "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
+ft qc --m6a-per-msp "$NUCS_BAM" "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
 
     # 5) Make pileup (per-base or per-feature aggregation)
-#ft pileup --m6a  --out "$SAMPLE_DIR/${SAMPLE}.m6Apileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
-#ft pileup --cpg --out "$SAMPLE_DIR/${SAMPLE}.5mcpileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
-#ft pileup --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.nucspileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --m6a  --out "$SAMPLE_DIR/${SAMPLE}.m6Apileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --cpg --out "$SAMPLE_DIR/${SAMPLE}.5mcpileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.nucspileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 
-#ft pileup --m6a --cpg --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.totalinfo_pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --m6a --cpg --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.totalinfo_pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 
-#ft extract -allow1bpOverlap "$NUCS_BAM" --m6a "$SAMPLE_DIR"/"$SAMPLE"_m6a.bed --cpg "$SAMPLE_DIR"/"$SAMPLE"_cpg.bed --nuc "$SAMPLE_DIR"/"$SAMPLE"_nucleosome.bed --threads $THREADS || echo "extract failed for $SAMPLE"
+ft extract "$NUCS_BAM" --m6a "$SAMPLE_DIR"/"$SAMPLE"_m6a.bed --cpg "$SAMPLE_DIR"/"$SAMPLE"_cpg.bed --nuc "$SAMPLE_DIR"/"$SAMPLE"_nucleosome.bed --threads $THREADS || echo "extract failed for $SAMPLE"
 ft extract "$NUCS_BAM" --all "$SAMPLE_DIR"/"$SAMPLE"_totalinfo.bed --threads $THREADS || echo "extract failed for $SAMPLE"
 
 

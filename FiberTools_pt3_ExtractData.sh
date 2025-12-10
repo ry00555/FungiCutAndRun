@@ -13,34 +13,95 @@
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
+#!/bin/bash
+#SBATCH --job-name=fibertools_TSSplots
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=40G
+#SBATCH --time=24:00:00
+#SBATCH --output=TSSplots.out
+#SBATCH --error=TSSplots.err
+
+module load Miniforge3/24.11.3-0
+source activate /home/ry00555/fibertools
+
 WORKDIR="/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 THREADS=8
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
-ml ucsc
-ml deepTools
+
+echo "Starting analysis..."
+echo "WORKDIR: $WORKDIR"
+echo "GENOME: $GENOME"
+echo "TSS BED: $TSS_BED"
+echo ""
+
+### ─────────────────────────────────────────────
+### FIND ALL BAMs (subdirectories included)
+### ─────────────────────────────────────────────
 find "$WORKDIR" -maxdepth 2 -type f -name "*_merged.nucs.bam" | while read -r BAM; do
     SAMPLE=$(basename "$BAM" _merged.nucs.bam)
     SAMPLE_DIR=$(dirname "$BAM")
 
-    echo "Processing $SAMPLE ..."
+    echo "────────────────────────────────────────"
+    echo " Processing sample: $SAMPLE"
+    echo " Directory: $SAMPLE_DIR"
+    echo "────────────────────────────────────────"
 
-    PILEUP="${SAMPLE_DIR}/${SAMPLE}.nucspileup.bedgraph"
-    BIGWIG="${SAMPLE_DIR}/${SAMPLE}.nucspileup.bw"
+    ### ─────────────────────────────────────────
+    ### 1. Identify existing pileups
+    ###    (nucs and m6A and 5mC)
+    ### ─────────────────────────────────────────
+    NUCPU="${SAMPLE_DIR}/${SAMPLE}.nucspileup.bedgraph"
+    M6APU="${SAMPLE_DIR}/${SAMPLE}.m6Apileup.bedgraph"
+    MCPPU="${SAMPLE_DIR}/${SAMPLE}.5mcpileup.bedgraph"
 
-    bedGraphToBigWig "$PILEUP" "$GENOME" "$BIGWIG" || echo "BigWig failed for $SAMPLE"
+    ### ─────────────────────────────────────────
+    ### 2. Convert BEDGRAPH → BigWig (if exists)
+    ### ─────────────────────────────────────────
+    for PU in "$NUCPU" "$M6APU" "$MCPPU"; do
+        if [ -f "$PU" ]; then
+            BW="${PU%.bedgraph}.bw"
+            echo "Converting to bigwig: $PU → $BW"
+            bedGraphToBigWig "$PU" "$GENOME" "$BW" || echo "BigWig conversion failed for $PU"
+        else
+            echo "Pileup not found: $PU (skipping)"
+        fi
+    done
 
-TSS_MATRIX="$WORKDIR/${SAMPLE}.TSS.matrix.tab"
-computeMatrix reference-point \
-    --referencePoint TSS \
-    -b 2000 -a 1000 \
-    -R "$TSS_BED" \
-    -S "$BIGWIG" \
-    -o "$TSS_MATRIX" \
-    --skipZeros \
-    --numberOfProcessors $THREADS
+    ### ─────────────────────────────────────────
+    ### 3. TSS computeMatrix + plotProfile
+    ###    (run for each available bigwig)
+    ### ─────────────────────────────────────────
+    for BW in "${SAMPLE_DIR}/${SAMPLE}.nucspileup.bw" \
+              "${SAMPLE_DIR}/${SAMPLE}.m6Apileup.bw" \
+              "${SAMPLE_DIR}/${SAMPLE}.5mcpileup.bw"; do
 
-    plotProfile -m "$TSS_MATRIX" -out "$WORKDIR/${SAMPLE}.TSS_profile.png" \
-        --perGroup --colors red
+        if [ -f "$BW" ]; then
+            FEATURE=$(basename "$BW" .bw | sed 's/^.*\.//')   # nucspileup / m6Apileup / 5mcpileup
 
+            MATRIX="${SAMPLE_DIR}/${SAMPLE}.${FEATURE}.TSS.matrix.gz"
+            PNG="${SAMPLE_DIR}/${SAMPLE}.${FEATURE}.TSS_profile.png"
+
+            echo "Running computeMatrix for $BW ..."
+            computeMatrix reference-point \
+                --referencePoint TSS \
+                -b 2000 -a 1000 \
+                -R "$TSS_BED" \
+                -S "$BW" \
+                -o "$MATRIX" \
+                --skipZeros \
+                --numberOfProcessors $THREADS
+
+            echo "Plotting profile: $PNG"
+            plotProfile -m "$MATRIX" \
+                -out "$PNG" \
+                --perGroup \
+                --plotTitle "${SAMPLE} ${FEATURE} TSS Profile"
+        fi
+    done
+
+    echo "Done with sample: $SAMPLE"
+    echo ""
 done
+
+echo "All samples completed!"
