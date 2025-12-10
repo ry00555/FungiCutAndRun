@@ -28,7 +28,7 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 
     # 1) Predict m6A (adds MM/ML tags)
     PRED="${SAMPLE_DIR}/${SAMPLE}.predicted.bam"
-    fibertools predict-m6a \
+    ft predict-m6a \
         --threads $THREADS \
         --ml 125 \
         --keep \
@@ -37,19 +37,23 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 
     # 2) Add nucleosomes (consumes predicted BAM)
     NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
-    fibertools add-nucleosomes \
+    ft add-nucleosomes \
         --input "$PRED" \
         --output "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
 
     # 3) Make decorated BED/track files
-    fibertools track-decorators \
+    ft track-decorators \
         --input "$NUCS_BAM" \
         --outdir "$SAMPLE_DIR/tracks" || echo "track-decorators failed for $SAMPLE"
 
     # 4) Make pileup (per-base or per-feature aggregation)
-    fibertools pileup \
+    ft pileup \
         --input "$NUCS_BAM" \
         --out "$SAMPLE_DIR/${SAMPLE}.pileup.bedgraph" || echo "pileup failed for $SAMPLE"
+
+ft qc \
+--input "$NUCS_BAM" \
+--out "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
 
     # Index the final BAM
     samtools index "$NUCS_BAM"
