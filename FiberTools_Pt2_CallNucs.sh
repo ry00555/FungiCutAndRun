@@ -35,7 +35,9 @@ for BAM in "$IN_DIR"/*_merged.bam; do
 #ft track-decorators --bed12 "$SAMPLE_DIR/${SAMPLE}.nuctracks.bed" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decorated_${SAMPLE}.nuctracks.bed" || echo "track-decorators failed for $SAMPLE"
 
     # 4) Make pileup (per-base or per-feature aggregation)
-ft pileup --m6a --cpg --fiber-coverage "$SAMPLE_DIR/${SAMPLE}.pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --m6a  "$SAMPLE_DIR/${SAMPLE}.m6Apileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --cpg "$SAMPLE_DIR/${SAMPLE}.5mcpileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --fiber-coverage "$SAMPLE_DIR/${SAMPLE}.nucspileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 
 #ft qc --m6a-per-msp "$NUCS_BAM" "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
 
