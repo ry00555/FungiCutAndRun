@@ -11,7 +11,7 @@
 
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
-BASE_DIR="/lustre2/scratch/ry00555/ONTRun10/bam_pass"
+BASE_DIR="/lustre2/scratch/ry00555/ONTRun9/bam_pass"
 OUT_DIR="$BASE_DIR/merged_bams_passed"
 META="/lustre2/scratch/ry00555/ONTRun9/ONTRun9.txt"
 
