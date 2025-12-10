@@ -13,7 +13,7 @@
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-IN_DIR="/lustre2/scratch/ry00555/ONTRun10/bam_pass/merged_bams_passed"
+IN_DIR="/scratch/ry00555/ONTRun9_10Combined/InputBams"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun10/fibertools_results"
 mkdir -p "$OUT_DIR"
 
