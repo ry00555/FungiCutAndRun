@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
-#SBATCH --time=12:00:00
+#SBATCH --mem=85G
+#SBATCH --time=24:00:00
 #SBATCH --output=ft_pt3.%j.out
 #SBATCH --error=ft_pt3.%j.err
 
@@ -14,7 +14,6 @@ module load Miniforge3/24.11.3-0 ucsc/443
 source activate /home/ry00555/fibertools
 
 WORKDIR="/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
-THREADS=8
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
 
@@ -80,7 +79,7 @@ done
     # ---------- Generate TSS matrices & plots ----------
     # 1. nucleosome-only
     if [ -f "$NUC_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.nuc.TSS.matrix.gz"
+        MATRIX="$DIR/${SAMPLE}.nuc.TSS.tab"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
@@ -88,7 +87,7 @@ done
             -S "$NUC_BW" \
             -o "$MATRIX" \
             --skipZeros \
-            --numberOfProcessors "$THREADS"
+            -p 12
 
         plotProfile \
             -m "$MATRIX" \
@@ -99,7 +98,7 @@ done
 
     # 2. m6A-only
     if [ -f "$M6A_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.m6A.TSS.matrix.gz"
+        MATRIX="$DIR/${SAMPLE}.m6A.TSS.tab"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
@@ -107,7 +106,7 @@ done
             -S "$M6A_BW" \
             -o "$MATRIX" \
             --skipZeros \
-            --numberOfProcessors "$THREADS"
+            -p 12
 
         plotProfile \
             -m "$MATRIX" \
@@ -118,7 +117,7 @@ done
 
     # 3. 5mC-only
     if [ -f "$CPG_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.5mC.TSS.matrix.gz"
+        MATRIX="$DIR/${SAMPLE}.5mC.TSS.tab"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
@@ -126,7 +125,7 @@ done
             -S "$CPG_BW" \
             -o "$MATRIX" \
             --skipZeros \
-            --numberOfProcessors "$THREADS"
+            -p 12
 
         plotProfile \
             -m "$MATRIX" \
