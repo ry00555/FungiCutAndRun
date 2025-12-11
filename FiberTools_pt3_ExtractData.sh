@@ -48,9 +48,9 @@ for BAM in "$WORKDIR"/*/*.nucs.bam; do
     echo "────────────────────────────────────────"
 
     # ----- Expected pileup files -----
-    NUC_BED="$DIR/${SAMPLE}.nucspileup.bedgraph"
-    M6A_BED="$DIR/${SAMPLE}.m6Apileup.bedgraph"
-    CPG_BED="$DIR/${SAMPLE}.5mcpileup.bedgraph"
+    NUC_BED="$DIR/${SAMPLE}.nucspileup2.bedgraph"
+    M6A_BED="$DIR/${SAMPLE}.m6Apileup2.bedgraph"
+    CPG_BED="$DIR/${SAMPLE}.5mcpileup2.bedgraph"
 
     # ---------- Sort and convert bedGraphs ----------
     for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
@@ -72,61 +72,63 @@ for BAM in "$WORKDIR"/*/*.nucs.bam; do
     CPG_BW="${CPG_BED%.bedgraph}.bw"
 
     # ---------- Generate TSS matrices & plots ----------
-    for FEATURE in nuc m6A 5mC; do
-        BW_VAR="${FEATURE^^}_BW"      # NUC_BW, M6A_BW, CPG_BW
-        MATRIX="$DIR/${SAMPLE}.${FEATURE}.TSS.matrix.gz"
-        PLOT="$DIR/${SAMPLE}.${FEATURE}.TSS_profile.png"
-        COLOR="Reds"
-        [ "$FEATURE" == "m6A" ] && COLOR="Greens"
-        [ "$FEATURE" == "5mC" ] && COLOR="Blues"
-
-        BW="${!BW_VAR}"
-        if [ -f "$BW" ]; then
-            echo "Generating TSS matrix and plot for $FEATURE"
-            computeMatrix reference-point \
-                --referencePoint TSS \
-                -b 2000 -a 1000 \
-                -R "$TSS_BED" \
-                -S "$BW" \
-                -o "$MATRIX" \
-                --skipZeros \
-                --numberOfProcessors "$THREADS"
-
-            plotProfile \
-                -m "$MATRIX" \
-                -out "$PLOT" \
-                --plotTitle "${SAMPLE} ${FEATURE}" \
-                --colorMap "$COLOR"
-        fi
-    done
-
-    # ---------- Optional: combined TSS plot ----------
-    COMBINED_MATRIX="$DIR/${SAMPLE}.combined.TSS.matrix.gz"
-    COMBINED_PLOT="$DIR/${SAMPLE}.combined.TSS_profile.png"
-    EXISTING_BWS=()
-    [ -f "$NUC_BW" ] && EXISTING_BWS+=("$NUC_BW")
-    [ -f "$M6A_BW" ] && EXISTING_BWS+=("$M6A_BW")
-    [ -f "$CPG_BW" ] && EXISTING_BWS+=("$CPG_BW")
-
-    if [ "${#EXISTING_BWS[@]}" -gt 1 ]; then
-        echo "Generating combined TSS matrix and plot"
+    # 1. nucleosome-only
+    if [ -f "$NUC_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.nuc.TSS.matrix.gz"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
-            -S "${EXISTING_BWS[@]}" \
-            -o "$COMBINED_MATRIX" \
+            -S "$NUC_BW" \
+            -o "$MATRIX" \
             --skipZeros \
             --numberOfProcessors "$THREADS"
 
         plotProfile \
-            -m "$COMBINED_MATRIX" \
-            -out "$COMBINED_PLOT" \
-            --plotTitle "${SAMPLE} Combined" \
-            --perGroup \
-            --colors "red green blue"
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.nuc.TSS_profile.png" \
+            --plotTitle "${SAMPLE} Nucleosomes" \
+            --colorMap 'Reds'
     fi
 
-done
+    # 2. m6A-only
+    if [ -f "$M6A_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.m6A.TSS.matrix.gz"
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 1000 \
+            -R "$TSS_BED" \
+            -S "$M6A_BW" \
+            -o "$MATRIX" \
+            --skipZeros \
+            --numberOfProcessors "$THREADS"
+
+        plotProfile \
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.m6A.TSS_profile.png" \
+            --plotTitle "${SAMPLE} m6A" \
+            --colorMap 'Greens'
+    fi
+
+    # 3. 5mC-only
+    if [ -f "$CPG_BW" ]; then
+        MATRIX="$DIR/${SAMPLE}.5mC.TSS.matrix.gz"
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 1000 \
+            -R "$TSS_BED" \
+            -S "$CPG_BW" \
+            -o "$MATRIX" \
+            --skipZeros \
+            --numberOfProcessors "$THREADS"
+
+        plotProfile \
+            -m "$MATRIX" \
+            -out "$DIR/${SAMPLE}.5mC.TSS_profile.png" \
+            --plotTitle "${SAMPLE} 5mC" \
+            --colorMap 'Blues'
+
+        fi
+    done
 
 echo "All done!"
