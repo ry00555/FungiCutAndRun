@@ -10,7 +10,7 @@
 #SBATCH --output=ft_pt3.%j.out
 #SBATCH --error=ft_pt3.%j.err
 
-module load Miniforge3/24.11.3-0
+module load Miniforge3/24.11.3-0 ucsc/443
 source activate /home/ry00555/fibertools
 
 WORKDIR="/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
