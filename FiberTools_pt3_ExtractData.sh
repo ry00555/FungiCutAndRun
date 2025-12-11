@@ -54,17 +54,23 @@ for BAM in "$WORKDIR"/*/*.nucs.bam; do
 
     # ---------- Sort and convert bedGraphs ----------
     for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
-        if [ -f "$BEDGRAPH" ]; then
-            sort_bedgraph "$BEDGRAPH"
-            BW="${BEDGRAPH%.bedgraph}.bw"
-            if [ ! -f "$BW" ]; then
-                echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
-                bedGraphToBigWig "$BEDGRAPH" "$GENOME" "$BW"
-            fi
-        else
-            echo "Pileup not found: $BEDGRAPH (skipping)"
-        fi
-    done
+      if [ -f "$BEDGRAPH" ]; then
+          # sort first
+          sort_bedgraph "$BEDGRAPH"
+
+          # extract only first 4 columns
+          BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
+          cut -f1-4 "$BEDGRAPH" > "$BG4"
+
+          BW="${BEDGRAPH%.bedgraph}.bw"
+          if [ ! -f "$BW" ]; then
+              echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
+              bedGraphToBigWig "$BG4" "$GENOME" "$BW"
+          fi
+      else
+          echo "Pileup not found: $BEDGRAPH (skipping)"
+      fi
+  done
 
     # ---------- BigWig paths ----------
     NUC_BW="${NUC_BED%.bedgraph}.bw"
