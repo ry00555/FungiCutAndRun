@@ -27,6 +27,7 @@ for BAM in "$IN_DIR"/*_merged.bam; do
     echo "Processing $SAMPLE ..."
 
     # 1) Add nucleosomes (consumes predicted BAM)
+    NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
 #ft add-nucleosomes "$BAM" "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
  #samtools index "$NUCS_BAM"
 
