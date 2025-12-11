@@ -48,29 +48,29 @@ for BAM in "$WORKDIR"/*/*.nucs.bam; do
     echo "────────────────────────────────────────"
 
     # ----- Expected pileup files -----
-    NUC_BED="$DIR/${SAMPLE}.nucspileup2.bedgraph"
-    M6A_BED="$DIR/${SAMPLE}.m6Apileup2.bedgraph"
-    CPG_BED="$DIR/${SAMPLE}.5mcpileup2.bedgraph"
+NUC_BED="$DIR/${SAMPLE}.nucspileup.bedgraph"
+M6A_BED="$DIR/${SAMPLE}.m6Apileup2.bedgraph"
+CPG_BED="$DIR/${SAMPLE}.5mcpileup2.bedgraph"
 
-    # ---------- Sort and convert bedGraphs ----------
-    for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
-      if [ -f "$BEDGRAPH" ]; then
-          # sort first
-          sort_bedgraph "$BEDGRAPH"
+# ---------- Sort and convert bedGraphs ----------
+for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
+    if [ -f "$BEDGRAPH" ]; then
+        # sort first
+        sort_bedgraph "$BEDGRAPH"
 
-          # extract only first 4 columns
-          BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
-          cut -f1-4 "$BEDGRAPH" > "$BG4"
+        # extract only first 4 columns for BigWig
+        BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
+        cut -f1-4 "$BEDGRAPH" > "$BG4"
 
-          BW="${BEDGRAPH%.bedgraph}.bw"
-          if [ ! -f "$BW" ]; then
-              echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
-              bedGraphToBigWig "$BG4" "$GENOME" "$BW"
-          fi
-      else
-          echo "Pileup not found: $BEDGRAPH (skipping)"
-      fi
-  done
+        BW="${BEDGRAPH%.bedgraph}.bw"
+        if [ ! -f "$BW" ]; then
+            echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
+            bedGraphToBigWig "$BG4" "$GENOME" "$BW"
+        fi
+    else
+        echo "Pileup not found: $BEDGRAPH (skipping)"
+    fi
+done
 
     # ---------- BigWig paths ----------
     NUC_BW="${NUC_BED%.bedgraph}.bw"
