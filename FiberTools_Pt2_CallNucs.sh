@@ -39,7 +39,7 @@ for BAM in "$IN_DIR"/*_merged.bam; do
     # 5) Make pileup (per-base or per-feature aggregation)
 ft pileup --m6a  --per-base  --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.m6Apileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 ft pileup --cpg --per-base --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.5mcpileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
-ft pileup --fiber-coverage -per-base --out "$SAMPLE_DIR/${SAMPLE}.nucspileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+ft pileup --fiber-coverage --per-base --out "$SAMPLE_DIR/${SAMPLE}.nucspileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 
 #ft pileup --m6a --cpg --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.totalinfo_pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
 

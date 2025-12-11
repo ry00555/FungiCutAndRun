@@ -18,9 +18,6 @@ GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
 
 
-# ======================================
-# Function: sort bedGraph properly
-# ======================================
 sort_bedgraph() {
     IN="$1"
     if [ -f "$IN" ]; then
@@ -31,9 +28,7 @@ sort_bedgraph() {
     fi
 }
 
-# ======================================
-# Iterate over all BAMs in subdirectories
-# ======================================
+
 for BAM in "$WORKDIR"/*/*.nucs.bam; do
     [ -f "$BAM" ] || continue
 
@@ -51,6 +46,7 @@ NUC_BED="$DIR/${SAMPLE}.nucspileup.bedgraph"
 M6A_BED="$DIR/${SAMPLE}.m6Apileup2.bedgraph"
 CPG_BED="$DIR/${SAMPLE}.5mcpileup2.bedgraph"
 
+
 # ---------- Sort and convert bedGraphs ----------
 for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
     if [ -f "$BEDGRAPH" ]; then
@@ -60,6 +56,11 @@ for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
         # extract only first 4 columns for BigWig
         BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
         cut -f1-4 "$BEDGRAPH" > "$BG4"
+
+        for f in *.bedgraph; do
+            echo "Checking $f"
+            awk 'NF!=4 {print "BAD:", $0}' $f | head
+        done
 
         BW="${BEDGRAPH%.bedgraph}.bw"
         if [ ! -f "$BW" ]; then
@@ -98,18 +99,18 @@ done
 
     # 2. m6A-only
     if [ -f "$M6A_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.m6A.TSS.tab"
+        M6AMATRIX="$DIR/${SAMPLE}.m6A.TSS.tab"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
             -S "$M6A_BW" \
-            -o "$MATRIX" \
+            -o "$M6AMATRIX" \
             --skipZeros \
             -p 12
 
         plotProfile \
-            -m "$MATRIX" \
+            -m "$M6AMATRIX" \
             -out "$DIR/${SAMPLE}.m6A.TSS_profile.png" \
             --plotTitle "${SAMPLE} m6A" \
             --colorMap 'Greens'
@@ -117,13 +118,13 @@ done
 
     # 3. 5mC-only
     if [ -f "$CPG_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.5mC.TSS.tab"
+        CPGMATRIX="$DIR/${SAMPLE}.5mC.TSS.tab"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
             -S "$CPG_BW" \
-            -o "$MATRIX" \
+            -o "$CPGMATRIX" \
             --skipZeros \
             -p 12
 
