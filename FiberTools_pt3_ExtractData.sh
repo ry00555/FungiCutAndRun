@@ -48,29 +48,29 @@ CPG_BED="$DIR/${SAMPLE}.5mcpileup2.bedgraph"
 
 
 # ---------- Sort and convert bedGraphs ----------
-for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
-    if [ -f "$BEDGRAPH" ]; then
+#for BEDGRAPH in "$NUC_BED" "$M6A_BED" "$CPG_BED"; do
+#    if [ -f "$BEDGRAPH" ]; then
         # sort first
-        sort_bedgraph "$BEDGRAPH"
+#        sort_bedgraph "$BEDGRAPH"
 
         # extract only first 4 columns for BigWig
-        BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
-        cut -f1-4 "$BEDGRAPH" > "$BG4"
+#        BG4="${BEDGRAPH%.bedgraph}.4col.bedgraph"
+#        cut -f1-4 "$BEDGRAPH" > "$BG4"
 
-        for f in *.bedgraph; do
-            echo "Checking $f"
-            awk 'NF!=4 {print "BAD:", $0}' $f | head
-        done
+#        for f in *.bedgraph; do
+#            echo "Checking $f"
+#            awk 'NF!=4 {print "BAD:", $0}' $f | head
+#        done
 
-        BW="${BEDGRAPH%.bedgraph}.bw"
-        if [ ! -f "$BW" ]; then
-            echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
-            bedGraphToBigWig "$BG4" "$GENOME" "$BW"
-        fi
-    else
-        echo "Pileup not found: $BEDGRAPH (skipping)"
-    fi
-done
+#        BW="${BEDGRAPH%.bedgraph}.bw"
+#        if [ ! -f "$BW" ]; then
+#            echo "Converting $(basename $BEDGRAPH) → $(basename $BW)"
+#            bedGraphToBigWig "$BG4" "$GENOME" "$BW"
+#        fi
+#    else
+#        echo "Pileup not found: $BEDGRAPH (skipping)"
+#    fi
+#done
 
     # ---------- BigWig paths ----------
     NUC_BW="${NUC_BED%.bedgraph}.bw"
@@ -80,17 +80,18 @@ done
     # ---------- Generate TSS matrices & plots ----------
     # 1. nucleosome-only
     if [ -f "$NUC_BW" ]; then
-        MATRIX="$DIR/${SAMPLE}.nuc.TSS.tab"
+        MATRIX="$DIR/${SAMPLE}.nuc.TSS.gz"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
             -S "$NUC_BW" \
             -o "$MATRIX" \
+            --outFileNameMatrix "$DIR/${SAMPLE}.nuc.TSS.tab" \
             --skipZeros \
             -p 12
 
-        plotProfile \
+        plotHeatmap \
             -m "$MATRIX" \
             -out "$DIR/${SAMPLE}.nuc.TSS_profile.png" \
             --plotTitle "${SAMPLE} Nucleosomes" \
@@ -99,17 +100,18 @@ done
 
     # 2. m6A-only
     if [ -f "$M6A_BW" ]; then
-        M6AMATRIX="$DIR/${SAMPLE}.m6A.TSS.tab"
+        M6AMATRIX="$DIR/${SAMPLE}.m6A.TSS.gz"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
             -S "$M6A_BW" \
             -o "$M6AMATRIX" \
+            --outFileNameMatrix "$DIR/${SAMPLE}.m6A.TSS.tab" \
             --skipZeros \
             -p 12
 
-        plotProfile \
+        plotHeatmap \
             -m "$M6AMATRIX" \
             -out "$DIR/${SAMPLE}.m6A.TSS_profile.png" \
             --plotTitle "${SAMPLE} m6A" \
@@ -118,17 +120,18 @@ done
 
     # 3. 5mC-only
     if [ -f "$CPG_BW" ]; then
-        CPGMATRIX="$DIR/${SAMPLE}.5mC.TSS.tab"
+        CPGMATRIX="$DIR/${SAMPLE}.5mC.TSS.gz"
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 1000 \
             -R "$TSS_BED" \
             -S "$CPG_BW" \
+            --outFileNameMatrix "$DIR/${SAMPLE}.5mC.TSS.tab" \
             -o "$CPGMATRIX" \
             --skipZeros \
             -p 12
 
-        plotProfile \
+        plotHeatmap \
             -m "$MATRIX" \
             -out "$DIR/${SAMPLE}.5mC.TSS_profile.png" \
             --plotTitle "${SAMPLE} 5mC" \
