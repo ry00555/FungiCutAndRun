@@ -10,6 +10,9 @@
 #SBATCH --error=Heatmaps.%j.err
 
 cd $SLURM_SUBMIT_DIR
+OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025"
+GENEDIR="/home/ry00555/Research/Genomes/HeatmapGeneFiles"
+BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools/3.5.2-foss-2022a
 
