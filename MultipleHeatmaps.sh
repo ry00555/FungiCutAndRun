@@ -10,7 +10,7 @@
 #SBATCH --error=../MultipleHeatmaps.%j.err
 cd $SLURM_SUBMIT_DIR
 
-OUTDIR="/scratch/ry00555/RTT109PaperFigures/"
+OUTDIR="/scratch/ry00555/RTT109PaperFigures"
 GENEDIR="/home/ry00555/Research/Genomes/HeatmapGeneFiles"
 BWDIR="$OUTDIR/PreviouslyMappedBigWigs"
 
