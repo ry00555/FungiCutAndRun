@@ -10,9 +10,8 @@
 #SBATCH --error=Heatmaps.%j.err
 
 cd $SLURM_SUBMIT_DIR
-OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025"
+OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/BigWigs"
 GENEDIR="/home/ry00555/Research/Genomes/HeatmapGeneFiles"
-BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools/3.5.2-foss-2022a
 
@@ -253,18 +252,18 @@ ml deepTools
 
 
 
-computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/2024_04_23_WT_peaks.txt" -S 153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw 153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o ../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.gz --outFileNameMatrix ../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.tab
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/2024_04_23_WT_peaks.txt" -S $OUTDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $OUTDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o $OUTDIR/../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.gz --outFileNameMatrix $OUTDIR/../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.tab
 
-plotHeatmap -m ../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.gz -o ../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions ../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
-
-
-
-computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/MyceliaK27me3_peaks.bed" -S 153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw 153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.gz --outFileNameMatrix ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.tab
+plotHeatmap -m $OUTDIR/../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.gz -o $OUTDIR/../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/../Heatmaps/RTT109_K27domains_2024_04_23_WT_peaks_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
 
 
-plotHeatmap -m ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.gz -o ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/MyceliaK27me3_peaks.bed" -S $OUTDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $OUTDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.gz --outFileNameMatrix $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.tab
 
 
-computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/MyceliaK27me3_peaks.txt" -S 153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw 153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.gz --outFileNameMatrix ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.tab
+plotHeatmap -m $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.gz -o $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peaks_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
 
-plotHeatmap -m ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.gz -o ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions ../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/MyceliaK27me3_peaks.txt" -S $OUTDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $OUTDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw /scratch/ry00555/RTT109PaperFigures/BigWigs/150-81_ChIP_rtt109FLAG_H3K27me3__S81_L002_R1_001_val_1.fq.gz.bin_25.smooth_50_Q30.bw --skipZeros -b 1000 -a 1000 --sortUsingSamples 1 --sortRegions descend -o $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.gz --outFileNameMatrix $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.tab
+
+plotHeatmap -m $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.gz -o $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/../Heatmaps/RTT109_K27domains_MyceliaK27me3_peakstxt_V1sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel  "WT 153-124" "∆rtt109 153-126"  "rtt109-3xflag 150-81" --colorMap 'Greens'
