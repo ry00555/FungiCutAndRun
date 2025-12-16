@@ -42,10 +42,15 @@ ml deepTools
 #plotHeatmap -m $OUTDIR/Heatmaps/RTT109_H3K9me3_K9Peaks_V3.mat -o $OUTDIR/Heatmaps/RTT109_H3K9me3_K9Peaks_V4.png --sortRegions descend --sortUsingSamples 3 --heatmapHeight 8  --heatmapWidth 4  --outFileSortedRegions $OUTDIR/Heatmaps/RTT109_H3K9me3_K9Peaks_sortOrder_V3.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --samplesLabel "WT K9me3" "∆rtt109 K9me3" "rtt109-3xflag K9me3"  --colorMap 'Blues'
 
 
-computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S $BWDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/150-62_WT_H3K36me3_rep8.bin_25.smooth_50.bw $BWDIR/150-70_rtt109_H3K36me3_rep7.bin_25.smooth_50.bw  -o $OUTDIR/Heatmaps/K27_K36onK27genes.gz --outFileNameMatrix $OUTDIR/Heatmaps/K27_K36onK27genes.tab 	--sortRegions keep  --missingDataAsZero -bs 10 -a 2000 -b 1000
+#computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" -S $BWDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/150-62_WT_H3K36me3_rep8.bin_25.smooth_50.bw $BWDIR/150-70_rtt109_H3K36me3_rep7.bin_25.smooth_50.bw  -o $OUTDIR/Heatmaps/K27_K36onK27genes.gz --outFileNameMatrix $OUTDIR/Heatmaps/K27_K36onK27genes.tab 	--sortRegions keep  --missingDataAsZero -bs 10 -a 2000 -b 1000
 
 
-plotHeatmap -m $OUTDIR/Heatmaps/K27_K36onK27genes.gz -o $OUTDIR/Heatmaps/K27_K36onK27genes.png --sortRegions descend --sortUsingSamples 2 --outFileSortedRegions $OUTDIR/Heatmaps/K27_K36onK27genes_sorted.bed --startLabel "5'" --endLabel "3'" --heatmapHeight 8 --heatmapWidth 4  --boxAroundHeatmaps no --samplesLabel "WT 153-124" "∆rtt109 153-126"  "WT K36me3" "∆rtt109 K36me3"  --colorMap  'Greens' 'Greens' 'YlOrBr' 'YlOrBr' --hclust 2
+#plotHeatmap -m $OUTDIR/Heatmaps/K27_K36onK27genes.gz -o $OUTDIR/Heatmaps/K27_K36onK27genes.png --sortRegions descend --sortUsingSamples 2 --outFileSortedRegions $OUTDIR/Heatmaps/K27_K36onK27genes_sorted.bed --startLabel "5'" --endLabel "3'" --heatmapHeight 8 --heatmapWidth 4  --boxAroundHeatmaps no --samplesLabel "WT 153-124" "∆rtt109 153-126"  "WT K36me3" "∆rtt109 K36me3"  --colorMap  'Greens' 'Greens' 'YlOrBr' 'YlOrBr' --hclust 2
+
+
+computeMatrix reference-point -p 12 -R "$OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1.bed" -S $BWDIR/153-124_ChIP_WT_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/153-126_ChIP_rtt109_H3K27me3_.bin_25.smooth_50Bulk.bw $BWDIR/150-62_WT_H3K36me3_rep8.bin_25.smooth_50.bw $BWDIR/150-70_rtt109_H3K36me3_rep7.bin_25.smooth_50.bw  -o $OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1.gz --outFileNameMatrix $OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1.tab 	--sortRegions keep  --missingDataAsZero -bs 10 -a 2000 -b 1000
+plotHeatmap -m $OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1.gz -o $OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1.png --sortRegions descend --sortUsingSamples 2 --outFileSortedRegions $OUTDIR/Heatmaps/K27_K36_onK27genes_cluster2_V1_sorted.bed --startLabel "5'" --endLabel "3'" --heatmapHeight 8 --heatmapWidth 4  --boxAroundHeatmaps no --samplesLabel "WT 153-124" "∆rtt109 153-126"  "WT K36me3" "∆rtt109 K36me3"  --colorMap  'Greens' 'Greens' 'YlOrBr' 'YlOrBr' --hclust 2
+
 
 #computeMatrix reference-point -p 12 -R "$GENEDIR/NonK27genes.bed" -S $BWDIR/150-62_WT_H3K36me3_rep8.bin_25.smooth_50.bw $BWDIR/150-70_rtt109_H3K36me3_rep7.bin_25.smooth_50.bw $BWDIR/150-82_rtt109flag_H3K36me3_rep3.bin_25.smooth_50.bw -o $OUTDIR/Heatmaps/RTT109_H3K36me3_nonK27genes_V2.mat 	--sortRegions keep --missingDataAsZero -bs 10 -a 2000 -b 1000
 
