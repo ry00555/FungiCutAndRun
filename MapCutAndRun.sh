@@ -30,9 +30,9 @@ OUTDIR="/scratch/ry00555/Run152"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
 #module load Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
- FILES="${OUTDIR}/TrimmedReads/*R1_001_val_1\.fq\.gz"
+ FILES="${OUTDIR}/TrimmedReads/*_L006_R1_001_val_1\.fq\.gz"
 
 
 #  Iterate over the files
@@ -46,7 +46,7 @@ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FAS
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
- name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
+ name=${file/%_S[1-150]*_L006_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 #
