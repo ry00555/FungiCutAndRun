@@ -23,9 +23,9 @@ OutputFolderName="/scratch/ry00555/Run152"
 #GENOME="/scratch/ry00555/McEachern/Genome/GCF_000002515.2_ASM251v1_genomic.fna"
 #GENOME="/scratch/ry00555/McEachern/Genome/Kluyveromycesmarxianus.fna"
 #GENOME="path/to/IndexedGenomeFile"
-
+GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/Nc12_RefSeq_wIntegratedTetO/GCA_000182925.2_NC12_genomic_wTetO_at_his3.fna"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic"
-GENOME/home/ry00555/Research/Genomes/Nc12wTetO_integrated_at_his3/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
+#GENOME/home/ry00555/Research/Genomes/Nc12wTetO_integrated_at_his3/GCA_000182925.2_NC12_genomic_wTetO_at_his3_CLEAN.fasta
 
 #GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
 #GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_00182925.2plusHphplusBarplusTetO_his3masked.fna"

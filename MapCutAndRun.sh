@@ -62,7 +62,7 @@ file=${f##*/}
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 #  	variable name for bigwig output
  bigwig="${OUTDIR}/BigWigs/${name}"
- $QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
+#QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
 #
 #
  ml SAMtools/1.16.1-GCC-11.3.0
@@ -71,8 +71,8 @@ bam="${OUTDIR}/SortedBamFiles/${name}.bam"
   bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
   samtools index "$bam"
 #
- samtools view -b -q 30 $bam > "$QualityBam"
- samtools index "$QualityBam"
+ #samtools view -b -q 30 $bam > "$QualityBam"
+# samtools index "$QualityBam"
 #
 #
 #    deeptools
@@ -81,7 +81,7 @@ bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 #  Plot all reads
  bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
- bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
+ #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
  done
 # mkdir $OUTDIR/MACSPeaks
 #PEAKDIR="${OUTDIR}/MACSPeaks"
