@@ -11,8 +11,8 @@
 
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
-BASE_DIR="/project/zallab/SequencingArchive/Oxford_Nanopore_Runs/ONTRun11/bam_pass"
-OUT_DIR="/lustre2/scratch/ry00555/ONTRun11/merged_bams_passed"
+BASE_DIR="/lustre2/scratch/ry00555/ONTRun11/bam_pass"
+OUT_DIR="${BASE_DIR}/merged_bams_passed"
 META="/lustre2/scratch/ry00555/ONTRun11/ONTRun11.txt"
 
 mkdir -p "$OUT_DIR"
@@ -20,7 +20,7 @@ mkdir -p "$OUT_DIR"
 # Step 1-2: Filter, sort, and merge BAMs
 for BARCODE_DIR in "$BASE_DIR"/barcode*/; do
     BARCODE_NAME=$(basename "$BARCODE_DIR")
-    SORTED_DIR="${OUT_DIR}sorted_q10"
+    SORTED_DIR="${BASE_DIR}sorted_q10"
     mkdir -p "$SORTED_DIR"
 
     # Filter + Sort each BAM
@@ -29,7 +29,7 @@ for BARCODE_DIR in "$BASE_DIR"/barcode*/; do
         [ -f "$BAM" ] || continue  # skip if no BAMs
         BAM_BASENAME=$(basename "$BAM" .bam)
         SORTED_BAM="$SORTED_DIR/${BAM_BASENAME}_q10_sorted.bam"
-        samtools view -b -q 9 "$BAM" | samtools sort -@ 4 -o "$SORTED_BAM"
+        samtools view -b -q 10 "$BAM" | samtools sort -@ 4 -o "$SORTED_BAM"
         SORTED_BAMS+=("$SORTED_BAM")
     done
 
