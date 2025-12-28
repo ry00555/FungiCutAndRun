@@ -32,44 +32,44 @@ OUTDIR="/scratch/ry00555/Run152"
 #module load Trim_Galore
 #trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
- FILES="${OUTDIR}/TrimmedReads/*_L006_R1_001_val_1\.fq\.gz"
+ #FILES="${OUTDIR}/TrimmedReads/*_L006_R1_001_val_1\.fq\.gz"
 
-
+ FILES="/scratch/ry00555/Run147/TrimmedReads/RemapTemp"
 #  Iterate over the files
-# for f in $FILES
-# do
+ for f in $FILES
+do
 
 #   	Examples to Get Different parts of the file name
 #   		See here for details: http://tldp.org/LDP/abs/html/refcards.htmlAEN22664
 #  		${string//substring/replacement}
 #   		dir=${f%/*}
 #
-#file=${f##*/}
+file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
- #name=${file/%_S[1-150]*_L006_R1_001_val_1.fq.gz/}
+ name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-990]*_L002_R1_001_val_1.fq.gz/}
 # name=${file/%_S[1-190]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
- #read2=$(echo "$f" | sed 's/_L006_R1_001_val_1\.fq\.gz/_L006_R2_001_val_2\.fq\.gz/g')
+ read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
 #
 #   	 File Vars
 #   	use sed to get the name of the second read matching the input file
 # read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file
-#bam="${OUTDIR}/SortedBamFiles/${name}.bam"
+bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 #  	variable name for bigwig output
- #bigwig="${OUTDIR}/BigWigs/${name}"
+bigwig="${OUTDIR}/BigWigs/${name}"
 #QualityBam="${OUTDIR}/SortedBamFiles/${name}_Q30.bam"
-#
-#
- #ml SAMtools/1.16.1-GCC-11.3.0
- #ml BWA/0.7.17-GCCcore-11.3.0
-#
-#  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
-  #samtools index "$bam"
+
+
+ml SAMtools/1.16.1-GCC-11.3.0
+ml BWA/0.7.17-GCCcore-11.3.0
+
+  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+samtools index "$bam"
 #
  #samtools view -b -q 30 $bam > "$QualityBam"
 # samtools index "$QualityBam"
@@ -77,12 +77,12 @@ OUTDIR="/scratch/ry00555/Run152"
 #
 #    deeptools
 #
-# ml deepTools
+ml deepTools
 #  Plot all reads
-# bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
+ bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$bam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 #
  #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
-# done
+ done
 mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
