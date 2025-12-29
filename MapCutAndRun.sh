@@ -34,7 +34,7 @@ trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FAS
 
  #FILES="${OUTDIR}/TrimmedReads/*_L006_R1_001_val_1\.fq\.gz"
 
- FILES="/scratch/ry00555/Run147/TrimmedReads/RemapTemp/*_R1_001_val_1\.fq\.gz"
+ FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
  for f in $FILES
 do
