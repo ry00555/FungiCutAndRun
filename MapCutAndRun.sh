@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/Run145"
+OUTDIR="/lustre2/scratch/ry00555/Run153/"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
@@ -29,12 +29,12 @@ OUTDIR="/lustre2/scratch/ry00555/Run145"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-module load Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#module load Trim_Galore
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-#FILES="${OUTDIR}/TrimmedReads/*_L001_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/UnmappedTrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
 
-FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+#FILES="${OUTDIR}/UnmappedTrimmedReads/*_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
  for f in $FILES
 do
