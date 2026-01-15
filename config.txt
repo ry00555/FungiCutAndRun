@@ -10,13 +10,13 @@ THREADS=12
 #FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
 
 #fastqPath="/scratch/ry00555/RTT109PaperFigures/2024_Run142_FASTQ"
-FASTQ="/lustre2/scratch/ry00555/Run145/Run145FastQ"
+FASTQ="/lustre2/scratch/ry00555/RNASeqPaper2026/FastQ"
 
 #Edit Code to add Q score option
 
 #Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
 
-OutputFolderName="/lustre2/scratch/ry00555/Run145"
+OutputFolderName="/lustre2/scratch/ry00555/RNASeqPaper2026"
 
 
 #GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
