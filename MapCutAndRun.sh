@@ -29,12 +29,12 @@ OUTDIR="/lustre2/scratch/ry00555/RNASeqPaper2026"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-module load Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#module load Trim_Galore
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 #FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
 
-FILES="${OUTDIR}/UnmappedTrimmedReads/*_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
  for f in $FILES
 do
@@ -55,8 +55,6 @@ name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
 #  	use sed to get the name of the second read matching the input file
 #read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
 #
-#   	 File Vars
-#   	use sed to get the name of the second read matching the input file
 read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
@@ -68,7 +66,7 @@ bigwig="${OUTDIR}/BigWigs/${name}"
 ml SAMtools/1.16.1-GCC-11.3.0
 ml BWA/0.7.17-GCCcore-11.3.0
 
-  bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
+bwa mem -M -v 3 -t $THREADS $GENOME $f $read2 | samtools view -bhSu - | samtools sort -@ $THREADS -T $OUTDIR/SortedBamFiles/tempReps -o "$bam" -
 samtools index "$bam"
 #
  #samtools view -b -q 30 $bam > "$QualityBam"
@@ -83,18 +81,18 @@ ml deepTools
 #
  #bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 10 --smoothLength $SMOOTH -of bigwig -b "$QualityBam" -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}_Q30.bw"
  done
-mkdir $OUTDIR/MACSPeaks
+#mkdir $OUTDIR/MACSPeaks
 PEAKDIR="${OUTDIR}/MACSPeaks"
 
 ml MACS3
 # command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
-   for infile in $BAMDIR/*.bam
-  do
-     base=$(basename ${infile} .bam)
+for infile in $BAMDIR/*.bam
+do
+  base=$(basename ${infile} .bam)
 #    Input=$BAMDIR/ ${infile} Input_Q30.bam
-  macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
+macs3 callpeak -t $infile -f BAMPE -n $base --broad -g 41037538 --broad-cutoff 0.1 --outdir $PEAKDIR --min-length 800 --max-gap 500 #-c $Input
  done
 #
 # HOMERPEAKSDIR="${OUTDIR}/HomerPeaks"
