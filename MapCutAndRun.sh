@@ -29,12 +29,12 @@ OUTDIR="/lustre2/scratch/ry00555/RNASeqPaper2026"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-#module load Trim_Galore
-#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+module load Trim_Galore
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-#FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_L007_R1_001_val_1\.fq\.gz"
 
-FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
+#FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
  for f in $FILES
 do
@@ -46,16 +46,16 @@ do
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
-# name=${file/%_S[1-150]*_L001_R1_001_val_1.fq.gz/}
+ name=${file/%_S[1-150]*_L007_R1_001_val_1.fq.gz/}
  #name=${file/%_S[1-990]*_L001_R1_001_val_1.fq.gz/}
-name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
+#name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
-#read2=$(echo "$f" | sed 's/_L001_R1_001_val_1\.fq\.gz/_L001_R2_001_val_2\.fq\.gz/g')
-#
-read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
+read2=$(echo "$f" | sed 's/_L007_R1_001_val_1\.fq\.gz/_L007_R2_001_val_2\.fq\.gz/g')
+
+#read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file
 bam="${OUTDIR}/SortedBamFiles/${name}.bam"
 #  	variable name for bigwig output
