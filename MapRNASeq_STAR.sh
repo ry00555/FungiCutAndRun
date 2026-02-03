@@ -87,4 +87,4 @@ while read -r accession; do
   bamCoverage -p "$THREADS" -bs 50 --normalizeUsing BPM -of bigwig \
     -b "$bam_out" -o "$bw_out"
 
-done < accessions.txt
+done < /lustre2/scratch/ry00555/RNASeqBamCoverage/Eaf3/FASTQ/accessions.txt
