@@ -3,9 +3,9 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
-#SBATCH --time=8:00:00
+#SBATCH --time=10:00:00
 #SBATCH --output=../MappingOutput/logs/%x.out
 #SBATCH --error=../MappingOutput/logs/%x.err
 
@@ -55,9 +55,7 @@ while read -r accession; do
   bw_out="${bwDir}/${accession}.bw"
 
   # Trim
-  trim_galore --illumina --fastqc --paired --length 25 \
-    --basename "${accession}" --gzip -o "$trimmed" \
-    "$read1" "$read2"
+  #trim_galore --illumina --fastqc --paired --length 25 --basename "${accession}" --gzip -o "$trimmed" "$read1" "$read2"
 
   # Map with STAR
   STAR --runMode alignReads \
