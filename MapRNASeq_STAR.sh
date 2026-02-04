@@ -55,7 +55,7 @@ while read -r accession; do
   bw_out="${bwDir}/${accession}.bw"
 
   # Trim
-  #trim_galore --illumina --fastqc --paired --length 25 --basename "${accession}" --gzip -o "$trimmed" "$read1" "$read2"
+  trim_galore --illumina --fastqc --paired --length 25 --basename "${accession}" --gzip -o "$trimmed" "$read1" "$read2"
 
   # Map with STAR
   STAR --runMode alignReads \
