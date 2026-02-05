@@ -53,7 +53,7 @@ $BWDIR/142-11_ChIP_WT_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
 $BWDIR/142-77_WT_H3K36me3_rep5.bin_25.smooth_50.bw \
 --skipZeros -b 2000 -a 1000 --sortRegions descend -o $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2.gz --outFileNameMatrix $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2.tab
 
-plotHeatmap -m $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2.gz -o $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr'
+plotHeatmap -m $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2.gz -o $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V3.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions $OUTDIR/Heatmaps/WT_nonK27genes_H3K36me3_Feb2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8
 
 computeMatrix reference-point -p 12 -R "$GENEDIR/K27genes.bed" \
 -S $BWDIR/142-5_ChIP_NCU06787KO_H3K36me3_Rep1.bin_25.smooth_75Bulk.bw \
@@ -68,3 +68,34 @@ $BWDIR/142-77_WT_H3K36me3_rep5.bin_25.smooth_50.bw \
 --skipZeros -b 2000 -a 1000 --sortRegions descend -o $OUTDIR/Heatmaps/WT_K27genes_H3K36me3_Feb2026_V2.gz --outFileNameMatrix $OUTDIR/Heatmaps/WT_K27genes_H3K36me3_Feb2026_V2.tab
 
 plotHeatmap -m $OUTDIR/Heatmaps/WT_K27genes_H3K36me3_Feb2026_V2.gz -o $OUTDIR/Heatmaps/WT_K27genes_H3K36me3_Feb2026_V2.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions $OUTDIR/Heatmaps/WT_K27genes_H3K36me3_Feb2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr'
+
+computeMatrix scale-regions -p 12 -R ../MACSPeaksDONE/WT_consensus_merged_V5.bed \
+-S ../BigWigs/148-102_WT_H3K27me3_rep10.bin_25.smooth_50.bw \
+../BigWigs/147-12_mrg-15_H3K27me3_rep1.bin_25.smooth_50.bw \
+../BigWigs/142-4_ChIP_NCU06787KO_H3K27me3_Rep1_bin_25.smooth_75Bulk.bw \
+ --skipZeros -b 500 -a 500 --sortRegions descend -o WT_K27domains_Feb2026_V4.gz --outFileNameMatrix WT_K27domains_Feb2026_V4.tab
+
+
+plotHeatmap -m WT_K27domains_Feb2026_V4.gz -o WT_K27domains_Feb2026_V4.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions WT_K27domains_Feb2026_V4_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'Greens' --zMax 30
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/NonK27genes.bed" \
+-S ../BigWigs/142-5_ChIP_NCU06787KO_H3K36me3_Rep1.bin_25.smooth_75Bulk.bw \
+../BigWigs/153-123_ChIP_mrg15_H3K36me3_Rep2_S115_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw \
+../BigWigs/142-17_ChIP_NCU06788KOa_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-21_ChIP_NCU06788KOA_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-11_ChIP_WT_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-77_WT_H3K36me3_rep5.bin_25.smooth_50.bw \
+--skipZeros -b 2000 -a 1000 --sortRegions descend -o WT_nonK27genes_H3K36me3_Feb2026_V2.gz --outFileNameMatrix WT_nonK27genes_H3K36me3_Feb2026_V2.tab
+
+plotHeatmap -m WT_nonK27genes_H3K36me3_Feb2026_V2.gz -o WT_nonK27genes_H3K36me3_Feb2026_V3.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --zMax 8 --outFileSortedRegions WT_nonK27genes_H3K36me3_Feb2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr'
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes.bed" \
+-S ../BigWigs/142-5_ChIP_NCU06787KO_H3K36me3_Rep1.bin_25.smooth_75Bulk.bw \
+../BigWigs/153-123_ChIP_mrg15_H3K36me3_Rep2_S115_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw \
+../BigWigs/142-17_ChIP_NCU06788KOa_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-21_ChIP_NCU06788KOA_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-11_ChIP_WT_H3K36me3_Rep3.bin_25.smooth_75Bulk.bw \
+../BigWigs/142-77_WT_H3K36me3_rep5.bin_25.smooth_50.bw \
+--skipZeros -b 2000 -a 1000 --sortRegions descend -o WT_K27genes_H3K36me3_Feb2026_V2.gz --outFileNameMatrix WT_K27genes_H3K36me3_Feb2026_V2.tab
+
+plotHeatmap -m WT_K27genes_H3K36me3_Feb2026_V2.gz -o WT_K27genes_H3K36me3_Feb2026_V2.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions WT_K27genes_H3K36me3_Feb2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr'
