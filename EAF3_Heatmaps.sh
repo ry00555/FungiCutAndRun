@@ -17,7 +17,7 @@ BWDIR="$OUTDIR/BigWigs"
 ml deepTools
 
 computeMatrix scale-regions -p 12 -R $OUTDIR/MACSPeaksDONE/WT_consensus_merged.bed \
-$BWDIR/133-78_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw \
+-S $BWDIR/133-78_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_75Bulk.bw \
 $BWDIR/134-28_ChIP_WT_H3K27me3_Rep2.bin_25.smooth_75Bulk.bw \
 $BWDIR/134-2_ChIP_WT_H3K27me3_Rep2.bin_25.smooth_75Bulk.bw \
 $BWDIR/135-27_WT_H3K27me3_rep3.bin_25.smooth_50.bw \
