@@ -5,8 +5,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --mem=400gb
-#SBATCH --time=4:00:00
+#SBATCH --mem=100gb
+#SBATCH --time=5:00:00
 #SBATCH --output=../multiBamSummary.%j.out
 #SBATCH --error=../multiBamSummary.%j.err
 
@@ -20,9 +20,9 @@ ml BEDTools/2.30.0-GCC-11.3.0 deepTools SAMtools/1.16.1-GCC-11.3.0 BamTools/2.5.
  #================================
  #Paths
  #================================
-META="/scratch/ry00555/RNASeqPaper/Oct2025/BAM_File_Metadata_with_index_merged_V2.csv"
-BAMDIR="/scratch/ry00555/RNASeqPaper/Oct2025/SortedBamFiles"
-OUTDIR="/scratch/ry00555/RNASeqPaper/Oct2025/IDR"
+META="/lustre2/scratch/ry00555/RTT109PaperFigures/RTT109Paper_AllMeta_CorrPlot.csv"
+BAMDIR="/lustre2/scratch/ry00555/RTT109PaperFigures/SortedBamFiles"
+OUTDIR="/lustre2/scratch/ry00555/RTT109PaperFigures/IDR"
 dos2unix "$META" 2>/dev/null || true
 
 BAM_CORR_NPZ="${OUTDIR}/bam_corr.npz"
@@ -84,6 +84,7 @@ for tissue in "${!groups[@]}"; do
     multiBamSummary bins \
         --bamfiles $bams \
         --binSize 50000 \
+        --numberOfProcessors max \
         -p max \
         --smartLabels \
         -o "$tissue_npz" \
@@ -91,10 +92,12 @@ for tissue in "${!groups[@]}"; do
 
     plotCorrelation \
         -in "$tissue_npz" \
-        -c pearson \
+        -c spearman \
         --whatToPlot heatmap \
         --plotNumbers \
         --skipZeros \
+        --plotHeight 3.5 \
+        --plotWidth 3.5 \
         --plotFile "$tissue_heat" \
         --outFileCorMatrix "$tissue_matrix"
 
@@ -106,3 +109,17 @@ if [[ -s "$SKIPPED_BAMS" ]]; then
     echo "⚠️ Skipped BAMs:"
     cat "$SKIPPED_BAMS"
 fi
+
+# source code:https://deeptools.readthedocs.io/en/develop/content/tools/plotCorrelation.html
+# Performing correlation analysis between bam files (selecting the pertinent bigwig files)
+# multiBigwigSummary bins \
+# -b IP-1_1.bigwig IP-1_2.bigwig \
+# --labels IP-1_1 IP-1_2 \
+# -out scores_per_bin.npz --outRawCounts scores_per_bin.tab
+# plotCorrelation \
+# -in scores_per_bin.npz \
+# --corMethod pearson --skipZeros \
+# --plotTitle "Pearson Correlation of Average Scores Per Transcript" \
+# --whatToPlot scatterplot \
+# -o scatterplot_PearsonCorr_bigwigScores.png \
+# --outFileCorMatrix PearsonCorr_bigwigScores.tab
