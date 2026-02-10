@@ -78,7 +78,7 @@ for tissue in "${!groups[@]}"; do
 
     tissue_npz="${OUTDIR}/${tissue}_multiBamSummary.npz"
     tissue_tab="${OUTDIR}/${tissue}_readCounts.tab"
-    tissue_heat="${OUTDIR}/${tissue}_correlation_heatmap.png"
+    tissue_heat="${OUTDIR}/${tissue}_Pearson_correlation_heatmap.png"
     tissue_matrix="${OUTDIR}/${tissue}_PearsonCorrMatrix.tab"
 
     multiBamSummary bins \
@@ -92,7 +92,7 @@ for tissue in "${!groups[@]}"; do
 
     plotCorrelation \
         -in "$tissue_npz" \
-        -c spearman \
+        -c pearson \
         --whatToPlot heatmap \
         --plotNumbers \
         --skipZeros \
