@@ -7,15 +7,15 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=20:00:00
-#SBATCH --output=../MapCutAndRun153.%j.out
-#SBATCH --error=../MapCutAndRun153.%j.err
+#SBATCH --output=../tetR_realign_MapCutandRun.%j.out
+#SBATCH --error=../tetR_realign_MapCutandRun.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/RNASeqPaper2026"
+OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
