@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32gb
 #SBATCH --time=12:00:00
-#SBATCH --output=%AlphaFold2_ml.%j.out
-#SBATCH --error=%x.%j.err
+#SBATCH --output=%AlphaFold2_ml_12.%j.out
+#SBATCH --error=%AlphaFold2_ml_12.%j.err
 #SBATCH --array=1-200
 #Substep1 before running check and stop elements script
 cd $SLURM_SUBMIT_DIR
