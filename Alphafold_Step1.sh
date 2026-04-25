@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphaMSAs
+#SBATCH --job-name=alphaMSAs_step1
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --mail-type=ALL
@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32gb
 #SBATCH --time=12:00:00
-#SBATCH --output=%AlphaFold2_ml_12.%j.out
-#SBATCH --error=%AlphaFold2_ml_12.%j.err
+#SBATCH --output=%AlphaFold2_MSABuilder.%j.out
+#SBATCH --error=%AlphaFold2_MSABuilder.%j.err
 #SBATCH --array=1-200
 #Substep1 before running check and stop elements script
 cd $SLURM_SUBMIT_DIR

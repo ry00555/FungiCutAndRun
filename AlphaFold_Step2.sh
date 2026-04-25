@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphafold
+#SBATCH --job-name=alphafold_step2
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -8,8 +8,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --gres=gpu:V100:1
 #SBATCH --time=4:00:00
-#SBATCH --output=%x.%j.out
-#SBATCH --error=%x.%j.err
+#SBATCH --output=%AlphaFold2_Step2_StructurePred.%j.out
+#SBATCH --error=%AlphaFold2_Step2_StructurePred.%j.err
 #SBATCH --array=1-200
 
 cd $SLURM_SUBMIT_DIR
