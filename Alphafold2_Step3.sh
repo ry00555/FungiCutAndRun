@@ -38,32 +38,37 @@ try:
 except:
     iptm_model0 = 'NA'
 
-# Read all 5 models
+# Read all 5 models for ipTM and SD
 iptm_vals = []
-pae_vals = []
 iptm_sd_vals = []
+pae_vals = []
 
 for i in range(5):
+    # ipTM and SD from summary_confidences
     try:
         with open(workdir + f'/summary_confidences_{i}.json') as f:
             data = json.load(f)
-        
         iptm = data.get('iptm', None)
-        pae = data.get('mean_pae', None)
-        
         if iptm is not None:
             iptm_vals.append(iptm)
-        if pae is not None:
-            pae_vals.append(pae)
-        
-        # SD from diffusion samples
         samples = data.get('diffusion_samples', {})
         sd_iptm = samples.get('iptm', [])
         if sd_iptm:
             iptm_sd_vals.extend(sd_iptm)
-
     except:
-        continue
+        pass
+
+    # PAE matrix from full_data files
+    try:
+        with open(workdir + f'/_full_data_{i}.json') as f:
+            full_data = json.load(f)
+        pae_matrix = full_data.get('pae', None)
+        if pae_matrix is not None:
+            # Flatten and average the entire matrix
+            flat = [val for row in pae_matrix for val in row]
+            pae_vals.append(statistics.mean(flat))
+    except:
+        pass
 
 mean_iptm = round(statistics.mean(iptm_vals), 4) if iptm_vals else 'NA'
 mean_pae  = round(statistics.mean(pae_vals), 4)  if pae_vals  else 'NA'
