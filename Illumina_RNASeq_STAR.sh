@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
-#SBATCH --time=10:00:00
+#SBATCH --time=18:00:00
 #SBATCH --output=../MappingOutput/logs/%x.out
 #SBATCH --error=../MappingOutput/logs/%x.err
 
