@@ -9,7 +9,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --output=%AlphaFold2_MSABuilder.%j.out
 #SBATCH --error=%AlphaFold2_MSABuilder.%j.err
-#SBATCH --array=1-200
+#SBATCH --array=1-200 #change to the actual number of interactions otherwise x-200 will fail 
 #Substep1 before running check and stop elements script
 cd $SLURM_SUBMIT_DIR
 
