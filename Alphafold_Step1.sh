@@ -7,14 +7,14 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32gb
 #SBATCH --time=12:00:00
-#SBATCH --output=%x.%j.out
+#SBATCH --output=%AlphaFold2_ml.%j.out
 #SBATCH --error=%x.%j.err
 #SBATCH --array=1-200
 #Substep1 before running check and stop elements script
 cd $SLURM_SUBMIT_DIR
 
 ml purge
-ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
+ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
 export ALPHAFOLD_DATA_DIR=/apps/db/AlphaFold/2.3.1
 WORKDIR="/scratch/ry00555/AlphaFold"
 
