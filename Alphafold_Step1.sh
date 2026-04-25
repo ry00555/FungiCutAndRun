@@ -14,14 +14,14 @@
 cd $SLURM_SUBMIT_DIR
 
 ml purge
-ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
+ml AlphaFold/2.3.1-foss-2022a-CUDA-11.7.0
 export ALPHAFOLD_DATA_DIR=/apps/db/AlphaFold/2.3.1
 WORKDIR="/scratch/ry00555/AlphaFold"
 
-file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/FastaforAlphaFold/input.lst)
+file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/input.lst)
 
 alphafold \
---models_to_relax=False \
+--run_relax=False \
 --data_dir=$ALPHAFOLD_DATA_DIR \
 --uniref90_database_path=$ALPHAFOLD_DATA_DIR/uniref90/uniref90.fasta \
 --mgnify_database_path=$ALPHAFOLD_DATA_DIR/mgnify/mgy_clusters.fa \
@@ -35,5 +35,5 @@ alphafold \
 --num_multimer_predictions_per_model=1 \
 --max_template_date=2023-10-01 \
 --db_preset=full_dbs \
---output_dir=$WORKDIR/outputs/$(basename $file .fa) \
---fasta_paths=$WORKDIR/Rtt109_Accessions_Fastas/$file
+--output_dir=$WORKDIR/output/AF2/$(basename $file .fa) \
+--fasta_paths=$WORKDIR/FastaforAlphaFold/$file
