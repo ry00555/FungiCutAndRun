@@ -6,7 +6,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32gb
-#SBATCH --time=12:00:00
+#SBATCH --time=12:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
 #SBATCH --output=%AlphaFold2_MSABuilder.%j.out
 #SBATCH --error=%AlphaFold2_MSABuilder.%j.err
 #SBATCH --array=1-200 #change to the actual number of interactions otherwise x-200 will fail 

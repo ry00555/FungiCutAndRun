@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --constraint=Milan|SapphireRapids
 #SBATCH --mem=60gb
-#SBATCH --time=10:00:00
+#SBATCH --time=10:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
 #SBATCH --output=%x.%j.out
 #SBATCH --error=%x.%j.err
 #SBATCH --mail-type=ALL
