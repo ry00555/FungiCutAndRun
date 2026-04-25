@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 
 ml purge
 ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
-export ALPHAFOLD_DATA_DIR=/apps/db/AlphaFold/2.3.1
+export ALPHAFOLD_DATA_DIR=/db/AlphaFold/2.3.1
 WORKDIR="/scratch/ry00555/AlphaFold"
 
 file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/FastaforAlphaFold/input.lst)
