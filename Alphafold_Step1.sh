@@ -19,7 +19,7 @@ export ALPHAFOLD_DATA_DIR=/db/AlphaFold/2.3.1
 WORKDIR="/scratch/ry00555/AlphaFold"
 
 file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/FastaforAlphaFold/input.lst)
-
+#test
 alphafold \
 --models_to_relax=none \
 --data_dir=$ALPHAFOLD_DATA_DIR \
