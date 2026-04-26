@@ -10,10 +10,18 @@
 #SBATCH --time=4:00:00
 #SBATCH --output=%AlphaFold2_Step2_StructurePred.%j.out
 #SBATCH --error=%AlphaFold2_Step2_StructurePred.%j.err
-#SBATCH --array=1-200
+#SBATCH --array=1-113
 
 cd $SLURM_SUBMIT_DIR
 
+#check if the msas were properly made from step1
+for dir in /scratch/ry00555/AlphaFold/output/AF2/*/; do
+    protein=$(basename $dir)
+    if [ ! -d "$dir/$protein/msas/A" ] || [ ! -d "$dir/$protein/msas/B" ]; then
+        echo "INCOMPLETE: $protein"
+    fi
+done
+    
 ml purge
 ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
 export ALPHAFOLD_DATA_DIR=/db/AlphaFold/2.3.2
