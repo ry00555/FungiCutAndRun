@@ -7,16 +7,16 @@
 #SBATCH --constraint=Milan|SapphireRapids
 #SBATCH --mem=60gb
 #SBATCH --time=10:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
-#SBATCH --output=%x.%j.out
-#SBATCH --error=%x.%j.err
+#SBATCH --output=../AlphaFold3_RPool.%j.out
+#SBATCH --error=../AlphaFold3_RPool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --array=1-200 # change this to the number of input jsons 
+#SBATCH --array=1-113 # change this to the number of input jsons 
 
 cd $SLURM_SUBMIT_DIR
 
 # Directories
-INPUT_DIR="/lustre2/scratch/ry00555/AlphaFold/input/AF3"
+INPUT_DIR="/lustre2/scratch/ry00555/AlphaFold/input/AF3/RPrepped_AF3_inputsJsons"
 OUTPUT_DIR="/lustre2/scratch/ry00555/AlphaFold/output/AF3"
 MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"
 PUBLIC_DB="/db/AlphaFold3/20241114"
