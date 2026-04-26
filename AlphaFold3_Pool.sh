@@ -16,8 +16,8 @@
 cd $SLURM_SUBMIT_DIR
 
 # Directories
-INPUT_DIR="/lustre2/scratch/ry00555/AlphaFold/input/AF3/RPrepped_AF3_inputsJsons"
-OUTPUT_DIR="/lustre2/scratch/ry00555/AlphaFold/output/AF3"
+INPUT_DIR="/scratch/ry00555/AlphaFold/input/RPrepped_AF3_inputsJsons"
+OUTPUT_DIR="/scratch/ry00555/AlphaFold/output/AF3"
 MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"
 PUBLIC_DB="/db/AlphaFold3/20241114"
 
