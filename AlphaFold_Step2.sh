@@ -7,7 +7,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --gres=gpu:V100:1
-#SBATCH --time=12:00:00
+#SBATCH --time=4:00:00
 #SBATCH --output=AlphaFold2_Step2_StructurePred.%j.out
 #SBATCH --error=AlphaFold2_Step2_StructurePred.%j.err
 #SBATCH --array=1-113
