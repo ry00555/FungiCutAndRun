@@ -1,80 +1,108 @@
 #!/bin/bash
-#SBATCH --job-name=extract_ipTM
+#SBATCH --job-name=extract_AF2_scores
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
+#SBATCH --mem=16gb
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --mem=8gb
-#SBATCH --time=1:00:00
-#SBATCH --output=%AlphaFold2_Step3_PullipTMs.%j.out
-#SBATCH --error=%AlphaFold2_Step3_PullipTMs.%j.err
+#SBATCH --time=2:00:00
+#SBATCH --output=extract_AF2_scores.%j.out
+#SBATCH --error=extract_AF2_scores.%j.err
 
-
-
-WORKDIR="/lustre2/scratch/ry00555/AlphaFold"
+WORKDIR="/scratch/ry00555/AlphaFold"
 AF2_DIR="$WORKDIR/output/AF2"
 FASTA_DIR="$WORKDIR/FastaforAlphaFold"
-OUTPUT_CSV="$AF2_DIR/RTT109_MSHits_ipTM_scores.csv"
+OUTPUT_CSV="$WORKDIR/ipTM_scores.csv"
 
-echo "interactor2,ipTM_model0,mean_ipTM,mean_PAE,ipTM_sd" > $OUTPUT_CSV
+ml purge
+ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
+
+echo "interactor2,best_model,iptm_best,ptm_best,ranking_confidence_best,mean_iptm,iptm_sd,mean_contacts_5A,mean_contacts_10A" > $OUTPUT_CSV
 
 for dir in $AF2_DIR/*/; do
     protein=$(basename $dir)
+    inner_dir="$dir/$protein"
     fasta="$FASTA_DIR/${protein}.fa"
+
     interactor2=$(grep "^>" $fasta | sed 's/>//' | sed -n '2p')
 
     python3 -c "
-import json, statistics
+import json, os, pickle
+import numpy as np
 
-workdir = '$dir/$protein'
+inner_dir = '$inner_dir'
 interactor2 = '$interactor2'
+fasta_path = '$fasta'
 
-# Get ipTM from model 0
+# ── Chain lengths from fasta ──────────────────────────────────────────────────
+chain_lengths = []
+current_seq = ''
+with open(fasta_path) as f:
+    for line in f:
+        if line.startswith('>'):
+            if current_seq:
+                chain_lengths.append(len(current_seq))
+            current_seq = ''
+        else:
+            current_seq += line.strip()
+    if current_seq:
+        chain_lengths.append(len(current_seq))
+
+len_A = chain_lengths[0]
+len_B = chain_lengths[1]
+
+# ── Best model from ranking_debug.json ───────────────────────────────────────
 try:
-    with open(workdir + '/summary_confidences_0.json') as f:
-        data0 = json.load(f)
-    iptm_model0 = data0.get('iptm', 'NA')
+    with open(os.path.join(inner_dir, 'ranking_debug.json')) as f:
+        ranking = json.load(f)
+    best_model = ranking.get('order', [None])[0]
+    best_idx   = int(best_model.split('_')[1])  # e.g. model_3 -> 3
 except:
-    iptm_model0 = 'NA'
+    best_model, best_idx = 'NA', None
 
-# Read all 5 models for ipTM and SD
-iptm_vals = []
-iptm_sd_vals = []
-pae_vals = []
+# ── Extract from all 5 pkl files ─────────────────────────────────────────────
+iptm_vals      = []
+pae_5A_counts  = []
+pae_10A_counts = []
+iptm_best      = 'NA'
+ptm_best       = 'NA'
+ranking_best   = 'NA'
 
-for i in range(5):
-    # ipTM and SD from summary_confidences
+for i in range(1, 6):
+    pkl_path = os.path.join(inner_dir, f'result_model_{i}_multimer_v3_pred_0.pkl')
     try:
-        with open(workdir + f'/summary_confidences_{i}.json') as f:
-            data = json.load(f)
-        iptm = data.get('iptm', None)
-        if iptm is not None:
-            iptm_vals.append(iptm)
-        samples = data.get('diffusion_samples', {})
-        sd_iptm = samples.get('iptm', [])
-        if sd_iptm:
-            iptm_sd_vals.extend(sd_iptm)
+        with open(pkl_path, 'rb') as f:
+            result = pickle.load(f)
+
+        iptm = float(result.get('iptm', float('nan')))
+        ptm  = float(result.get('ptm',  float('nan')))
+        rc   = float(result.get('ranking_confidence', float('nan')))
+        iptm_vals.append(iptm)
+
+        # Save best model scores
+        if best_idx is not None and i == best_idx:
+            iptm_best    = round(iptm, 4)
+            ptm_best     = round(ptm, 4)
+            ranking_best = round(rc, 4)
+
+        # Inter-chain PAE contact counts
+        pae = result.get('predicted_aligned_error', None)
+        if pae is not None:
+            pae = np.array(pae)
+            AB = pae[0:len_A, len_A:len_A+len_B]
+            BA = pae[len_A:len_A+len_B, 0:len_A]
+            pae_5A_counts.append(int(np.sum(AB < 5)  + np.sum(BA < 5)))
+            pae_10A_counts.append(int(np.sum(AB < 10) + np.sum(BA < 10)))
     except:
-        pass
+        continue
 
-    # PAE matrix from full_data files
-    try:
-        with open(workdir + f'/_full_data_{i}.json') as f:
-            full_data = json.load(f)
-        pae_matrix = full_data.get('pae', None)
-        if pae_matrix is not None:
-            # Flatten and average the entire matrix
-            flat = [val for row in pae_matrix for val in row]
-            pae_vals.append(statistics.mean(flat))
-    except:
-        pass
+mean_iptm  = round(float(np.mean(iptm_vals)), 4)      if iptm_vals      else 'NA'
+iptm_sd    = round(float(np.std(iptm_vals)), 4)       if len(iptm_vals) > 1 else 'NA'
+mean_5A    = round(float(np.mean(pae_5A_counts)), 1)  if pae_5A_counts  else 'NA'
+mean_10A   = round(float(np.mean(pae_10A_counts)), 1) if pae_10A_counts else 'NA'
 
-mean_iptm = round(statistics.mean(iptm_vals), 4) if iptm_vals else 'NA'
-mean_pae  = round(statistics.mean(pae_vals), 4)  if pae_vals  else 'NA'
-iptm_sd   = round(statistics.stdev(iptm_sd_vals), 4) if len(iptm_sd_vals) > 1 else 'NA'
-
-print(f'{interactor2},{iptm_model0},{mean_iptm},{mean_pae},{iptm_sd}')
+print(f'{interactor2},{best_model},{iptm_best},{ptm_best},{ranking_best},{mean_iptm},{iptm_sd},{mean_5A},{mean_10A}')
 " >> $OUTPUT_CSV
 
 done
