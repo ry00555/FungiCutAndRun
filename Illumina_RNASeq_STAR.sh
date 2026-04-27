@@ -51,7 +51,7 @@ for read1 in "${fastqPath}"/*_R1_001.fastq.gz; do
   bam_prefix="${bamdir}/${accession}_"
   bam_out="${bam_prefix}Aligned.sortedByCoord.out.bam"
   bw_out="${bwDir}/${accession}.bw"
-trim_galore --illumina--fastqc --paired --length 25 --basename "$accession" --gzip -o "$trimmed" "$read1" "$read2"
+trim_galore --illumina --fastqc --paired --length 25 --basename "$accession" --gzip -o "$trimmed" "$read1" "$read2"
 
   STAR --runMode alignReads \
     --runThreadN "$THREADS" \
