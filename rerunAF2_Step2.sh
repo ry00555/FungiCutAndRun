@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphafold_step2
+#SBATCH --job-name=alphafold_step2_rerun
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -8,20 +8,12 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --gres=gpu:V100:1
 #SBATCH --time=8:00:00
-#SBATCH --output=%AlphaFold2_Step2_StructurePred.%j.out
-#SBATCH --error=%AlphaFold2_Step2_StructurePred.%j.err
-#SBATCH --array=1-113
+#SBATCH --output=AlphaFold2_Step2_rerun.%j.out
+#SBATCH --error=AlphaFold2_Step2_rerun.%j.err
+#SBATCH --array=8,16,17,24,25,26,30,31,37,39,48,49,50,54,55,59,67,70,75,82,94,96,112
 
 cd $SLURM_SUBMIT_DIR
 
-#check if the msas were properly made from step1
-for dir in /scratch/ry00555/AlphaFold/output/AF2/*/; do
-    protein=$(basename $dir)
-    if [ ! -d "$dir/$protein/msas/A" ] || [ ! -d "$dir/$protein/msas/B" ]; then
-        echo "INCOMPLETE: $protein"
-    fi
-done
-    
 ml purge
 ml AlphaFold/2.3.2-foss-2023a-CUDA-12.1.1
 export ALPHAFOLD_DATA_DIR=/db/AlphaFold/2.3.2
@@ -29,7 +21,6 @@ export TF_FORCE_UNIFIED_MEMORY=1
 export XLA_PYTHON_CLIENT_MEM_FRACTION=8
 
 WORKDIR="/scratch/ry00555/AlphaFold"
-
 file=$(awk "NR==${SLURM_ARRAY_TASK_ID}" $WORKDIR/FastaforAlphaFold/input.lst)
 
 alphafold \
