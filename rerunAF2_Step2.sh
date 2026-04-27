@@ -1,9 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=alphafold_step2
-#SBATCH --partition=gpu_p
+#SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --gres=gpu:A100:1 #You can specify other GPU devices, like 'H100', here
 #SBATCH --mem=32gb                    
 #SBATCH --time=12:00:00           
 #SBATCH --mail-type=ALL
