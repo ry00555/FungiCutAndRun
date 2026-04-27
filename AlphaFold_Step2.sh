@@ -3,13 +3,13 @@
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64gb
+#SBATCH --mem=32gb
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --gres=gpu:V100:1
-#SBATCH --time=8:00:00
-#SBATCH --output=%AlphaFold2_Step2_StructurePred.%j.out
-#SBATCH --error=%AlphaFold2_Step2_StructurePred.%j.err
+#SBATCH --time=12:00:00
+#SBATCH --output=AlphaFold2_Step2_StructurePred.%j.out
+#SBATCH --error=AlphaFold2_Step2_StructurePred.%j.err
 #SBATCH --array=1-113
 
 cd $SLURM_SUBMIT_DIR
