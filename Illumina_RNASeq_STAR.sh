@@ -6,8 +6,8 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
 #SBATCH --time=36:00:00
-#SBATCH --output=../MappingOutput/logs/%x.out
-#SBATCH --error=../MappingOutput/logs/%x.err
+#SBATCH --output=../%x.out
+#SBATCH --error=../%x.err
 
 cd "$SLURM_SUBMIT_DIR"
 

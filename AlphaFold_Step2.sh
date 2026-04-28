@@ -8,8 +8,8 @@
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --gres=gpu:V100:1 
 #SBATCH --time=4:00:00
-#SBATCH --output=AlphaFold2_Step2_StructurePred.%j.out
-#SBATCH --error=AlphaFold2_Step2_StructurePred.%j.err
+#SBATCH --output=StructurePred.%j.out
+#SBATCH --error=StructurePred.%j.err
 #SBATCH --array=1-113
 
 cd $SLURM_SUBMIT_DIR

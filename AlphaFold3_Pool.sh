@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphafold3_pooled_PPI
+#SBATCH --job-name=AF3_pool_PPI
 #SBATCH --partition=gpu_p
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
@@ -7,8 +7,8 @@
 #SBATCH --constraint=Milan|SapphireRapids
 #SBATCH --mem=60gb
 #SBATCH --time=10:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
-#SBATCH --output=AlphaFold3_RPool.%j.out
-#SBATCH --error=AlphaFold3_RPool.%j.err
+#SBATCH --output=AF3Pool.%j.out
+#SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --array=1-4 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc

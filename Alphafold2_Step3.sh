@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=extract_AF2_scores
+#SBATCH --job-name=extract_iptm
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
@@ -7,8 +7,8 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --time=2:00:00
-#SBATCH --output=extract_AF2_scores.%j.out
-#SBATCH --error=extract_AF2_scores.%j.err
+#SBATCH --output=AF2_Step3.%j.out
+#SBATCH --error=AF2_Step3.%j.err
 
 
 WORKDIR="/scratch/ry00555/AlphaFold"
