@@ -9,7 +9,7 @@
 #SBATCH --time=8:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
 #SBATCH --output=../AF2_MSABuilder.%j.out
 #SBATCH --error=../AF2_MSABuilder.%j.err
-#SBATCH --array=1-200 #change to the actual number of interactions otherwise x-200 will fail, 113 predictions took 4 hours
+#SBATCH --array=1-2 #change to the actual number of interactions otherwise x-200 will fail, 113 predictions took 4 hours
 #Substep1 before running check and stop elements script
 cd $SLURM_SUBMIT_DIR
 
