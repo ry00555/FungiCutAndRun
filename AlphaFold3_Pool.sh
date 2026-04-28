@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=AF3_pool_PPI
+#SBATCH --job-name=RTT109
 #SBATCH --partition=gpu_p
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
@@ -11,7 +11,7 @@
 #SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --array=5-113%10 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
+#SBATCH --array=5-11 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
 
 cd $SLURM_SUBMIT_DIR
 
