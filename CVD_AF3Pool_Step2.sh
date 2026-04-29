@@ -31,7 +31,8 @@ import statistics
 job_dir = '$dir'
 job_name = '$job_name'
 interactor2 = '$interactor2'
-
+dock_protein = 'PA14_52800'
+    
 # Read sample 0 (best model) from top-level summary_confidences.json
 try:
     with open(os.path.join(job_dir, f'{job_name}_summary_confidences.json')) as f:
@@ -68,7 +69,7 @@ for i in range(5):
 mean_iptm          = round(statistics.mean(iptm_vals), 4)          if iptm_vals          else 'NA'
 mean_ranking_score = round(statistics.mean(ranking_score_vals), 4) if ranking_score_vals else 'NA'
 
-print(f'{job_name},{interactor2},{iptm_sample0},{ranking_score_sample0},{mean_iptm},{mean_ranking_score},{chain_pair_iptm_AB},{chain_pair_pae_AB}')
+print(f'{dock_protein},{interactor2},{iptm_sample0},{ranking_score_sample0},{mean_iptm},{mean_ranking_score},{chain_pair_iptm_AB},{chain_pair_pae_AB}')
 PYEOF
 
 done >> $OUTPUT_CSV
