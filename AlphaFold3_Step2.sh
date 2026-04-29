@@ -1,94 +1,76 @@
 #!/bin/bash
-#SBATCH --job-name=AF3_extract_ipTM
+#SBATCH --job-name=RTT109
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --mem=8gb
 #SBATCH --time=1:00:00
-#SBATCH --output=%AlphaFold3_Step2_PullipTMs.%j.out
-#SBATCH --error=%AlphaFold3_Step2_PullipTMs.%j.err
-
-
+#SBATCH --output=AF3_Step2_PullipTMs.%j.out
+#SBATCH --error=AF3_Step2_PullipTMs.%j.err
 
 WORKDIR="/scratch/ry00555/AlphaFold"
-AF3_DIR="$WORKDIR/output/AF2"
-FASTA_DIR="$WORKDIR/FastaforAlphaFold"
-OUTPUT_CSV="$AF3_DIR/RTT109_MSHits_ipTM_scores.csv"
+AF3_DIR="$WORKDIR/output/AF3"
+OUTPUT_CSV="$AF3_DIR/RTT109_AF3_ipTM_scores.csv"
 
-echo "interactor2,ipTM_model0,mean_ipTM,mean_PAE,ipTM_sd" > $OUTPUT_CSV
-while read -r f; do
-  p="${f%.fa}"
-  if [[ -f "$WORKDIR/output/AF3/$p/$p/summary_confidences_0.json" || -f "$WORKDIR/output/AF3/$p/summary_confidences_0.json" ]]; then
-    :
-  else
-    echo "MISSING: $p"
-    ((missing++))
-  fi
-done < "$INPUT"
-
-echo "Missing predictions: $missing"
-
+echo "dock_protein,interactor2,iptm_sample0,ranking_score_sample0,mean_iptm,std_iptm,mean_ranking_score,std_ranking_score,chain_pair_iptm_AB,chain_pair_pae_min_AB" > $OUTPUT_CSV
 
 for dir in $AF3_DIR/*/; do
-    protein=$(basename $dir)
-    fasta="$FASTA_DIR/${protein}.fa"
-    interactor2=$(grep "^>" $fasta | sed 's/>//' | sed -n '2p')
+    job_name=$(basename $dir)
 
-    python3 -c "
-import json, statistics
+    # Extract interactor2 name from job name
+    interactor2=$(echo $job_name | sed 's/rtt109//')
 
-workdir = '$dir/$protein'
+    python3 << PYEOF
+import json, os
+import statistics
+
+job_dir = '$dir'
+job_name = '$job_name'
 interactor2 = '$interactor2'
-
-# Get ipTM from model 0
+dock_protein = 'RTT109'
+    
+# Read sample 0 (best model) from top-level summary_confidences.json
 try:
-    with open(workdir + '/summary_confidences_0.json') as f:
-        data0 = json.load(f)
-    iptm_model0 = data0.get('iptm', 'NA')
-except:
-    iptm_model0 = 'NA'
+    with open(os.path.join(job_dir, f'{job_name}_summary_confidences.json')) as f:
+        top = json.load(f)
+    iptm_sample0        = top.get('iptm', 'NA')
+    ranking_score_sample0 = top.get('ranking_score', 'NA')
+    # chain_pair_iptm[0][1] = A->B inter-chain ipTM
+    cpp = top.get('chain_pair_iptm', None)
+    chain_pair_iptm_AB  = cpp[0][1] if cpp else 'NA'
+    # chain_pair_pae_min[0][1] = A->B minimum PAE
+    cpm = top.get('chain_pair_pae_min', None)
+    chain_pair_pae_AB   = cpm[0][1] if cpm else 'NA'
+except Exception as e:
+    iptm_sample0, ranking_score_sample0, chain_pair_iptm_AB, chain_pair_pae_AB = 'NA', 'NA', 'NA', 'NA'
 
-# Read all 5 models for ipTM and SD
-iptm_vals = []
-iptm_sd_vals = []
-pae_vals = []
+# Read all 5 samples for mean ipTM and ranking score
+iptm_vals         = []
+ranking_score_vals = []
 
 for i in range(5):
-    # ipTM and SD from summary_confidences
+    sample_dir = os.path.join(job_dir, f'seed-1_sample-{i}')
     try:
-        with open(workdir + f'/summary_confidences_{i}.json') as f:
+        with open(os.path.join(sample_dir, 'summary_confidences.json')) as f:
             data = json.load(f)
         iptm = data.get('iptm', None)
+        rs   = data.get('ranking_score', None)
         if iptm is not None:
             iptm_vals.append(iptm)
-        samples = data.get('diffusion_samples', {})
-        sd_iptm = samples.get('iptm', [])
-        if sd_iptm:
-            iptm_sd_vals.extend(sd_iptm)
+        if rs is not None:
+            ranking_score_vals.append(rs)
     except:
-        pass
+        continue
 
-    # PAE matrix from full_data files
-    try:
-        with open(workdir + f'/_full_data_{i}.json') as f:
-            full_data = json.load(f)
-        pae_matrix = full_data.get('pae', None)
-        if pae_matrix is not None:
-            # Flatten and average the entire matrix
-            flat = [val for row in pae_matrix for val in row]
-            pae_vals.append(statistics.mean(flat))
-    except:
-        pass
+mean_iptm          = round(statistics.mean(iptm_vals), 4)          if iptm_vals          else 'NA'
+mean_ranking_score = round(statistics.mean(ranking_score_vals), 4) if ranking_score_vals else 'NA'
+std_iptm = round(statistics.stdev(iptm_vals), 4) if len(iptm_vals) > 1 else 'NA'
+std_ranking_score = round(statistics.stdev(ranking_score_vals), 4) if len(ranking_score_vals) > 1 else 'NA'
+print(f'{dock_protein},{interactor2},{iptm_sample0},{ranking_score_sample0},{mean_iptm},{std_iptm},{mean_ranking_score},{std_ranking_score},{chain_pair_iptm_AB},{chain_pair_pae_AB}')
+PYEOF
 
-mean_iptm = round(statistics.mean(iptm_vals), 4) if iptm_vals else 'NA'
-mean_pae  = round(statistics.mean(pae_vals), 4)  if pae_vals  else 'NA'
-iptm_sd   = round(statistics.stdev(iptm_sd_vals), 4) if len(iptm_sd_vals) > 1 else 'NA'
-
-print(f'{interactor2},{iptm_model0},{mean_iptm},{mean_pae},{iptm_sd}')
-" >> $OUTPUT_CSV
-
-done
+done >> $OUTPUT_CSV
 
 echo "Done! Scores written to $OUTPUT_CSV"

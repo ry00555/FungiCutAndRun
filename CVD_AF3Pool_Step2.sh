@@ -10,11 +10,11 @@
 #SBATCH --output=AF3_Step2_PullipTMs.%j.out
 #SBATCH --error=AF3_Step2_PullipTMs.%j.err
 
-WORKDIR="/lustre2/scratch/ry00555/CVD_AF3"
+WORKDIR="/scratch/ry00555/CVD_AF3"
 AF3_DIR="$WORKDIR/output"
 OUTPUT_CSV="$AF3_DIR/CVD_AF3_ipTM_scores.csv"
 
-echo "job_name,interactor2,iptm_sample0,ranking_score_sample0,mean_iptm,mean_ranking_score,chain_pair_iptm_AB,chain_pair_pae_min_AB" > $OUTPUT_CSV
+echo "dock_protein,interactor2,iptm_sample0,ranking_score_sample0,mean_iptm,std_iptm,mean_ranking_score,std_ranking_score,chain_pair_iptm_AB,chain_pair_pae_min_AB" > $OUTPUT_CSV
 
 for dir in $AF3_DIR/*/; do
     job_name=$(basename $dir)
@@ -68,8 +68,9 @@ for i in range(5):
 
 mean_iptm          = round(statistics.mean(iptm_vals), 4)          if iptm_vals          else 'NA'
 mean_ranking_score = round(statistics.mean(ranking_score_vals), 4) if ranking_score_vals else 'NA'
-
-print(f'{dock_protein},{interactor2},{iptm_sample0},{ranking_score_sample0},{mean_iptm},{mean_ranking_score},{chain_pair_iptm_AB},{chain_pair_pae_AB}')
+std_iptm = round(statistics.stdev(iptm_vals), 4) if len(iptm_vals) > 1 else 'NA'
+std_ranking_score = round(statistics.stdev(ranking_score_vals), 4) if len(ranking_score_vals) > 1 else 'NA'
+print(f'{dock_protein},{interactor2},{iptm_sample0},{ranking_score_sample0},{mean_iptm},{std_iptm},{mean_ranking_score},{std_ranking_score},{chain_pair_iptm_AB},{chain_pair_pae_AB}')
 PYEOF
 
 done >> $OUTPUT_CSV
