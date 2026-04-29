@@ -11,7 +11,7 @@
 #SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --array=11-21 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
+#SBATCH --array=22-34 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
 
 cd $SLURM_SUBMIT_DIR
 
