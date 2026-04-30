@@ -1,17 +1,17 @@
 #!/bin/bash
 #SBATCH --job-name=RTT109
-#SBATCH --partition=batch
+#SBATCH --partition=gpu_p
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --gres=gpu:V100:1 
-#SBATCH --mem=32gb
-#SBATCH --time=4:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
+#SBATCH --cpus-per-task=32
+#SBATCH --gres=gpu:A100:1
+#SBATCH --constraint=Milan|SapphireRapids
+#SBATCH --mem=60gb
+#SBATCH --time=10:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
 #SBATCH --output=AF3Pool.%j.out
 #SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --array=60-113 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
-
+#SBATCH --array=60-71 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
 
 
 
