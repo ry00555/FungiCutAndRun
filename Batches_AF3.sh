@@ -1,4 +1,11 @@
 #!/bin/bash
+#SBATCH --job-name=AF3_chain
+#SBATCH --partition=inter_p
+#SBATCH --ntasks=1
+#SBATCH --mem=1gb
+#SBATCH --time=01:00:00
+#SBATCH --output=chain.%j.out
+#SBATCH --error=chain.%j.err
 
 TOTAL=584
 BATCH_SIZE=5
@@ -16,6 +23,11 @@ echo "Submitting EAF3 AF3 array ${START}-${END}%${MAX_RUNNING}"
 
 JOBID=$(sbatch --parsable --array=${START}-${END}%${MAX_RUNNING} $SCRIPT)
 
+if [ -z "$JOBID" ]; then
+    echo "Submission failed. Exiting."
+    exit 1
+fi
+    
 echo "Submitted job $JOBID"
 
 NEXT_START=$((END + 1))
