@@ -14,7 +14,6 @@
 #SBATCH --array=100-113 # change this to the number of input jsons the %10 means it will run only 10 at a time but it will go through all 113, otherwise you can do 1-20, 21-40 etc
 
 
-
 cd $SLURM_SUBMIT_DIR
 
 # Directories
