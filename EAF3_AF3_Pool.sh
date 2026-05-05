@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --gres=gpu:A100:1
 #SBATCH --mem=60gb
-#SBATCH --time=10:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
+#SBATCH --time=2:00:00 #this is the longest step according to EMBL EBI; adjust accordingly Small proteins (<300 aa): 1-3 hours Medium proteins (300-800 aa): 3-8 hours Large proteins (>800 aa): 8-12 hours
 #SBATCH --output=AF3Pool.%j.out
 #SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
