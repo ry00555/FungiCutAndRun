@@ -1,21 +1,21 @@
 #!/bin/bash
-#SBATCH --job-name=Run153ChIP
+#SBATCH --job-name=Run156ChIP
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=100gb
-#SBATCH --time=20:00:00
-#SBATCH --output=../tetR_realign_MapCutandRun.%j.out
-#SBATCH --error=../tetR_realign_MapCutandRun.%j.err
+#SBATCH --time=36:00:00
+#SBATCH --output=../MapCutandRun.%j.out
+#SBATCH --error=../MapCutandRun.%j.err
 
 cd $SLURM_SUBMIT_DIR
 
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/Run155"
+OUTDIR="/lustre2/scratch/ry00555/Run156"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
@@ -32,7 +32,7 @@ OUTDIR="/lustre2/scratch/ry00555/Run155"
 module load Trim_Galore
 trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
 
 #FILES="${OUTDIR}/TrimmedReads/*_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
@@ -46,14 +46,13 @@ do
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%_S[1-150]*_L002_R1_001_val_1.fq.gz/}
- #name=${file/%_S[1-990]*_L001_R1_001_val_1.fq.gz/}
+name=${file/%__S[1-990]*_L003_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
-read2=$(echo "$f" | sed 's/_L002_R1_001_val_1\.fq\.gz/_L002_R2_001_val_2\.fq\.gz/g')
+read2=$(echo "$f" | sed 's/_L003_R1_001_val_1\.fq\.gz/_L003_R2_001_val_2\.fq\.gz/g')
 
 #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file
