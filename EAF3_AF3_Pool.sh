@@ -10,7 +10,7 @@
 #SBATCH --error=AF3Pool.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
- 
+
 
 
 cd $SLURM_SUBMIT_DIR
@@ -18,7 +18,7 @@ cd $SLURM_SUBMIT_DIR
 # Directories
 INPUT_DIR="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/Input/EAF3_MS_JsonInputs"
 OUTPUT_DIR="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/Output/EAF3"
-MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"
+MODEL_DIR="/home/ry00555/Research/AlphaFold3ModelParameters"
 PUBLIC_DB="/db/AlphaFold3/20241114"
 
 # Pick the JSON file for this array task
