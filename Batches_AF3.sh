@@ -8,8 +8,8 @@
 #SBATCH --error=chain.%j.err
 
 TOTAL=584
-BATCH_SIZE=5
-MAX_RUNNING=1
+BATCH_SIZE=10
+MAX_RUNNING=5
 SCRIPT="EAF3_AF3_Pool.sh"
 
 START=${1:-1}
@@ -27,7 +27,7 @@ if [ -z "$JOBID" ]; then
     echo "Submission failed. Exiting."
     exit 1
 fi
-    
+
 echo "Submitted job $JOBID"
 
 NEXT_START=$((END + 1))
