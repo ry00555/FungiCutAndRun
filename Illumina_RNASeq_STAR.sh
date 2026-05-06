@@ -14,7 +14,7 @@ cd "$SLURM_SUBMIT_DIR"
 THREADS=12
 
 fastqPath="/lustre2/scratch/ry00555/Run156/2025_Run156_FASTQ/RNASeq"
-outdir="/lustre2/scratch/ry00555/Run156"
+outdir="/lustre2/scratch/ry00555/Run156/RNASeq"
 
 mkdir -p \
   "${outdir}/TrimmedFastQs" \
