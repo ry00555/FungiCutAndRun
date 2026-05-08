@@ -27,7 +27,7 @@ YAML_FILES=("$BOLTZDIR"/*.yaml)
     echo "[$(date)] Running Boltz-2 on: $INPUT"
 
     boltz predict "$INPUT" \
-        --out_dir  $BOLTZDIR \
+        --out_dir  $OUTDIR \
 --cache "/scratch/ry00555/Boltz2/" \
         --use_msa_server  \
         --diffusion_samples 5 \
