@@ -1,7 +1,9 @@
 #!/bin/bash
 #SBATCH --job-name=ASH1
-#SBATCH --partition=batch
-#SBATCH --gres=gpu:A100:1
+#SBATCH --partition=gpu_p
+#SBATCH --gres=gpu:L4:1
+#SBATCH --qos=gpu_l4_qos
+#SBATCH --array=0-294%4       # max 4 running per gpu_l4_qos limit
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
