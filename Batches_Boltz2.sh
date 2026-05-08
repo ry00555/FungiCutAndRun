@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=Boltz2_batch
+#SBATCH --job-name=ASH1
 #SBATCH --partition=inter_p
 #SBATCH --ntasks=1
 #SBATCH --mem=12gb
@@ -14,7 +14,7 @@
 TOTAL=294       
 BATCH_SIZE=20    # how many jobs to submit at once (stay under QOS limit of 20)
 MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
-SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_ASH1array.sh"
+SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
 START=${1:-0}
 END=$((START + BATCH_SIZE - 1))
