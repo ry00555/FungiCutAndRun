@@ -38,7 +38,7 @@ NEXT_START=$((END + 1))
 
 if [ $NEXT_START -le $TOTAL ]; then
     echo "Submitting dependency for next batch starting at $NEXT_START"
-    sbatch --dependency=afterok:${JOBID} Boltz2_Step1.sh $NEXT_START
+    sbatch --dependency=afterok:${JOBID} Batches_Boltz2.sh $NEXT_START
 else
     echo "All batches submitted."
 fi
