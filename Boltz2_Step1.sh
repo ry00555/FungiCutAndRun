@@ -28,6 +28,7 @@ YAML_FILES=("$BOLTZDIR"/*.yaml)
 
     boltz predict "$INPUT" \
         --out_dir  $BOLTZDIR \
+--cache "/scratch/ry00555/Boltz2/" \
         --use_msa_server  \
         --diffusion_samples 5 \
         --diffusion_samples_affinity 5 \
