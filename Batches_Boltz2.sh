@@ -11,8 +11,8 @@
 #SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_%A_%a.out
 #SBATCH --error=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_%A_%a.err
 
-TOTAL=294       
-BATCH_SIZE==10    # how many jobs to submit at once (stay under QOS limit of 20)
+TOTAL=293 # total number of files -1      
+BATCH_SIZE=10    # how many jobs to submit at once (stay under QOS limit of 20)
 MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
