@@ -1,12 +1,12 @@
 #!/bin/bash
 #SBATCH --job-name=ASH1
-#SBATCH --partition=gpu_p
-#SBATCH --gres=gpu:1
-#SBATCH --ntasks=2
+#SBATCH --partition=batch
+#SBATCH --gres=gpu:A100:1
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=04:00:00
-#SBATCH --array=0-294
+#SBATCH --array=0-29
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_%A_%a.out
@@ -29,7 +29,7 @@ YAML_FILES=("$BOLTZDIR"/*.yaml)
 
     boltz predict "$INPUT" \
         --out_dir  $BOLTZDIR \
-        --use_msa_server \
+        --use_msa_server  \
         --diffusion_samples 5 \
         --diffusion_samples_affinity 5 \
         --accelerator  gpu \
