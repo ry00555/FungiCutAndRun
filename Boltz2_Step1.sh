@@ -2,6 +2,7 @@
 #SBATCH --job-name=ASH1
 #SBATCH --partition=gpu_p
 #SBATCH --gres=gpu:1
+#SBATCH --ntasks=2
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=04:00:00
