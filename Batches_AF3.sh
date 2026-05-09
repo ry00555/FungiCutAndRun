@@ -7,12 +7,12 @@
 #SBATCH --output=chain.%j.out
 #SBATCH --error=chain.%j.err
 
-TOTAL=584
+TOTAL=384
 BATCH_SIZE=10
 MAX_RUNNING=2
 SCRIPT="EAF3_AF3_Pool.sh"
 
-START=${1:-1}
+START=${194:-1}
 END=$((START + BATCH_SIZE - 1))
 
 if [ $END -gt $TOTAL ]; then
