@@ -25,6 +25,7 @@ PUBLIC_DB="/db/AlphaFold3/20241114"
 # Pick the JSON file for this array task
 file=$(ls $INPUT_DIR/*.json | awk "NR==${SLURM_ARRAY_TASK_ID}")
 
+export XLA_FLAGS="--xla_disable_hlo_passes=custom-kernel-fusion-rewriter" # resends jobs to H100 or A100 nodes 
 singularity exec \
      --nv \
      --bind ${INPUT_DIR}:/root/af_input \
