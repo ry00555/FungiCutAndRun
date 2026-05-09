@@ -54,7 +54,7 @@ cd $OUTDIR
 TransDecoder.LongOrfs -t  EAF3_transcripts.fa -m 50
 
 # predict coding regions, keep all ORFs per transcript (not just best)
-TransDecoder.Predict -t  EAF3_transcripts.fa
+TransDecoder.Predict -t  EAF3_transcripts.fa --no_refine_starts # which skips the  Position Weight Matrix model training step, this is okay for this situation because I only care about one gene probably not okay in de novo genome assembly
 
 # copy final protein sequences to a clean output file
 cp  EAF3_transcripts.fa.transdecoder.pep  EAF3_proteins.fa
