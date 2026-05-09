@@ -10,7 +10,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 
-ml SAMtools/1.23.1-GCC-13.3.0 StringTie/3.0.0-GCC-13.3.0 gffread/0.12.7-GCCcore-12.3.0
+ml SAMtools/1.23.1-GCC-13.3.0 StringTie/3.0.0-GCC-13.3.0 gffread/0.12.7-GCCcore-12.3.0 TransDecoder/5.7.1-GCC-12.3.0
 
 GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
 GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.gff"
@@ -47,3 +47,17 @@ gffread $OUTDIR/EAF3_assembly.gtf \
     -w $OUTDIR/EAF3_transcripts.fa
 
 echo "Done — transcripts written to $OUTDIR/EAF3_transcripts.fa"
+
+#figure out amino acid sequence using transdecoder identify long ORFs (minimum 50 aa to catch short isoform)
+TransDecoder.LongOrfs -t  $OUTDIR/EAF3_transcripts.fa -m 50
+
+# predict coding regions, keep all ORFs per transcript (not just best)
+TransDecoder.Predict -t  $OUTDIR/EAF3_transcripts.fa
+
+# copy final protein sequences to a clean output file
+cp  $OUTDIR/EAF3_transcripts.fa.transdecoder.pep  $OUTDIR/EAF3_proteins.fa
+
+echo "Done — protein sequences written to $OUTDIR/EAF3_proteins.fa"
+echo ""
+echo "Predicted proteins:" # this will say the protein length for each sequence made in the .out file and if any of them are incomplete proteins 
+grep ">"  $OUTDIR/EAF3_proteins.fa
