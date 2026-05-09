@@ -12,8 +12,8 @@
 
 ml SAMtools/1.23.1-GCC-13.3.0 StringTie/3.0.0-GCC-13.3.0 gffread/0.12.7-GCCcore-12.3.0
 
-GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/Nc12_RefSeq_wIntegratedTetO/GCA_000182925.2_NC12_genomic_wTetO_at_his3.fna"
-GTF="/home/ry00555/Research/Genomes/Nc12wTetO_at_his3_FINAL.gtf"
+GENOME="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
+GTF="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/enomes/GCA_000182925.2_NC12_genomic.gff"
 OUTDIR="/scratch/ry00555/EpigeneticMemoryPaper2026/RNASeq/EAF3_assembly"
 WTBAMs="/lustre2/scratch/ry00555/Run155/SortedBamFiles/"
 mkdir -p $OUTDIR
