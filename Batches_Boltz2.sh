@@ -10,8 +10,8 @@
 cd $SLURM_SUBMIT_DIR
 PROJECT="EAF3" #change this and job name to dock protein
 TOTAL=584 # total number of files
-BATCH_SIZE=17    # how many jobs to submit at once (stay under QOS limit of 20)
-MAX_RUNNING=10    # how many run simultaneously (QOS limit is 8)
+BATCH_SIZE=20    # how many jobs to submit at once (stay under QOS limit of 20)
+MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
 START=${1:-1}
