@@ -1,27 +1,27 @@
 #!/bin/bash
-#SBATCH --job-name=ASH1
+#SBATCH --job-name=EAF3
 #SBATCH --partition=inter_p
 #SBATCH --ntasks=1
 #SBATCH --mem=1gb
 #SBATCH --time=01:00:00
-#SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_batch.%j.out
-#SBATCH --error=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_batch.%j.err
+#SBATCH --output=/scratch/ry00555/Boltz2/logs/boltz2_batch.%j.out
+#SBATCH --error=/scratch/ry00555/Boltz2/logs/boltz2_batch.%j.err
 
 cd $SLURM_SUBMIT_DIR
-
-TOTAL=293 # total number of files -1      
-BATCH_SIZE=15    # how many jobs to submit at once (stay under QOS limit of 20)
-MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
+PROJECT="EAF3" #change this and job name to dock protein
+TOTAL=584 # total number of files  
+BATCH_SIZE=19    # how many jobs to submit at once (stay under QOS limit of 20)
+MAX_RUNNING=10    # how many run simultaneously (QOS limit is 8)
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
-START=${1:-0}
+START=${1:-1}
 END=$((START + BATCH_SIZE - 1))
 
 if [ $END -gt $TOTAL ]; then
     END=$TOTAL
 fi
 
-echo "Submitting Boltz2 ASH1 array ${START}-${END}%${MAX_RUNNING}"
+echo "Submitting Boltz2 $PROJECT array ${START}-${END}%${MAX_RUNNING}"
 
 JOBID=$(sbatch --parsable --array=${START}-${END}%${MAX_RUNNING} $SCRIPT)
 
