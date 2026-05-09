@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=ASH1
+#SBATCH --job-name=EAF3
 #SBATCH --partition=gpu_p
 #SBATCH --gres=gpu:H100:1
 #SBATCH --ntasks=1
@@ -13,7 +13,7 @@
 
 module load Boltz/2.2.0
 
-PROJECT="EAF3" #change this and job name to dock protein 
+PROJECT="EAF3" #change this and job name to dock protein
 
 BOLTZDIR="/scratch/ry00555/Boltz2/$PROJECT/boltz2_inputs"
 OUTDIR="/scratch/ry00555/Boltz2/$PROJECT/boltz2_outputs"
