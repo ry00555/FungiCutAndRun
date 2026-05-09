@@ -6,13 +6,11 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_batch.%j.out
 #SBATCH --error=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_batch.%j.err
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ry00555@uga.edu
-#SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_%A_%a.out
-#SBATCH --error=/scratch/ry00555/Boltz2/ASH1/logs/boltz2_%A_%a.err
+
+cd $SLURM_SUBMIT_DIR
 
 TOTAL=293 # total number of files -1      
-BATCH_SIZE=10    # how many jobs to submit at once (stay under QOS limit of 20)
+BATCH_SIZE=15    # how many jobs to submit at once (stay under QOS limit of 20)
 MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
@@ -38,7 +36,8 @@ NEXT_START=$((END + 1))
 
 if [ $NEXT_START -le $TOTAL ]; then
     echo "Submitting dependency for next batch starting at $NEXT_START"
-    sbatch --dependency=afterok:${JOBID} Batches_Boltz2.sh $NEXT_START
+    sbatch --dependency=afterany:${JOBID} Batches_Boltz2.sh $NEXT_START
+    #sbatch --dependency=afterok:${JOBID} Batches_Boltz2.sh $NEXT_START use this one it you want to see where the chain fails (reasoning varies
 else
     echo "All batches submitted."
 fi
