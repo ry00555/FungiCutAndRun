@@ -48,16 +48,18 @@ gffread $OUTDIR/EAF3_assembly.gtf \
 
 echo "Done — transcripts written to $OUTDIR/EAF3_transcripts.fa"
 
+#TransDecoder writes its output files to whatever directory you run it from (your submit directory), not to $OUTDIR
+cd $OUTDIR
 #figure out amino acid sequence using transdecoder identify long ORFs (minimum 50 aa to catch short isoform)
-TransDecoder.LongOrfs -t  $OUTDIR/EAF3_transcripts.fa -m 50
+TransDecoder.LongOrfs -t  EAF3_transcripts.fa -m 50
 
 # predict coding regions, keep all ORFs per transcript (not just best)
-TransDecoder.Predict -t  $OUTDIR/EAF3_transcripts.fa
+TransDecoder.Predict -t  EAF3_transcripts.fa
 
 # copy final protein sequences to a clean output file
-cp  $OUTDIR/EAF3_transcripts.fa.transdecoder.pep  $OUTDIR/EAF3_proteins.fa
+cp  EAF3_transcripts.fa.transdecoder.pep  EAF3_proteins.fa
 
 echo "Done — protein sequences written to $OUTDIR/EAF3_proteins.fa"
 echo ""
-echo "Predicted proteins:" # this will say the protein length for each sequence made in the .out file and if any of them are incomplete proteins 
+echo "Predicted proteins:" # this will say the protein length for each sequence made in the .out file and if any of them are incomplete proteins
 grep ">"  $OUTDIR/EAF3_proteins.fa
