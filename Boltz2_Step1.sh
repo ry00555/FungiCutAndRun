@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=04:00:00
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAILED
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --output=/scratch/ry00555/Boltz2/logs/boltz2_%A_%a.out
 #SBATCH --error=/scratch/ry00555/Boltz2/logs/boltz2_%A_%a.err
