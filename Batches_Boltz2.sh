@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=EAF3
+#SBATCH --job-name=EAF3_Boltz
 #SBATCH --partition=inter_p
 #SBATCH --ntasks=1
 #SBATCH --mem=1gb
@@ -10,8 +10,8 @@
 cd $SLURM_SUBMIT_DIR
 PROJECT="EAF3" #change this and job name to dock protein
 TOTAL=583 # total number of files minus one as Boltz is on a 0 scale not +1
-BATCH_SIZE=12    # how many jobs to submit at once (stay under QOS limit of 20)
-MAX_RUNNING=7    # how many run simultaneously (QOS limit is 8)
+BATCH_SIZE=15    # how many jobs to submit at once (stay under QOS limit of 20)
+MAX_RUNNING=8    # how many run simultaneously (QOS limit is 8)
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
 
 START=${1:-0}
