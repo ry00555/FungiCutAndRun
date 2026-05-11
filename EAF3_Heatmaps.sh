@@ -132,3 +132,27 @@ plotHeatmap -m EAF3_nonASH1_noK27_H3K36me3_May2026_V1.gz -o EAF3_nonASH1_noK27_H
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/Bicocca_ASH1_noK27_wCM.bed" -S ../BigWigs/153-107_ChIP_WT_H3K36me3_.bin_25.smooth_50Bulk.bw  ../BigWigs/155-80_ChIP_C9_H3K36me3__S80.bin_25.smooth_75Bulk.bw ../BigWigs/155-77_ChIP_C8_H3K36me3__S77.bin_25.smooth_75Bulk.bw ../BigWigs/155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw --skipZeros -b 2000 -a 1000 --sortRegions descend -o EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.gz --outFileNameMatrix EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.tab
 
 plotHeatmap -m EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.gz -o EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+
+
+# Set your file paths
+BW1="sample1.bigwig"
+BW2="sample2.bigwig"
+OUTDIR="correlation_output"
+
+mkdir -p $OUTDIR
+
+# Step 1: Compute genome-wide bin scores
+multiBigwigSummary bins \
+  -b ASH1cat_H3K36me3_GSM3330994_Galaxy198-_bamCoverage_on_GTGCCA_N6875_ash1_H3K36me3_.bigwig 155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw \
+  -o ash1cat_eaf3_May26_summary.npz \
+  --binSize 10000 \
+  -p 4 \
+  --outRawCounts ash1cat_eaf3_May26_summary.tab
+
+# Step 3: Plot scatter plot
+plotCorrelation \
+  -in ash1cat_eaf3_May26_summary.npz \
+  --corMethod pearson \
+  --skipZeros \
+  --whatToPlot scatterplot \
+  -o ash1cat_eaf3_May26_correlation_scatter.png
