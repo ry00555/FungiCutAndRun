@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=alphafold3_rtt109_isw		#Name your job something original
+#SBATCH --job-name=eaf3_ash1		#Name your job something original
 #SBATCH --partition=gpu_p			#Use the GPU partition
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32			#If you use the default options, AlphaFold3 will run four simutaneous Jackhmmer processes with 8 CPUs each
@@ -28,20 +28,7 @@ singularity exec \
      --bind ${PUBLIC_DB}:/root/public_databases \
      /apps/singularity-images/alphafold-3.0.0.sif \
      python /app/alphafold/run_alphafold.py \
-     --json_path=/root/af_input/RTT109_ASH1.json \
+     --json_path=/root/af_input/ASH1_EAF3Transcoder.json \
      --model_dir=/root/models \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output
-
-     singularity exec \
-          --nv \
-          --bind ${INPUT_DIR}:/root/af_input \
-          --bind ${OUTPUT_DIR}:/root/af_output \
-          --bind ${MODEL_DIR}:/root/models \
-          --bind ${PUBLIC_DB}:/root/public_databases \
-          /apps/singularity-images/alphafold-3.0.0.sif \
-          python /app/alphafold/run_alphafold.py \
-          --json_path=/root/af_input/RTT109_HDA3.json \
-          --model_dir=/root/models \
-          --db_dir=/root/public_databases \
-          --output_dir=/root/af_output
