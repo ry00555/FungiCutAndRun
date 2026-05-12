@@ -10,8 +10,8 @@
 #SBATCH --output=/scratch/ry00555/Boltz2/ASH1/logs/Boltz2_Step2.%j.out
 #SBATCH --error=/scratch/ry00555/Boltz2/ASH1/logs/Boltz2_Step2.%j.err
 
-OUTDIR="/scratch/ry00555/Boltz2/ASH1/boltz2_outputs"
-OUTPUT_CSV="$OUTDIR/ASH1_Boltz2_confidence_scores.csv"
+OUTDIR="/scratch/ry00555/Boltz2/EAF3/boltz2_outputs"
+OUTPUT_CSV="$OUTDIR/EAF3_Boltz2_confidence_scores.csv"
 
 # One row per binder, one column per model for each metric
 echo "dock_protein,binder,\
@@ -36,7 +36,7 @@ import json, os, statistics
 
 pred_dir = '$pred_dir'
 binder   = '$binder'
-dock     = 'ASH1'
+dock     = 'EAF3'
 folder   = os.path.basename(pred_dir.rstrip('/'))
 
 vals = {m: {} for m in range(5)}
