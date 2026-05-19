@@ -58,3 +58,16 @@ singularity exec \
      --output_dir=/root/af_output \
      --run_data_pipeline=false \
      --run_inference=true
+
+     # ── Move timestamped output into the clean MSA folder ─────────────────────────
+     # Find the most recently created timestamped folder for this pool
+     timestamped=$(ls -dt ${OUTPUT_DIR}/${job_name}_*/ 2>/dev/null | head -1)
+
+     if [ -n "$timestamped" ]; then
+         echo "Moving output from $timestamped into ${OUTPUT_DIR}/${job_name}/"
+         mv ${timestamped}/* ${OUTPUT_DIR}/${job_name}/
+         rmdir ${timestamped}
+         echo "Done — output consolidated into ${OUTPUT_DIR}/${job_name}/"
+     else
+         echo "No timestamped folder found for $job_name"
+     fi
