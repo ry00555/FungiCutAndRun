@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=EAF3
-#SBATCH --partition=gpu_p #All MSAs (batch partition, no GPU cost) → All INFs (gpu_p, batched)
+#SBATCH --job-name=EAF3_INF
+#SBATCH --partition=gpu_p
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --gres=gpu:A100:1
@@ -23,21 +23,26 @@ INPUT_DIR="${BASE_DIR}/${PROTEIN}_AF3_PooledJSONs"
 OUTPUT_DIR="${BASE_DIR}/${PROTEIN}_AF3_PooledJSON_output"
 MODEL_DIR="/home/ry00555/Research/AlphaFold3ModelParameters"
 PUBLIC_DB="/db/AlphaFold3/20241114"
-MSA_JSON=$(find $OUTPUT_DIR -name "$(basename "$file" .json)*data.json" | head -n 1)
 
-mkdir -p $OUTPUT_DIR
-
+# Get the json file for this array task
 file=$(ls $INPUT_DIR/*.json | awk "NR==${SLURM_ARRAY_TASK_ID}")
 
-echo "Running INF for: $(basename $file)"
+# Derive the output folder name — AF3 lowercases the job name
+job_name=$(basename $file .json | tr '[:upper:]' '[:lower:]')
+MSA_JSON="${OUTPUT_DIR}/${job_name}/${job_name}_data.json"
 
-export XLA_FLAGS="--xla_disable_hlo_passes=custom-kernel-fusion-rewriter"
+echo "Running INF for: $job_name"
+echo "Using MSA JSON: $MSA_JSON"
 
-
+# Check MSA exists before running
 if [ ! -f "$MSA_JSON" ]; then
-    echo "Missing MSA JSON for task ${SLURM_ARRAY_TASK_ID}"
+    echo "ERROR: Missing MSA JSON for $job_name at $MSA_JSON"
+    echo "Available folders:"
+    ls $OUTPUT_DIR/
     exit 1
 fi
+
+export XLA_FLAGS="--xla_disable_hlo_passes=custom-kernel-fusion-rewriter"
 
 singularity exec \
      --nv \
@@ -47,9 +52,9 @@ singularity exec \
      --bind ${PUBLIC_DB}:/root/public_databases \
      /apps/singularity-images/alphafold-3.0.1.sif \
      python /app/alphafold/run_alphafold.py \
---json_path=$MSA_JSON \
+     --json_path=/root/af_output/${job_name}/${job_name}_data.json \
      --model_dir=/root/models \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output \
      --run_data_pipeline=false \
-     --run_inference=true # this is essentially Ankur's run_inf.py script
+     --run_inference=true
