@@ -16,6 +16,67 @@ BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools
 
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" --skipZeros -b 2000 -a 1000 --sortRegions descend -o ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.gz --outFileNameMatrix ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.tab
+
+plotHeatmap -m ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.gz \
+    -o ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.png \
+    --sortRegions descend \
+    --sortUsingSamples 4 \
+    --heatmapHeight 5 \
+    --heatmapWidth 3 \
+    --outFileSortedRegions ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.bed \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'Greens' 'YlOrBr' 'Greens' 'YlOrBr'  --zMax 20 10 20 10  \
+      --samplesLabel "WT H3K27me3" "WT H3K36me3" "set7 H3K27me3" "set7 H3K36me3"
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-30_ChIP_set2_H3K27me3_Rep1_S30_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw"  "/scratch/ry00555/Run153/BigWigs/153-34_ChIP_set2_H3K27me3_Rep1_S34_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw"  "/scratch/ry00555/Run153/BigWigs/153-35_ChIP_set2_H3K27me3_Rep2_S35_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-90_ChIP_set2set7_H3K36me3_Rep1_S84_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/lustre2/scratch/ry00555/RNASeqPaper2026/BigWigs/142-119_set-2_H3K36me3_rep1.bin_25.smooth_50.bw" "ash1_Y888F_H3K27me2_3_renamed.bigwig" "ash1_Y888F_H3K27me2_3_scaled.bigwig" "cat_ash1_H3K36me3_renamed.bigwig" "cat_ash1_H3K36me3_scaled.bigwig" --skipZeros -b 2000 -a 1000 --sortRegions descend -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V3.gz --outFileNameMatrix ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V3.tab
+
+plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V3.gz \
+    -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V4.png \
+    --sortRegions descend \
+    --sortUsingSamples 1 \
+    --heatmapHeight 5 \
+    --heatmapWidth 3 \
+    --outFileSortedRegions ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V4.bed \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' 'Greens' 'Greens' 'Greens' 'YlOrBr' 'YlOrBr' 'Greens' 'Greens' 'YlOrBr' 'YlOrBr' \
+    --zMax 20 10 20 10 20 20 20 10 10 20 20 10 10 \
+    --samplesLabel "WT H3K27me3" "WT H3K36me3" "set7 H3K27me3" "set7 H3K36me3" "set2 H3K27me3 Rep1" "set2 H3K27me3 Rep1b" "set2 H3K27me3 Rep2" "set2set7 H3K36me3" "set2 H3K36me3" "Y888F H3K27me2/3" "Y888F H3K27me2/3 scaled" "ASH1cat H3K36me3" "ASH1cat H3K36me3 scaled"
+
+    computeMatrix reference-point -p 12 \
+        -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" \
+        -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "/scratch/ry00555/Run153/BigWigs/153-35_ChIP_set2_H3K27me3_Rep2_S35_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "/scratch/ry00555/Run153/BigWigs/153-90_ChIP_set2set7_H3K36me3_Rep1_S84_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+        "ash1_Y888F_H3K27me2_3_scaled.bigwig" \
+        "cat_ash1_H3K36me3_scaled.bigwig" \
+        --skipZeros -b 2000 -a 1000 \
+        --sortRegions descend \
+        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.gz \
+        --outFileNameMatrix ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.tab
+
+    plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.gz \
+        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.png \
+        --sortRegions descend \
+        --sortUsingSamples 1 2 \
+        --heatmapHeight 8 \
+        --heatmapWidth 3 \
+        --outFileSortedRegions ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.bed \
+        --startLabel "5'" \
+        --endLabel "3'" \
+        --boxAroundHeatmaps no \
+        --colorMap 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' \
+        --zMax 20 10 20 8 20 10 20 10 \
+        --samplesLabel "WT H3K27me3" "WT H3K36me3" "set7 H3K27me3" "set7 H3K36me3" "set2 H3K27me3" "set2set7 H3K36me3" "Y888F H3K27me2/3" "ASH1cat H3K36me3"
+
 computeMatrix scale-regions -p 12 -R $OUTDIR/MACSPeaksDONE/WT_consensus_merged_V3.bed \
 -S $BWDIR/142-10_ChIP_WT_H3K27me3_Rep3.bin_25.smooth_75Bulk.bw \
 $BWDIR/145-30_WT_H3K27me3_rep8.bin_25.smooth_50.bw \
