@@ -30,11 +30,6 @@ if [ -z "$MSA_JOBID" ]; then
 fi
 echo "MSA job submitted: $MSA_JOBID (pools ${START}-${END})"
 
-if [ ! -f "$EXPECTED_MSA_FILE" ]; then
-    echo "Missing MSA for task ${SLURM_ARRAY_TASK_ID}"
-    exit 1
-fi
-
 # ── Submit INF jobs dependent on MSA finishing ────────────────────────────────
 INF_JOBID=$(sbatch --parsable \
     --dependency=afterok:${MSA_JOBID} \

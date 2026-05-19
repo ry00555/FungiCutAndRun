@@ -33,6 +33,12 @@ echo "Running INF for: $(basename $file)"
 
 export XLA_FLAGS="--xla_disable_hlo_passes=custom-kernel-fusion-rewriter"
 
+
+if [ ! -f "$MSA_JSON" ]; then
+    echo "Missing MSA JSON for task ${SLURM_ARRAY_TASK_ID}"
+    exit 1
+fi
+
 singularity exec \
      --nv \
      --bind ${INPUT_DIR}:/root/af_input \
