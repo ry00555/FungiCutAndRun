@@ -23,6 +23,7 @@ INPUT_DIR="${BASE_DIR}/${PROTEIN}_AF3_PooledJSONs"
 OUTPUT_DIR="${BASE_DIR}/${PROTEIN}_AF3_PooledJSON_output"
 MODEL_DIR="/home/ry00555/Research/AlphaFold3ModelParameters"
 PUBLIC_DB="/db/AlphaFold3/20241114"
+MSA_JSON=$(find $OUTPUT_DIR -name "$(basename "$file" .json)*data.json" | head -n 1)
 
 mkdir -p $OUTPUT_DIR
 
@@ -40,7 +41,7 @@ singularity exec \
      --bind ${PUBLIC_DB}:/root/public_databases \
      /apps/singularity-images/alphafold-3.0.1.sif \
      python /app/alphafold/run_alphafold.py \
-     --json_path=/root/af_input/$(basename $file) \
+--json_path=$MSA_JSON \
      --model_dir=/root/models \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output \
