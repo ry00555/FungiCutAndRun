@@ -40,4 +40,4 @@ singularity exec \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output \
      --run_data_pipeline=true \
-     --run_inference=false
+     --run_inference=false  # this is essentially Ankur's run_msa.py script

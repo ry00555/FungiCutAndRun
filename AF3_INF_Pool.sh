@@ -45,4 +45,4 @@ singularity exec \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output \
      --run_data_pipeline=false \
-     --run_inference=true
+     --run_inference=true # this is essentially Ankur's run_inf.py script

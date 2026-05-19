@@ -42,11 +42,11 @@ if [ -z "$INF_JOBID" ]; then
 fi
 echo "INF job submitted: $INF_JOBID (depends on MSA $MSA_JOBID)"
 
-# ── Submit next batch dependent on INF finishing ──────────────────────────────
+# ── Submit next batch dependent on MSA finishing ──────────────────────────────
 NEXT_START=$((END + 1))
 if [ $NEXT_START -le $TOTAL ]; then
-    echo "Queuing next batch starting at pool $NEXT_START (depends on INF $INF_JOBID)"
-    sbatch --dependency=afterok:${INF_JOBID} AF3_Pools.sh $NEXT_START
+    echo "Queuing next batch starting at pool $NEXT_START (depends on MSA $MSA_JOBID)" #this was changed from INF_JOBID so if you want MSA 1-5 → INF 1-5 → THEN MSA 6-10 then switch to INF_JOBID
+    sbatch --dependency=afterok:${MSA_JOBID} AF3_Pools.sh $NEXT_START
 else
     echo "All $TOTAL pools submitted."
 fi
