@@ -3,7 +3,7 @@
 #SBATCH --partition=batch #All MSAs (batch partition, no GPU cost) → All INFs (gpu_p, batched)
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
-#SBATCH --mem=60gb
+#SBATCH --mem=120gb
 #SBATCH --time=8:00:00
 #SBATCH --output=MSA.%j.out
 #SBATCH --error=MSA.%j.err
