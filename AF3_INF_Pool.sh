@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --gres=gpu:A100:1
 #SBATCH --constraint=Milan|SapphireRapids
-#SBATCH --mem=60gb
+#SBATCH --mem=100gb
 #SBATCH --time=4:00:00
 #SBATCH --output=INF.%j.out
 #SBATCH --error=INF.%j.err
