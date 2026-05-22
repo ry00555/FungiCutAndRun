@@ -12,8 +12,8 @@ cd $SLURM_SUBMIT_DIR
 # ── Only change these lines when swapping proteins ────────────────────────────
 PROJECT="PRC2"
 TOTAL=3261       # total YAMLs minus 1 (0-based) — update after running generator
-BATCH_SIZE=15
-MAX_RUNNING=8
+BATCH_SIZE=20
+MAX_RUNNING=3
 # ─────────────────────────────────────────────────────────────────────────────
 
 SCRIPT="/home/ry00555/Research/FungiCutAndRun/Boltz2_Step1.sh"
