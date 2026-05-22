@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:H100:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=32G
+#SBATCH --mem=40G
 #SBATCH --time=06:00:00
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=ry00555@uga.edu
@@ -31,8 +31,8 @@ boltz predict "$INPUT" \
     --out_dir  $OUTDIR \
     --cache    "/scratch/ry00555/Boltz2/cache" \
     --use_msa_server \
-    --diffusion_samples 5 \
-    --diffusion_samples_affinity 5 \
+    --diffusion_samples 3 \
+    --diffusion_samples_affinity 3 \
     --accelerator gpu \
     --devices 1
 

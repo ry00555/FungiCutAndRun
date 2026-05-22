@@ -11,7 +11,7 @@ cd $SLURM_SUBMIT_DIR
 
 # ── Only change these lines when swapping proteins ────────────────────────────
 PROJECT="PRC2"
-TOTAL=3261       # total YAMLs minus 1 (0-based) — update after running generator
+TOTAL=3362       # total YAMLs minus 1 (0-based) — update after running generator
 BATCH_SIZE=5
 MAX_RUNNING=5
 # ─────────────────────────────────────────────────────────────────────────────
@@ -30,7 +30,7 @@ echo "Submitted job $JOBID"
 
 NEXT_START=$((END + 1))
 if [ $NEXT_START -le $TOTAL ]; then
-    sbatch --dependency=afterany:${JOBID} Batches_Boltz2.sh $NEXT_START
+    sbatch --dependency=afterok:${JOBID} Batches_Boltz2.sh $NEXT_START
 else
     echo "All $PROJECT Boltz2 batches submitted."
 fi
