@@ -9,7 +9,7 @@
 #SBATCH --time=4:00:00
 #SBATCH --output=INF.%j.out
 #SBATCH --error=INF.%j.err
-#SBATCH --mail-type=FAILED
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=ry00555@uga.edu
 
 # ── Only change this line when swapping proteins ──────────────────────────────
