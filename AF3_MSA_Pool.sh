@@ -7,7 +7,7 @@
 #SBATCH --time=8:00:00
 #SBATCH --output=MSA.%j.out
 #SBATCH --error=MSA.%j.err
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAILED
 #SBATCH --mail-user=ry00555@uga.edu
 
 # ── Only change this line when swapping proteins ──────────────────────────────
