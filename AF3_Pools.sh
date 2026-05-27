@@ -10,7 +10,7 @@
 #SBATCH --mail-user=ry00555@uga.edu
 
 # ── Settings ──────────────────────────────────────────────────────────────────
-TOTAL=173         # update to your total number of JSONs
+TOTAL=153         # update to your total number of JSONs
 BATCH_SIZE=5      # number of pools per batch
 MSA_SCRIPT="AF3_MSA_Pool.sh"
 INF_SCRIPT="AF3_INF_Pool.sh"
