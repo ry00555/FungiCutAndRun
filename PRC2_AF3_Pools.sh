@@ -6,12 +6,12 @@
 #SBATCH --time=01:00:00
 #SBATCH --output=AF3_Pool.%j.out
 #SBATCH --error=AF3_Pool.%j.err
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=FAIL
 #SBATCH --mail-user=ry00555@uga.edu
 
 # ── Settings ──────────────────────────────────────────────────────────────────
 TOTAL=3366         # update to your total number of JSONs
-BATCH_SIZE=5      # number of pools per batch
+BATCH_SIZE=9      # number of pools per batch
 MSA_SCRIPT="PRC2_AF3_MSA_Pool.sh"
 INF_SCRIPT="PRC2_AF3_INF_Pool.sh"
 
