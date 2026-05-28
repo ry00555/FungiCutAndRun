@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=EAF3 #change this line for record keeping 
+#SBATCH --job-name=EAF3 #change this line for record keeping
 #SBATCH --partition=batch
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=2
@@ -10,7 +10,7 @@
 #SBATCH --output=AF3_Pool_Scraper.%j.out
 #SBATCH --error=AF3_Pool_Scraper.%j.err
 
-KEY_CSV="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/PooledPPI/EAF3_AF3_PooledJSONs/EAF3_pool_key_scraper.csv"
+KEY_CSV="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/PooledPPI/EAF3_AF3_PooledJSONs/EAF3_pool_key_scraper_lower.csv"
 BASE_DIR="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/PooledPPI/EAF3_AF3_PooledJSON_output"
 OUTPUT_CSV="/scratch/ry00555/EpigeneticMemoryPaper2026/AlphaFold3/PooledPPI/EAF3_AF3_ipTM_scores.csv"
 SCRIPTS_DIR="/home/ry00555/Research/FungiCutAndRun"
