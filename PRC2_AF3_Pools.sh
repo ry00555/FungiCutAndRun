@@ -10,43 +10,78 @@
 #SBATCH --mail-user=ry00555@uga.edu
 
 # ── Settings ──────────────────────────────────────────────────────────────────
-TOTAL=3366         # update to your total number of JSONs
-BATCH_SIZE=9      # number of pools per batch
+TOTAL=3366
+BATCH_SIZE=11
 MSA_SCRIPT="PRC2_AF3_MSA_Pool.sh"
 INF_SCRIPT="PRC2_AF3_INF_Pool.sh"
+INPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_StringDB_pools/AF3_JSONs"
+OUTPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_AF3_PooledJSON_output"
+# ─────────────────────────────────────────────────────────────────────────────
 
 START=${1:-1}
+
+# ── If START is "recheck" run the missing pools check ─────────────────────────
+if [ "$START" == "recheck" ]; then
+    echo "Running missing pools check..."
+    missing=()
+    for i in $(seq 1 $TOTAL); do
+        pool=$(printf "prc2_pool%03d" $i)
+        # Check if JSON exists (valid pool index)
+        json=$(ls $INPUT_DIR/*.json 2>/dev/null | awk "NR==$i")
+        [ -z "$json" ] && continue
+        # Check if INF completed
+        dir="${OUTPUT_DIR}/${pool}"
+        if ! ls $dir/seed-1_sample-0/summary_confidences.json &>/dev/null 2>&1; then
+            missing+=($i)
+        fi
+    done
+
+    if [ ${#missing[@]} -eq 0 ]; then
+        echo "All pools complete!"
+        exit 0
+    fi
+
+    echo "Found ${#missing[@]} missing pools: ${missing[@]}"
+
+    # Submit missing in batches of 10
+    indices=$(IFS=,; echo "${missing[*]}")
+    MSA_JOBID=$(sbatch --parsable --array=${indices}%5 $MSA_SCRIPT)
+    [ -z "$MSA_JOBID" ] && echo "Recheck MSA submission failed." && exit 1
+    echo "Recheck MSA submitted: $MSA_JOBID"
+
+    INF_JOBID=$(sbatch --parsable \
+        --dependency=afterok:${MSA_JOBID} \
+        --array=${indices}%5 \
+        $INF_SCRIPT)
+    echo "Recheck INF submitted: $INF_JOBID"
+
+    # Schedule one more recheck after this finishes
+    sbatch --dependency=afterany:${INF_JOBID} PRC2_AF3_Pools.sh recheck
+    exit 0
+fi
+
+# ── Normal batch submission ───────────────────────────────────────────────────
 END=$((START + BATCH_SIZE - 1))
 [ $END -gt $TOTAL ] && END=$TOTAL
 
 echo "Submitting batch: pools ${START}-${END}"
 
-# ── Submit MSA jobs for this batch ────────────────────────────────────────────
 MSA_JOBID=$(sbatch --parsable --array=${START}-${END} $MSA_SCRIPT)
-
-if [ -z "$MSA_JOBID" ]; then
-    echo "MSA submission failed. Exiting."
-    exit 1
-fi
+[ -z "$MSA_JOBID" ] && echo "MSA submission failed." && exit 1
 echo "MSA job submitted: $MSA_JOBID (pools ${START}-${END})"
 
-# ── Submit INF jobs dependent on MSA finishing ────────────────────────────────
 INF_JOBID=$(sbatch --parsable \
     --dependency=afterok:${MSA_JOBID} \
     --array=${START}-${END} \
     $INF_SCRIPT)
+[ -z "$INF_JOBID" ] && echo "INF submission failed." && exit 1
+echo "INF job submitted: $INF_JOBID"
 
-if [ -z "$INF_JOBID" ]; then
-    echo "INF submission failed. Exiting."
-    exit 1
-fi
-echo "INF job submitted: $INF_JOBID (depends on MSA $MSA_JOBID)"
-
-# ── Submit next batch dependent on MSA finishing ──────────────────────────────
 NEXT_START=$((END + 1))
 if [ $NEXT_START -le $TOTAL ]; then
-    echo "Queuing next batch starting at pool $NEXT_START (depends on MSA $MSA_JOBID)" #this was changed from INF_JOBID so if you want MSA 1-5 → INF 1-5 → THEN MSA 6-10 then switch to INF_JOBID
-    sbatch --dependency=afterok:${MSA_JOBID} PRC2_AF3_Pools.sh $NEXT_START
+    sbatch --dependency=afterany:${MSA_JOBID} PRC2_AF3_Pools.sh $NEXT_START
 else
-    echo "All $TOTAL pools submitted."
+    # All batches submitted — schedule automatic recheck
+    echo "All batches submitted — scheduling recheck for missing pools"
+    sbatch --dependency=afterany:${INF_JOBID} PRC2_AF3_Pools.sh recheck
 fi
