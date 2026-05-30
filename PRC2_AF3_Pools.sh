@@ -11,7 +11,7 @@
 
 # ── Settings ──────────────────────────────────────────────────────────────────
 TOTAL=3366
-BATCH_SIZE=11
+BATCH_SIZE=9
 MSA_SCRIPT="PRC2_AF3_MSA_Pool.sh"
 INF_SCRIPT="PRC2_AF3_INF_Pool.sh"
 INPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_StringDB_pools/AF3_JSONs"
