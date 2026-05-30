@@ -26,10 +26,6 @@ if [ "$START" == "recheck" ]; then
     missing=()
     for i in $(seq 1 $TOTAL); do
         pool=$(printf "prc2_pool%03d" $i)
-        # Check if JSON exists (valid pool index)
-        json=$(ls $INPUT_DIR/*.json 2>/dev/null | awk "NR==$i")
-        [ -z "$json" ] && continue
-        # Check if INF completed
         dir="${OUTPUT_DIR}/${pool}"
         if ! ls $dir/seed-1_sample-0/summary_confidences.json &>/dev/null 2>&1; then
             missing+=($i)
