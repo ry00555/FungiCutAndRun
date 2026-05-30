@@ -40,19 +40,32 @@ if [ "$START" == "recheck" ]; then
     echo "Found ${#missing[@]} missing pools: ${missing[@]}"
 
     # Submit missing in batches of 10
-    indices=$(IFS=,; echo "${missing[*]}")
-    MSA_JOBID=$(sbatch --parsable --array=${indices}%5 $MSA_SCRIPT)
-    [ -z "$MSA_JOBID" ] && echo "Recheck MSA submission failed." && exit 1
-    echo "Recheck MSA submitted: $MSA_JOBID"
+    CHUNK=200
+   PREV_JOBID=""
+   for ((start=0; start<${#missing[@]}; start+=CHUNK)); do
+       chunk=("${missing[@]:$start:$CHUNK}")
+       indices=$(IFS=,; echo "${chunk[*]}")
 
-    INF_JOBID=$(sbatch --parsable \
-        --dependency=afterok:${MSA_JOBID} \
-        --array=${indices}%5 \
-        $INF_SCRIPT)
-    echo "Recheck INF submitted: $INF_JOBID"
+       if [ -z "$PREV_JOBID" ]; then
+           MSA_JOBID=$(sbatch --parsable --array=${indices}%5 $MSA_SCRIPT)
+       else
+           MSA_JOBID=$(sbatch --parsable \
+               --dependency=afterany:${PREV_JOBID} \
+               --array=${indices}%5 $MSA_SCRIPT)
+       fi
+       [ -z "$MSA_JOBID" ] && echo "MSA submission failed at chunk $start." && exit 1
+       echo "MSA chunk submitted: $MSA_JOBID (${#chunk[@]} pools)"
 
-    # Schedule one more recheck after this finishes
-    sbatch --dependency=afterany:${INF_JOBID} PRC2_AF3_Pools.sh recheck
+       INF_JOBID=$(sbatch --parsable \
+           --dependency=afterok:${MSA_JOBID} \
+           --array=${indices}%5 \
+           $INF_SCRIPT)
+       echo "INF chunk submitted: $INF_JOBID"
+
+       PREV_JOBID=$INF_JOBID
+   done
+
+   sbatch --dependency=afterany:${PREV_JOBID} PRC2_AF3_Pools.sh recheck
     exit 0
 fi
 
