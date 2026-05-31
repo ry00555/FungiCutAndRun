@@ -12,9 +12,11 @@
 # ── Settings ──────────────────────────────────────────────────────────────────
 TOTAL=3366
 BATCH_SIZE=9
+MSA_THROTTLE=20   # MSA on batch partition — can run many at once
+INF_THROTTLE=9    # INF on gpu_p — keep low for fairshare
 MSA_SCRIPT="PRC2_AF3_MSA_Pool.sh"
 INF_SCRIPT="PRC2_AF3_INF_Pool.sh"
-INPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_StringDB_pools/AF3_JSONs"
+INPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_AF3_PooledJSONs"
 OUTPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/PRC2_Proteome_pools/PooledPPI/PRC2_AF3_PooledJSON_output"
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -37,35 +39,103 @@ if [ "$START" == "recheck" ]; then
         exit 0
     fi
 
-    echo "Found ${#missing[@]} missing pools: ${missing[@]}"
+    echo "Found ${#missing[@]} missing pools"
 
-    # Submit missing in batches of 10
+    # Submit missing in chunks of 200 to avoid SLURM array string limit
     CHUNK=200
-   PREV_JOBID=""
-   for ((start=0; start<${#missing[@]}; start+=CHUNK)); do
-       chunk=("${missing[@]:$start:$CHUNK}")
-       indices=$(IFS=,; echo "${chunk[*]}")
+    PREV_JOBID=""
+    for ((start=0; start<${#missing[@]}; start+=CHUNK)); do
+        chunk=("${missing[@]:$start:$CHUNK}")
+        indices="${chunk[0]}"
+        for idx in "${chunk[@]:1}"; do
+            indices="${indices},${idx}"
+        done
 
-       if [ -z "$PREV_JOBID" ]; then
-           MSA_JOBID=$(sbatch --parsable --array=${indices}%5 $MSA_SCRIPT)
-       else
-           MSA_JOBID=$(sbatch --parsable \
-               --dependency=afterany:${PREV_JOBID} \
-               --array=${indices}%5 $MSA_SCRIPT)
-       fi
-       [ -z "$MSA_JOBID" ] && echo "MSA submission failed at chunk $start." && exit 1
-       echo "MSA chunk submitted: $MSA_JOBID (${#chunk[@]} pools)"
+        if [ -z "$PREV_JOBID" ]; then
+            MSA_JOBID=$(sbatch --parsable --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
+        else
+            MSA_JOBID=$(sbatch --parsable \
+                --dependency=afterany:${PREV_JOBID} \
+                --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
+        fi
+        [ -z "$MSA_JOBID" ] && echo "MSA submission failed at chunk $start." && exit 1
+        echo "MSA chunk submitted: $MSA_JOBID (${#chunk[@]} pools)"
 
-       INF_JOBID=$(sbatch --parsable \
-           --dependency=afterok:${MSA_JOBID} \
-           --array=${indices}%5 \
-           $INF_SCRIPT)
-       echo "INF chunk submitted: $INF_JOBID"
+        INF_JOBID=$(sbatch --parsable \
+            --dependency=afterok:${MSA_JOBID} \
+            --array=${indices}%${INF_THROTTLE} \
+            $INF_SCRIPT)
+        echo "INF chunk submitted: $INF_JOBID"
 
-       PREV_JOBID=$INF_JOBID
-   done
+        PREV_JOBID=$INF_JOBID
+    done
 
-   sbatch --dependency=afterany:${PREV_JOBID} PRC2_AF3_Pools.sh recheck
+    # Schedule another recheck after all chunks finish
+    sbatch --dependency=afterany:${PREV_JOBID} PRC2_AF3_Pools.sh recheck
+    exit 0
+fi
+
+# ── If START is "inf_scan" — find MSA-complete pools and submit INF ───────────
+if [ "$START" == "inf_scan" ]; then
+    echo "Scanning for pools ready for INF..."
+
+    line_num=0
+    ready=()
+    while IFS= read -r json_file; do
+        line_num=$((line_num + 1))
+        pool=$(basename "$json_file" .json | tr '[:upper:]' '[:lower:]')
+        msa_json="${OUTPUT_DIR}/${pool}/${pool}_data.json"
+        inf_done="${OUTPUT_DIR}/${pool}/seed-1_sample-0/summary_confidences.json"
+        if [ -f "$msa_json" ] && [ ! -f "$inf_done" ]; then
+            ready+=($line_num)
+        fi
+    done < <(ls $INPUT_DIR/*.json)
+
+    echo "Found ${#ready[@]} pools ready for INF"
+
+    if [ ${#ready[@]} -eq 0 ]; then
+        # Check if MSAs are still running
+        msa_running=$(squeue --me --partition=batch --name=PRC2_MSA --noheader | wc -l)
+        if [ "$msa_running" -gt 0 ]; then
+      echo "No INF ready yet but $msa_running MSA jobs still running — reschedule scan in 2hrs"
+      sbatch --begin=now+2hour PRC2_AF3_Pools.sh inf_scan
+  else
+            echo "No MSAs running and no INF ready — triggering recheck"
+            sbatch PRC2_AF3_Pools.sh recheck
+        fi
+        exit 0
+    fi
+
+    # Submit in batches of 8 with dependencies
+    prev_job=""
+    for ((start=0; start<${#ready[@]}; start+=8)); do
+        chunk=("${ready[@]:$start:8}")
+        indices="${chunk[0]}"
+        for idx in "${chunk[@]:1}"; do
+            indices="${indices},${idx}"
+        done
+
+        if [ -z "$prev_job" ]; then
+            job=$(sbatch --parsable --array=$indices $INF_SCRIPT)
+        else
+            job=$(sbatch --parsable --dependency=afterany:${prev_job} --array=$indices $INF_SCRIPT)
+        fi
+
+        if [ -n "$job" ]; then
+            echo "INF submitted: $job ($indices)"
+            prev_job=$job
+        else
+            echo "FAILED (QOS limit): $indices — stopping here"
+            break
+        fi
+    done
+
+    # Schedule next scan after last INF batch finishes to catch new MSAs
+    if [ -n "$prev_job" ]; then
+        sbatch --dependency=afterany:${prev_job} PRC2_AF3_Pools.sh inf_scan
+        echo "Next INF scan scheduled after job $prev_job"
+    fi
+
     exit 0
 fi
 
@@ -75,13 +145,13 @@ END=$((START + BATCH_SIZE - 1))
 
 echo "Submitting batch: pools ${START}-${END}"
 
-MSA_JOBID=$(sbatch --parsable --array=${START}-${END} $MSA_SCRIPT)
+MSA_JOBID=$(sbatch --parsable --array=${START}-${END}%${MSA_THROTTLE} $MSA_SCRIPT)
 [ -z "$MSA_JOBID" ] && echo "MSA submission failed." && exit 1
 echo "MSA job submitted: $MSA_JOBID (pools ${START}-${END})"
 
 INF_JOBID=$(sbatch --parsable \
     --dependency=afterok:${MSA_JOBID} \
-    --array=${START}-${END} \
+    --array=${START}-${END}%${INF_THROTTLE} \
     $INF_SCRIPT)
 [ -z "$INF_JOBID" ] && echo "INF submission failed." && exit 1
 echo "INF job submitted: $INF_JOBID"
@@ -90,7 +160,6 @@ NEXT_START=$((END + 1))
 if [ $NEXT_START -le $TOTAL ]; then
     sbatch --dependency=afterany:${MSA_JOBID} PRC2_AF3_Pools.sh $NEXT_START
 else
-    # All batches submitted — schedule automatic recheck
     echo "All batches submitted — scheduling recheck for missing pools"
     sbatch --dependency=afterany:${INF_JOBID} PRC2_AF3_Pools.sh recheck
 fi
