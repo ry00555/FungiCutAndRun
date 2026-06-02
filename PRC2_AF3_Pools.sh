@@ -25,53 +25,58 @@ START=${1:-1}
 # ── If START is "recheck" run the missing pools check ─────────────────────────
 if [ "$START" == "recheck" ]; then
     echo "Running missing pools check..."
-    missing=()
+    missing_msa=()
+    missing_inf_only=()
+
     for i in $(seq 1 $TOTAL); do
         pool=$(printf "prc2_pool%03d" $i)
         dir="${OUTPUT_DIR}/${pool}"
-        if ! ls $dir/seed-1_sample-0/summary_confidences.json &>/dev/null 2>&1; then
-            missing+=($i)
-        fi
+        has_msa=0
+        has_inf=0
+        ls $dir/*_data.json &>/dev/null 2>&1 && has_msa=1
+        ls $dir/seed-1_sample-0/summary_confidences.json &>/dev/null 2>&1 && has_inf=1
+        [ $has_msa -eq 0 ] && missing_msa+=($i)
+        [ $has_msa -eq 1 ] && [ $has_inf -eq 0 ] && missing_inf_only+=($i)
     done
 
-    if [ ${#missing[@]} -eq 0 ]; then
+    echo "Missing MSA: ${#missing_msa[@]}"
+    echo "Missing INF only (MSA done): ${#missing_inf_only[@]}"
+
+    if [ ${#missing_msa[@]} -eq 0 ] && [ ${#missing_inf_only[@]} -eq 0 ]; then
         echo "All pools complete!"
         exit 0
     fi
 
-    echo "Found ${#missing[@]} missing pools"
-
-    # Submit missing in chunks of 200 to avoid SLURM array string limit
-    CHUNK=200
     PREV_JOBID=""
-    for ((start=0; start<${#missing[@]}; start+=CHUNK)); do
-        chunk=("${missing[@]:$start:$CHUNK}")
-        indices="${chunk[0]}"
-        for idx in "${chunk[@]:1}"; do
-            indices="${indices},${idx}"
+
+    # Submit MSA only for truly missing pools
+    if [ ${#missing_msa[@]} -gt 0 ]; then
+        CHUNK=200
+        for ((start=0; start<${#missing_msa[@]}; start+=CHUNK)); do
+            chunk=("${missing_msa[@]:$start:$CHUNK}")
+            indices="${chunk[0]}"
+            for idx in "${chunk[@]:1}"; do indices="${indices},${idx}"; done
+            if [ -z "$PREV_JOBID" ]; then
+                MSA_JOBID=$(sbatch --parsable --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
+            else
+                MSA_JOBID=$(sbatch --parsable --dependency=afterany:${PREV_JOBID} --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
+            fi
+            [ -z "$MSA_JOBID" ] && echo "MSA submission failed." && exit 1
+            echo "MSA submitted: $MSA_JOBID (${#chunk[@]} pools)"
+            INF_JOBID=$(sbatch --parsable --dependency=afterok:${MSA_JOBID} --array=${indices}%${INF_THROTTLE} $INF_SCRIPT)
+            echo "INF submitted: $INF_JOBID"
+            PREV_JOBID=$INF_JOBID
         done
+    fi
 
-        if [ -z "$PREV_JOBID" ]; then
-            MSA_JOBID=$(sbatch --parsable --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
-        else
-            MSA_JOBID=$(sbatch --parsable \
-                --dependency=afterany:${PREV_JOBID} \
-                --array=${indices}%${MSA_THROTTLE} $MSA_SCRIPT)
-        fi
-        [ -z "$MSA_JOBID" ] && echo "MSA submission failed at chunk $start." && exit 1
-        echo "MSA chunk submitted: $MSA_JOBID (${#chunk[@]} pools)"
+    # Trigger inf_scan for pools that have MSA but no INF
+    # inf_scan uses line numbers so it handles these correctly
+    if [ -n "$PREV_JOBID" ]; then
+        sbatch --dependency=afterany:${PREV_JOBID} PRC2_AF3_Pools.sh inf_scan
+    else
+        sbatch PRC2_AF3_Pools.sh inf_scan
+    fi
 
-        INF_JOBID=$(sbatch --parsable \
-            --dependency=afterok:${MSA_JOBID} \
-            --array=${indices}%${INF_THROTTLE} \
-            $INF_SCRIPT)
-        echo "INF chunk submitted: $INF_JOBID"
-
-        PREV_JOBID=$INF_JOBID
-    done
-
-    # Schedule another recheck after all chunks finish
-    sbatch --dependency=afterany:${PREV_JOBID} PRC2_AF3_Pools.sh recheck
     exit 0
 fi
 
