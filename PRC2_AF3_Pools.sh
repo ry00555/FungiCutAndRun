@@ -83,7 +83,6 @@ fi
 # ── If START is "inf_scan" — find MSA-complete pools and submit INF ───────────
 if [ "$START" == "inf_scan" ]; then
     echo "Scanning for pools ready for INF..."
-
     line_num=0
     ready=()
     while IFS= read -r json_file; do
@@ -91,26 +90,35 @@ if [ "$START" == "inf_scan" ]; then
         pool=$(basename "$json_file" .json | tr '[:upper:]' '[:lower:]')
         msa_json="${OUTPUT_DIR}/${pool}/${pool}_data.json"
         inf_done="${OUTPUT_DIR}/${pool}/seed-1_sample-0/summary_confidences.json"
-        if [ -f "$msa_json" ] && [ ! -f "$inf_done" ]; then
-            ready+=($line_num)
-        fi
+
+        # Skip if no MSA or INF already done
+        [ ! -f "$msa_json" ] && continue
+        [ -f "$inf_done" ] && continue
+
+        # Skip oversized pools — handled by large_scan
+        total=$(python3 -c "
+import json
+d = json.load(open('$json_file'))
+print(sum(len(s['protein']['sequence']) for s in d['sequences']))
+" 2>/dev/null)
+        [ -n "$total" ] && [ "$total" -gt 5120 ] && continue
+
+        ready+=($line_num)
     done < <(ls $INPUT_DIR/*.json)
 
     echo "Found ${#ready[@]} pools ready for INF"
-
     if [ ${#ready[@]} -eq 0 ]; then
         # Check if MSAs are still running
         msa_running=$(squeue --me --partition=batch --name=PRC2_MSA --noheader | wc -l)
         if [ "$msa_running" -gt 0 ]; then
-      echo "No INF ready yet but $msa_running MSA jobs still running — reschedule scan in 2hrs"
-      sbatch --begin=now+2hour PRC2_AF3_Pools.sh inf_scan
-  else
+            echo "No INF ready yet but $msa_running MSA jobs still running — reschedule scan in 2hrs"
+            sbatch --begin=now+2hour PRC2_AF3_Pools.sh inf_scan
+        else
             echo "No MSAs running and no INF ready — triggering recheck"
             sbatch PRC2_AF3_Pools.sh recheck
         fi
         exit 0
     fi
-
     # Submit in batches of 8 with dependencies
     prev_job=""
     for ((start=0; start<${#ready[@]}; start+=8)); do
@@ -119,13 +127,11 @@ if [ "$START" == "inf_scan" ]; then
         for idx in "${chunk[@]:1}"; do
             indices="${indices},${idx}"
         done
-
         if [ -z "$prev_job" ]; then
             job=$(sbatch --parsable --array=$indices $INF_SCRIPT)
         else
             job=$(sbatch --parsable --dependency=afterany:${prev_job} --array=$indices $INF_SCRIPT)
         fi
-
         if [ -n "$job" ]; then
             echo "INF submitted: $job ($indices)"
             prev_job=$job
@@ -134,16 +140,13 @@ if [ "$START" == "inf_scan" ]; then
             break
         fi
     done
-
     # Schedule next scan after last INF batch finishes to catch new MSAs
     if [ -n "$prev_job" ]; then
         sbatch --dependency=afterany:${prev_job} PRC2_AF3_Pools.sh inf_scan
         echo "Next INF scan scheduled after job $prev_job"
     fi
-
     exit 0
 fi
-
 
 # ── If START is "large_scan" — find oversized MSA-complete pools and submit with unifiedmem ──
 if [ "$START" == "large_scan" ]; then
