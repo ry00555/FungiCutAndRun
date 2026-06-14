@@ -144,6 +144,78 @@ if [ "$START" == "inf_scan" ]; then
     exit 0
 fi
 
+
+# ── If START is "large_scan" — find oversized MSA-complete pools and submit with unifiedmem ──
+if [ "$START" == "large_scan" ]; then
+    echo "Scanning for oversized pools (>5120 tokens) ready for INF..."
+
+    INF_LARGE_SCRIPT="PRC2_AF3_INF_Pool_large.sh"
+    line_num=0
+    ready=()
+    while IFS= read -r json_file; do
+        line_num=$((line_num + 1))
+        pool=$(basename "$json_file" .json | tr '[:upper:]' '[:lower:]')
+        msa_json="${OUTPUT_DIR}/${pool}/${pool}_data.json"
+        inf_done="${OUTPUT_DIR}/${pool}/seed-1_sample-0/summary_confidences.json"
+
+        # Skip if INF already done
+        [ -f "$inf_done" ] && continue
+
+        # Skip if no MSA
+        [ ! -f "$msa_json" ] && continue
+
+        # Check token count
+        total=$(python3 -c "
+import json
+d = json.load(open('$json_file'))
+print(sum(len(s['protein']['sequence']) for s in d['sequences']))
+" 2>/dev/null)
+
+        if [ -n "$total" ] && [ "$total" -gt 5120 ]; then
+            ready+=($line_num)
+        fi
+    done < <(ls $INPUT_DIR/*.json)
+
+    echo "Found ${#ready[@]} oversized pools ready for INF"
+
+    if [ ${#ready[@]} -eq 0 ]; then
+        echo "All oversized pools complete!"
+        exit 0
+    fi
+
+    # Submit in batches of 8 with dependencies
+    prev_job=""
+    for ((start=0; start<${#ready[@]}; start+=8)); do
+        chunk=("${ready[@]:$start:8}")
+        indices="${chunk[0]}"
+        for idx in "${chunk[@]:1}"; do
+            indices="${indices},${idx}"
+        done
+
+        if [ -z "$prev_job" ]; then
+            job=$(sbatch --parsable --array=$indices $INF_LARGE_SCRIPT)
+        else
+            job=$(sbatch --parsable --dependency=afterany:${prev_job} --array=$indices $INF_LARGE_SCRIPT)
+        fi
+
+        if [ -n "$job" ]; then
+            echo "INF_large submitted: $job ($indices)"
+            prev_job=$job
+        else
+            echo "FAILED (QOS limit): $indices — stopping here"
+            break
+        fi
+    done
+
+    # Schedule next scan after last batch finishes
+    if [ -n "$prev_job" ]; then
+        sbatch --dependency=afterany:${prev_job} PRC2_AF3_Pools.sh large_scan
+        echo "Next large_scan scheduled after job $prev_job"
+    fi
+
+    exit 0
+fi
+
 # ── Normal batch submission ───────────────────────────────────────────────────
 END=$((START + BATCH_SIZE - 1))
 [ $END -gt $TOTAL ] && END=$TOTAL
