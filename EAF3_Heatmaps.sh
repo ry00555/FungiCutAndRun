@@ -56,20 +56,20 @@ plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V3.gz \
         "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
         "/scratch/ry00555/Run153/BigWigs/153-35_ChIP_set2_H3K27me3_Rep2_S35_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
         "/scratch/ry00555/Run153/BigWigs/153-90_ChIP_set2set7_H3K36me3_Rep1_S84_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
-        "ash1_Y888F_H3K27me2_3_scaled.bigwig" \
-        "cat_ash1_H3K36me3_scaled.bigwig" \
-        --skipZeros -b 2000 -a 1000 \
+        "../BigWigs/ash1_Y888F_H3K27me2_3_scaled.bigwig" \
+        "../BigWigs/cat_ash1_H3K36me3_scaled.bigwig" \
+        --skipZeros -b 2000 -a 2000 \
         --sortRegions descend \
-        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.gz \
-        --outFileNameMatrix ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.tab
+        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V7.gz \
+        --outFileNameMatrix ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V7.tab
 
-    plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.gz \
-        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.png \
+    plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V7.gz \
+        -o ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V7.png \
         --sortRegions descend \
         --sortUsingSamples 1 2 \
         --heatmapHeight 8 \
         --heatmapWidth 3 \
-        --outFileSortedRegions ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V6.bed \
+        --outFileSortedRegions ASH1_SET2_K27me3_H3K36me3_H3K27me3genes_V7.bed \
         --startLabel "5'" \
         --endLabel "3'" \
         --boxAroundHeatmaps no \
@@ -166,9 +166,9 @@ computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGe
 plotHeatmap -m EAF3_K27genes_H3K27me3_May2026_V1.gz -o EAF3_K27genes_H3K27me3_May2026_V1.png --sortRegions descend --sortUsingSamples 7 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_K27genes_H3K27me3_May2026_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'Greens' --zMax 30
 
 
-computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S ../BigWigs/153-15_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_50Bulk.bw  ../BigWigs/155-82_ChIP_C10a_H3K27me3__S82.bin_25.smooth_75Bulk.bw ../BigWigs/155-76_ChIP_C8_H3K27me3__S76.bin_25.smooth_75Bulk.bw ../BigWigs/155-91_ChIP_eaf3bar_H3K27me3__S91.bin_25.smooth_75Bulk.bw  --skipZeros -b 2000 -a 1000 --sortRegions descend -o EAF3_K27genes_H3K27me3_May2026_V2.gz --outFileNameMatrix EAF3_K27genes_H3K27me3_May2026_V2.tab
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S ../BigWigs/153-15_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_50Bulk.bw  ../BigWigs/155-82_ChIP_C10a_H3K27me3__S82.bin_25.smooth_75Bulk.bw ../BigWigs/155-76_ChIP_C8_H3K27me3__S76.bin_25.smooth_75Bulk.bw ../BigWigs/155-91_ChIP_eaf3bar_H3K27me3__S91.bin_25.smooth_75Bulk.bw  --skipZeros -b 2000 -a 2000 --sortRegions descend -o EAF3_K27genes_H3K27me3_May2026_V3.gz --outFileNameMatrix EAF3_K27genes_H3K27me3_May2026_V3.tab
 
-plotHeatmap -m EAF3_K27genes_H3K27me3_May2026_V2.gz -o EAF3_K27genes_H3K27me3_May2026_V5.png --sortRegions descend --sortUsingSamples 4 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_K27genes_H3K27me3_May2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no --samplesLabel "WT" "cdp6" "mrg15"  "eaf3" --colorMap 'Greens' --zMax 30
+plotHeatmap -m EAF3_K27genes_H3K27me3_May2026_V3.gz -o EAF3_K27genes_H3K27me3_May2026_V6.png --sortRegions descend --sortUsingSamples 4 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_K27genes_H3K27me3_May2026_V3.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no --samplesLabel "WT" "cdp6" "mrg15"  "eaf3" --colorMap 'Greens' --zMax 30
 
 computeMatrix scale-regions -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/WT_H3K27me3_consensus_MACSpeaks.bed" -S ../BigWigs/153-15_ChIP_WT_H3K27me3_Rep1.bin_25.smooth_50Bulk.bw  ../BigWigs/155-82_ChIP_C10a_H3K27me3__S82.bin_25.smooth_75Bulk.bw ../BigWigs/155-76_ChIP_C8_H3K27me3__S76.bin_25.smooth_75Bulk.bw ../BigWigs/155-91_ChIP_eaf3bar_H3K27me3__S91.bin_25.smooth_75Bulk.bw  --skipZeros -b 500 -a 500 --sortRegions descend -o EAF3_K27domains_H3K27me3_May2026_V2.gz --outFileNameMatrix EAF3_K27domains_H3K27me3_May2026_V2.tab
 
@@ -192,7 +192,49 @@ plotHeatmap -m EAF3_nonASH1_noK27_H3K36me3_May2026_V1.gz -o EAF3_nonASH1_noK27_H
 
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/Bicocca_ASH1_noK27_wCM.bed" -S ../BigWigs/153-107_ChIP_WT_H3K36me3_.bin_25.smooth_50Bulk.bw  ../BigWigs/155-80_ChIP_C9_H3K36me3__S80.bin_25.smooth_75Bulk.bw ../BigWigs/155-77_ChIP_C8_H3K36me3__S77.bin_25.smooth_75Bulk.bw ../BigWigs/155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw --skipZeros -b 2000 -a 1000 --sortRegions descend -o EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.gz --outFileNameMatrix EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.tab
 
-plotHeatmap -m EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.gz -o EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.png --sortRegions descend --sortUsingSamples 1 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+plotHeatmap -m EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1.gz -o EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.png --sortRegions descend --sortUsingSamples 2 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_ASH1_nonK27genes_H3K36me3_May2026_V1_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/Bicocca_ASH1_noK27_wCM.bed" -S ../BigWigs/153-107_ChIP_WT_H3K36me3_.bin_25.smooth_50Bulk.bw  ../BigWigs/155-80_ChIP_C9_H3K36me3__S80.bin_25.smooth_75Bulk.bw ../BigWigs/155-77_ChIP_C8_H3K36me3__S77.bin_25.smooth_75Bulk.bw ../BigWigs/155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw --skipZeros -b 2000 -a 2000 --sortRegions descend -o EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.gz --outFileNameMatrix EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.tab
+
+plotHeatmap -m EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.gz -o EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.png --sortRegions descend --sortUsingSamples 2 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/Bicocca_ASH1_noK27_wCM.bed" -S ../BigWigs/153-107_ChIP_WT_H3K36me3_.bin_25.smooth_50Bulk.bw  ../BigWigs/155-80_ChIP_C9_H3K36me3__S80.bin_25.smooth_75Bulk.bw ../BigWigs/155-77_ChIP_C8_H3K36me3__S77.bin_25.smooth_75Bulk.bw ../BigWigs/155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw --skipZeros -b 2000 -a 2000 --sortRegions descend -o EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.gz --outFileNameMatrix EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.tab
+
+plotHeatmap -m EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.gz -o EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2.png --sortRegions descend --sortUsingSamples 2 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_ASH1_nonK27genes_H3K36me3_June2026_V2_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/NonK27genes.bed" -S ../BigWigs/153-107_ChIP_WT_H3K36me3_.bin_25.smooth_50Bulk.bw  ../BigWigs/155-80_ChIP_C9_H3K36me3__S80.bin_25.smooth_75Bulk.bw ../BigWigs/155-77_ChIP_C8_H3K36me3__S77.bin_25.smooth_75Bulk.bw ../BigWigs/155-92_ChIP_eaf3bar_H3K36me3__S92.bin_25.smooth_75Bulk.bw --skipZeros -b 2000 -a 2000 --sortRegions descend -o EAF3_nonK27genes_H3K36me3_June2026_V2.gz --outFileNameMatrix EAF3_nonK27genes_H3K36me3_June2026_V2.tab
+
+plotHeatmap -m EAF3_nonK27genes_H3K36me3_June2026_V2.gz -o EAF3_nonK27genes_H3K36me3_June2026_V2.png --sortRegions descend --sortUsingSamples 2 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions EAF3_nonK27genes_H3K36me3_June2026_V2.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'YlOrBr' --zMax 8 --samplesLabel "WT"  "cdp6" "mrg15" "eaf3"
+
+
+computeMatrix reference-point -p 12 \
+    -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/Bicocca_ASH1_noK27_wCM.bed" \
+    -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "/scratch/ry00555/Run153/BigWigs/153-35_ChIP_set2_H3K27me3_Rep2_S35_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "/scratch/ry00555/Run153/BigWigs/153-90_ChIP_set2set7_H3K36me3_Rep1_S84_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" \
+    "../BigWigs/ash1_Y888F_H3K27me2_3_scaled.bigwig" \
+    "../BigWigs/cat_ash1_H3K36me3_scaled.bigwig" \
+    --skipZeros -b 2000 -a 2000 \
+    --sortRegions descend \
+    -o ASH1_SET2_K27me3_H3K36me3_nonH3K27me3genes_V1.gz \
+    --outFileNameMatrix ASH1_SET2_K27me3_H3K36me3_nonH3K27me3genes_V1.tab
+
+plotHeatmap -m ASH1_SET2_K27me3_H3K36me3_nonH3K27me3genes_V1.gz \
+    -o ASH1_SET2_K27me3_H3K36me3_nonH3K27me3genes_V1.png \
+    --sortRegions descend \
+    --sortUsingSamples 1 2 \
+    --heatmapHeight 8 \
+    --heatmapWidth 3 \
+    --outFileSortedRegions ASH1_SET2_K27me3_H3K36me3_nonH3K27me3genes_V1.bed \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' 'Greens' 'YlOrBr' \
+    --zMax 20 10 20 8 20 10 20 10 \
+    --samplesLabel "WT H3K27me3" "WT H3K36me3" "set7 H3K27me3" "set7 H3K36me3" "set2 H3K27me3" "set2set7 H3K36me3" "Y888F H3K27me2/3" "ASH1cat H3K36me3"
 
 
 # Set your file paths
