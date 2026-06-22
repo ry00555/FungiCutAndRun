@@ -12,6 +12,8 @@
 
 # =============================================================================
 # Merge nucs.bam files across replicates + both runs for heatmap generation
+# Groups defined in fiber_groups.txt (must be in same dir as this script)
+# Format: GROUP_NAME barcode01 barcode02 ...
 # =============================================================================
 
 set -euo pipefail
@@ -23,24 +25,14 @@ FT_RESULTS="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedForHeatmaps"
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
+GROUPS_FILE="$(dirname "$0")/fiber_groups.txt"
 
 mkdir -p "$OUT_DIR"
 
-# =============================================================================
-# Group definitions — one line per group
-# Format: GROUP_NAME|barcode1 barcode2 barcode3
-# Barcodes matched against sample dir names from Part 2 (both runs)
-# =============================================================================
-GROUPS=(
-    "WT_Eddie|barcode01 barcode02 barcode13"
-    "WT_Rochelle|barcode07 barcode08 barcode18"
-    "cac-1|barcode03 barcode04 barcode14"
-    "cac-2|barcode05 barcode06 barcode15"
-    "rtt109|barcode09 barcode10 barcode19"
-    "rtt109FLAG|barcode11 barcode12 barcode20"
-    "gDNA_Hia5_ctrl|barcode16 barcode21"
-    "WizardgDNA_HMW|barcode17 barcode22"
-)
+if [ ! -f "$GROUPS_FILE" ]; then
+    echo "❌  Groups file not found: $GROUPS_FILE"
+    exit 1
+fi
 
 # =============================================================================
 # Helper: bedgraph → BigWig
@@ -105,17 +97,21 @@ make_heatmap() {
 }
 
 # =============================================================================
-# Main loop
+# Main: read groups file line by line
 # =============================================================================
 echo "============================================================"
 echo " Merging replicates + runs for heatmap generation"
+echo " Groups file: $GROUPS_FILE"
 echo " Output: $OUT_DIR"
 echo "============================================================"
 
-for ENTRY in "${GROUPS[@]}"; do
+while read -r LINE; do
+    # Skip empty lines and comments
+    [[ -z "$LINE" || "$LINE" == \#* ]] && continue
 
-    GROUP="${ENTRY%%|*}"
-    BARCODES="${ENTRY##*|}"
+    # First field = group name, remaining fields = barcodes
+    GROUP=$(echo "$LINE" | awk '{print $1}')
+    BARCODES=$(echo "$LINE" | awk '{$1=""; print $0}' | xargs)
 
     echo ""
     echo "╔══════════════════════════════════════════════════════╗"
@@ -127,7 +123,7 @@ for ENTRY in "${GROUPS[@]}"; do
     mkdir -p "$GROUP_DIR"
 
     # ── Collect matching nucs.bam files from both runs ───────────
-    BAMS_TO_MERGE=()
+    BAMS_TO_MERGE=""
     for RUN in ONTRun9 ONTRun10; do
         for BARCODE in $BARCODES; do
             for SAMPLE_DIR in "$FT_RESULTS/$RUN"/*${BARCODE}*/; do
@@ -135,7 +131,7 @@ for ENTRY in "${GROUPS[@]}"; do
                 NUCS_BAM=$(find "$SAMPLE_DIR" -maxdepth 1 -name "*.nucs.bam" | head -1)
                 if [ -n "$NUCS_BAM" ] && [ -f "$NUCS_BAM" ]; then
                     echo "  Found: $(basename $NUCS_BAM)"
-                    BAMS_TO_MERGE+=("$NUCS_BAM")
+                    BAMS_TO_MERGE="$BAMS_TO_MERGE $NUCS_BAM"
                 else
                     echo "  ⚠️  No nucs.bam in $SAMPLE_DIR"
                 fi
@@ -143,19 +139,23 @@ for ENTRY in "${GROUPS[@]}"; do
         done
     done
 
-    if [ ${#BAMS_TO_MERGE[@]} -eq 0 ]; then
+    # trim leading space
+    BAMS_TO_MERGE="${BAMS_TO_MERGE# }"
+
+    if [ -z "$BAMS_TO_MERGE" ]; then
         echo "  ❌  No nucs.bam files found for $GROUP — skipping"
         continue
     fi
 
-    echo "  Total: ${#BAMS_TO_MERGE[@]} nucs.bam(s) to merge"
+    BAM_COUNT=$(echo "$BAMS_TO_MERGE" | wc -w)
+    echo "  Total: $BAM_COUNT nucs.bam(s) to merge"
 
     # ── Merge ────────────────────────────────────────────────────
     if [ ! -f "$MERGED_BAM" ]; then
-        if [ ${#BAMS_TO_MERGE[@]} -eq 1 ]; then
-            cp "${BAMS_TO_MERGE[0]}" "$MERGED_BAM"
+        if [ "$BAM_COUNT" -eq 1 ]; then
+            cp $BAMS_TO_MERGE "$MERGED_BAM"
         else
-            samtools merge -f -@ 8 "$MERGED_BAM" "${BAMS_TO_MERGE[@]}"
+            samtools merge -f -@ 8 "$MERGED_BAM" $BAMS_TO_MERGE
         fi
         samtools index "$MERGED_BAM"
         echo "  ✅  Merged: $(basename $MERGED_BAM)"
@@ -194,7 +194,7 @@ for ENTRY in "${GROUPS[@]}"; do
     make_heatmap "$M6A_BW" "$GROUP" "m6A" "Greens" "$GROUP_DIR"
     make_heatmap "$CPG_BW" "$GROUP" "5mC" "Blues"  "$GROUP_DIR"
 
-done
+done < "$GROUPS_FILE"
 
 # =============================================================================
 # Summary
