@@ -205,13 +205,13 @@ for RUN in ONTRun9 ONTRun10; do
                 --whatToShow 'heatmap and colorbar'
             echo "      ✅  5mC heatmap done"
         fi
-if
-        ft extract "$NUCS_BAM" \
-    --nuc "${SAMPLE_DIR}/${SAMPLE}_nucleosome.bed" \
-    --m6a "${SAMPLE_DIR}/${SAMPLE}_m6a.bed" \
-    --cpg "${SAMPLE_DIR}/${SAMPLE}_cpg.bed" \
-    --threads 8
-fi
+        if [ ! -f "${DIR}/${SAMPLE}_nucleosome.bed" ]; then
+            ft extract "$NUCS_BAM" \
+                --nuc "${DIR}/${SAMPLE}_nucleosome.bed" \
+                --m6a "${DIR}/${SAMPLE}_m6a.bed" \
+                --cpg "${DIR}/${SAMPLE}_cpg.bed" \
+                --threads 8
+        fi
     done
 done
 
