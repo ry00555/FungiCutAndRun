@@ -11,23 +11,26 @@
 #SBATCH --error=FiberTools_Pt1_MergeBams.%j.err
 
 # =============================================================================
-# FiberTools Part 1 — Merge BAMs across ONTRun9 + ONTRun10
+# FiberTools Part 1 — Merge split BAMs within each run (runs kept separate)
 # =============================================================================
-# For each barcode (01–22), merges all split BAMs from both runs into a single
-# named merged BAM using sample/strain info from the metadata CSV.
+# For each run (ONTRun9, ONTRun10) and each barcode, merges all the split
+# BAM files (e.g. _0.bam, _1.bam ... _20.bam) into one merged BAM named
+# by strain/sample from the metadata.
+#
+# ONTRun9 and ONTRun10 are kept SEPARATE — each produces its own merged BAM.
 #
 # Input layout:
 #   InputBams/
-#     ONTRun9/barcode01/*.bam
-#     ONTRun10/barcode01/*.bam
-#     (same barcodes in both runs = same biological sample)
+#     ONTRun9/barcode01/FBE00208_pass_barcode01_*_0.bam  ...
+#     ONTRun10/barcode01/...
 #
 # Output layout:
 #   MergedBams/
-#     WT_barcode01_merged.bam
-#     WT_barcode02_merged.bam
-#     cac-1_barcode03_merged.bam
-#     ...
+#     ONTRun9/
+#       ONTRun9_WT_Eddie_barcode01_merged.bam
+#       ONTRun9_cac-1_Eddie_barcode03_merged.bam  ...
+#     ONTRun10/
+#       ONTRun10_WT_Eddie_barcode01_merged.bam  ...
 # =============================================================================
 
 set -euo pipefail
@@ -37,17 +40,15 @@ source activate /home/ry00555/fibertools
 
 BASE_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/InputBams"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedBams"
-SORTED_TMP="${BASE_DIR}/sorted_q10_tmp"
+SORTED_TMP="${OUT_DIR}/sorted_q10_tmp"
 
-mkdir -p "$OUT_DIR"
+mkdir -p "$OUT_DIR/ONTRun9"
+mkdir -p "$OUT_DIR/ONTRun10"
 mkdir -p "$SORTED_TMP"
 
 # =============================================================================
-# Barcode → sample name mapping
-# Derived from FiberMeta.csv (ONT9 metadata; same barcodes used for ONT10)
-# Format: [barcode]="SampleName"
-# Barcodes 23 and 24 are empty in the metadata — skipped.
-# gDNA controls (16, 17, 21, 22) and HMW prep included — remove if unwanted.
+# Barcode → sample name mapping (from FiberMeta.csv)
+# Barcodes 23 & 24 are empty in metadata — skipped.
 # =============================================================================
 declare -A SAMPLE_MAP=(
     [barcode01]="WT_Eddie_barcode01"
@@ -75,100 +76,93 @@ declare -A SAMPLE_MAP=(
 )
 
 echo "============================================================"
-echo " FiberTools Pt1: Merge BAMs — ONTRun9 + ONTRun10 combined"
+echo " FiberTools Pt1: Merge split BAMs (runs kept separate)"
 echo " Output dir: $OUT_DIR"
 echo "============================================================"
 
-for BARCODE in "${!SAMPLE_MAP[@]}"; do
-
-    SAMPLE="${SAMPLE_MAP[$BARCODE]}"
-    FINAL_BAM="$OUT_DIR/${SAMPLE}_merged.bam"
-
-    # Skip if already merged
-    if [ -f "$FINAL_BAM" ] && [ -f "${FINAL_BAM}.bai" ]; then
-        echo "⏭️   Skipping $SAMPLE — merged BAM already exists"
-        continue
-    fi
+for RUN in ONTRun9 ONTRun10; do
 
     echo ""
-    echo "────────────────────────────────────────────────────────"
-    echo " Barcode : $BARCODE"
-    echo " Sample  : $SAMPLE"
-    echo "────────────────────────────────────────────────────────"
+    echo "╔══════════════════════════════════════════════════════╗"
+    echo "  Processing $RUN"
+    echo "╚══════════════════════════════════════════════════════╝"
 
-    SORTED_BAMS=()
+    for BARCODE in "${!SAMPLE_MAP[@]}"; do
 
-    # ── Collect BAMs from both runs ──────────────────────────────
-    for RUN in ONTRun9 ONTRun10; do
+        SAMPLE="${SAMPLE_MAP[$BARCODE]}"
         SRC_DIR="$BASE_DIR/$RUN/$BARCODE"
+        FINAL_BAM="$OUT_DIR/$RUN/${RUN}_${SAMPLE}_merged.bam"
 
+        # Skip if source barcode dir doesn't exist for this run
         if [ ! -d "$SRC_DIR" ]; then
-            echo "  ⚠️  $RUN/$BARCODE not found — skipping this run"
+            echo "  ⚠️  $RUN/$BARCODE — directory not found, skipping"
             continue
         fi
 
-        BAM_COUNT=$(find "$SRC_DIR" -maxdepth 1 -name "*.bam" ! -name "*.bam.bai" | wc -l)
-        echo "  $RUN: found $BAM_COUNT BAM file(s)"
+        # Skip if already done
+        if [ -f "$FINAL_BAM" ] && [ -f "${FINAL_BAM}.bai" ]; then
+            echo "  ⏭️  Skipping ${RUN}/${BARCODE} — already merged"
+            continue
+        fi
+
+        BAM_COUNT=$(find "$SRC_DIR" -maxdepth 1 -name "*.bam" ! -name "*.bai" | wc -l)
+        if [ "$BAM_COUNT" -eq 0 ]; then
+            echo "  ⚠️  $RUN/$BARCODE — no BAMs found, skipping"
+            continue
+        fi
+
+        echo ""
+        echo "  ── $RUN / $BARCODE ($SAMPLE) ──"
+        echo "     Found $BAM_COUNT split BAM(s)"
+
+        SORTED_BAMS=()
 
         for BAM in "$SRC_DIR"/*.bam; do
             [ -f "$BAM" ] || continue
-            [ "${BAM}" != "${BAM%.bai}" ] && continue   # skip .bai files
 
             BAM_BASE=$(basename "$BAM" .bam)
-            SORTED_BAM="$SORTED_TMP/${SAMPLE}_${RUN}_${BAM_BASE}_q10_sorted.bam"
+            SORTED_BAM="$SORTED_TMP/${RUN}_${SAMPLE}_${BAM_BASE}_q10_sorted.bam"
 
             if [ ! -f "$SORTED_BAM" ]; then
-                echo "    Filtering + sorting: $(basename $BAM)"
                 samtools view -b -q 10 "$BAM" \
                     | samtools sort -@ 4 -o "$SORTED_BAM"
-            else
-                echo "    Already sorted: $(basename $SORTED_BAM)"
             fi
-
             SORTED_BAMS+=("$SORTED_BAM")
         done
+
+        echo "     Merging ${#SORTED_BAMS[@]} sorted BAM(s)..."
+
+        if [ ${#SORTED_BAMS[@]} -eq 1 ]; then
+            cp "${SORTED_BAMS[0]}" "$FINAL_BAM"
+        else
+            samtools merge -f -@ 4 "$FINAL_BAM" "${SORTED_BAMS[@]}"
+        fi
+
+        samtools index "$FINAL_BAM"
+        echo "     ✅  $(basename $FINAL_BAM)"
+
     done
-
-    # ── Merge all sorted BAMs for this barcode ───────────────────
-    if [ ${#SORTED_BAMS[@]} -eq 0 ]; then
-        echo "  ❌  No BAMs found for $BARCODE in either run — skipping"
-        continue
-    fi
-
-    echo "  Merging ${#SORTED_BAMS[@]} sorted BAM(s) → $(basename $FINAL_BAM)"
-
-    if [ ${#SORTED_BAMS[@]} -eq 1 ]; then
-        # Only one BAM — just copy rather than merge
-        cp "${SORTED_BAMS[0]}" "$FINAL_BAM"
-    else
-        samtools merge -f -@ 4 "$FINAL_BAM" "${SORTED_BAMS[@]}"
-    fi
-
-    samtools index "$FINAL_BAM"
-    echo "  ✅  Done: $FINAL_BAM"
-
 done
 
-# =============================================================================
-# Clean up temp sorted BAMs (comment out if you want to keep them)
-# =============================================================================
+# Clean up temp sorted BAMs
 echo ""
-echo "Cleaning up temp sorted BAMs..."
+echo "Cleaning up temp files..."
 rm -rf "$SORTED_TMP"
 
-# =============================================================================
 # Summary
-# =============================================================================
 echo ""
 echo "============================================================"
-echo " Merge complete. Final BAMs in: $OUT_DIR"
+echo " All done. Merged BAMs:"
 echo "============================================================"
-find "$OUT_DIR" -name "*_merged.bam" | sort | while read -r BAM; do
-    READS=$(samtools view -c "$BAM" 2>/dev/null || echo "?")
-    SIZE=$(du -h "$BAM" | cut -f1)
-    echo "  $SIZE  $(basename $BAM)  ($READS reads)"
+for RUN in ONTRun9 ONTRun10; do
+    echo ""
+    echo "  $RUN:"
+    find "$OUT_DIR/$RUN" -name "*_merged.bam" | sort | while read -r BAM; do
+        SIZE=$(du -h "$BAM" | cut -f1)
+        echo "    $SIZE  $(basename $BAM)"
+    done
 done
 
 echo ""
-echo "Next step: update IN_DIR in FiberTools_Pt2_CallNucs.sh to:"
-echo "  $OUT_DIR"
+echo "Next: update IN_DIR in FiberTools_Pt2_CallNucs.sh to:"
+echo "  $OUT_DIR/ONTRun9   and/or   $OUT_DIR/ONTRun10"
