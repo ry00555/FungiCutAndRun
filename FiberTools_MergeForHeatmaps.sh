@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #SBATCH --job-name=FiberTools_MergeHeatmaps
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
@@ -12,27 +12,6 @@
 
 # =============================================================================
 # Merge nucs.bam files across replicates + both runs for heatmap generation
-# =============================================================================
-# Takes the per-barcode nucs.bam files produced by Part 2 and merges them
-# by biological group across ONTRun9 and ONTRun10.
-#
-# Groups:
-#   WT_Eddie        barcodes 01, 02, 13  (Run9 + Run10)
-#   WT_Rochelle     barcodes 07, 08, 18  (Run9 + Run10)
-#   cac-1           barcodes 03, 04, 14  (Run9 + Run10)
-#   cac-2           barcodes 05, 06, 15  (Run9 + Run10)
-#   rtt109          barcodes 09, 10, 19  (Run9 + Run10)
-#   rtt109FLAG      barcodes 11, 12, 20  (Run9 + Run10)
-#   gDNA_Hia5_ctrl  barcodes 16, 21      (Run9 + Run10)
-#   WizardgDNA_HMW  barcodes 17, 22      (Run9 + Run10)
-#
-# Output:
-#   MergedForHeatmaps/
-#     WT_Eddie_merged.nucs.bam
-#     WT_Rochelle_merged.nucs.bam
-#     cac-1_merged.nucs.bam
-#     ...
-# Then runs pileup + BigWig + TSS heatmaps on each merged BAM.
 # =============================================================================
 
 set -euo pipefail
@@ -48,24 +27,23 @@ TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
 mkdir -p "$OUT_DIR"
 
 # =============================================================================
-# Group definitions
-# Key   = output group name
-# Value = space-separated list of barcode sample name patterns to match
-#         (matched against the nucs.bam directory names from Part 2)
+# Group definitions — one line per group
+# Format: GROUP_NAME|barcode1 barcode2 barcode3
+# Barcodes matched against sample dir names from Part 2 (both runs)
 # =============================================================================
-declare -A GROUPS=(
-    [WT_Eddie]="barcode01 barcode02 barcode13"
-    [WT_Rochelle]="barcode07 barcode08 barcode18"
-    [cac-1]="barcode03 barcode04 barcode14"
-    [cac-2]="barcode05 barcode06 barcode15"
-    [rtt109]="barcode09 barcode10 barcode19"
-    [rtt109FLAG]="barcode11 barcode12 barcode20"
-    [gDNA_Hia5_ctrl]="barcode16 barcode21"
-    [WizardgDNA_HMW]="barcode17 barcode22"
+GROUPS=(
+    "WT_Eddie|barcode01 barcode02 barcode13"
+    "WT_Rochelle|barcode07 barcode08 barcode18"
+    "cac-1|barcode03 barcode04 barcode14"
+    "cac-2|barcode05 barcode06 barcode15"
+    "rtt109|barcode09 barcode10 barcode19"
+    "rtt109FLAG|barcode11 barcode12 barcode20"
+    "gDNA_Hia5_ctrl|barcode16 barcode21"
+    "WizardgDNA_HMW|barcode17 barcode22"
 )
 
 # =============================================================================
-# Helper: sort bedgraph + clip coords + convert to BigWig
+# Helper: bedgraph → BigWig
 # =============================================================================
 make_bigwig() {
     local BG="$1"
@@ -96,14 +74,13 @@ make_bigwig() {
 make_heatmap() {
     local BW="$1"
     local LABEL="$2"
-    local SUFFIX="$3"    # nuc / m6A / 5mC
-    local CMAP="$4"      # Reds / Greens / Blues
+    local SUFFIX="$3"
+    local CMAP="$4"
     local DIR="$5"
 
     [ -f "$BW" ] || { echo "      ⚠️  $(basename $BW) not found — skipping heatmap"; return 0; }
 
     local MATRIX="$DIR/${LABEL}.${SUFFIX}.TSS.gz"
-    local TAB="$DIR/${LABEL}.${SUFFIX}.TSS.tab"
     local PNG="$DIR/${LABEL}.${SUFFIX}.TSS_profile.png"
 
     if [ ! -f "$MATRIX" ]; then
@@ -113,7 +90,7 @@ make_heatmap() {
             -R "$TSS_BED" \
             -S "$BW" \
             -o "$MATRIX" \
-            --outFileNameMatrix "$TAB" \
+            --outFileNameMatrix "$DIR/${LABEL}.${SUFFIX}.TSS.tab" \
             --skipZeros -p 12
     fi
 
@@ -128,39 +105,39 @@ make_heatmap() {
 }
 
 # =============================================================================
-# Main: for each group, find all matching nucs.bam files, merge, pileup, plot
+# Main loop
 # =============================================================================
 echo "============================================================"
 echo " Merging replicates + runs for heatmap generation"
 echo " Output: $OUT_DIR"
 echo "============================================================"
 
-for GROUP in "${!GROUPS[@]}"; do
+for ENTRY in "${GROUPS[@]}"; do
+
+    GROUP="${ENTRY%%|*}"
+    BARCODES="${ENTRY##*|}"
 
     echo ""
     echo "╔══════════════════════════════════════════════════════╗"
-    echo "  Group: $GROUP"
+    echo "  Group: $GROUP  (barcodes: $BARCODES)"
     echo "╚══════════════════════════════════════════════════════╝"
 
-    MERGED_BAM="$OUT_DIR/${GROUP}_merged.nucs.bam"
     GROUP_DIR="$OUT_DIR/${GROUP}"
+    MERGED_BAM="$OUT_DIR/${GROUP}_merged.nucs.bam"
     mkdir -p "$GROUP_DIR"
 
-    # ── Collect all matching nucs.bam files ─────────────────────
+    # ── Collect matching nucs.bam files from both runs ───────────
     BAMS_TO_MERGE=()
-    BARCODES="${GROUPS[$GROUP]}"
-
     for RUN in ONTRun9 ONTRun10; do
         for BARCODE in $BARCODES; do
-            # Match sample dirs containing this barcode name
-            for SAMPLE_DIR in "$FT_RESULTS/$RUN"/*${BARCODE}*; do
+            for SAMPLE_DIR in "$FT_RESULTS/$RUN"/*${BARCODE}*/; do
                 [ -d "$SAMPLE_DIR" ] || continue
                 NUCS_BAM=$(find "$SAMPLE_DIR" -maxdepth 1 -name "*.nucs.bam" | head -1)
                 if [ -n "$NUCS_BAM" ] && [ -f "$NUCS_BAM" ]; then
-                    echo "  Found: $NUCS_BAM"
+                    echo "  Found: $(basename $NUCS_BAM)"
                     BAMS_TO_MERGE+=("$NUCS_BAM")
                 else
-                    echo "  ⚠️  No nucs.bam in $SAMPLE_DIR — has Part 2 finished for this sample?"
+                    echo "  ⚠️  No nucs.bam in $SAMPLE_DIR"
                 fi
             done
         done
@@ -171,7 +148,7 @@ for GROUP in "${!GROUPS[@]}"; do
         continue
     fi
 
-    echo "  Merging ${#BAMS_TO_MERGE[@]} nucs.bam(s)..."
+    echo "  Total: ${#BAMS_TO_MERGE[@]} nucs.bam(s) to merge"
 
     # ── Merge ────────────────────────────────────────────────────
     if [ ! -f "$MERGED_BAM" ]; then
@@ -181,14 +158,13 @@ for GROUP in "${!GROUPS[@]}"; do
             samtools merge -f -@ 8 "$MERGED_BAM" "${BAMS_TO_MERGE[@]}"
         fi
         samtools index "$MERGED_BAM"
-        echo "  ✅  Merged BAM: $(basename $MERGED_BAM)"
+        echo "  ✅  Merged: $(basename $MERGED_BAM)"
     else
         echo "  ⏭️  Merged BAM already exists"
     fi
 
     # ── Pileups ──────────────────────────────────────────────────
     echo "  Running pileups..."
-
     M6A_BG="$GROUP_DIR/${GROUP}.m6Apileup.bedgraph"
     CPG_BG="$GROUP_DIR/${GROUP}.5mcpileup.bedgraph"
     NUC_BG="$GROUP_DIR/${GROUP}.nucspileup.bedgraph"
@@ -225,7 +201,7 @@ done
 # =============================================================================
 echo ""
 echo "============================================================"
-echo " All done. Heatmaps:"
+echo " All done. Heatmaps generated:"
 echo "============================================================"
 find "$OUT_DIR" -name "*.TSS_profile.png" | sort | while read -r PNG; do
     echo "  $(basename $PNG)"
