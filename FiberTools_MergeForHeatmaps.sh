@@ -25,7 +25,7 @@ FT_RESULTS="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedForHeatmaps"
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
-GROUPS_FILE="$(dirname "$0")/fiber_groups.txt"
+GROUPS_FILE="/home/ry00555/Research/FungiCutAndRun/fiber_groups.txt"
 
 mkdir -p "$OUT_DIR"
 
