@@ -4,14 +4,15 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
+#SBATCH --cpus-per-task=12
+#SBATCH --mem=85G
 #SBATCH --time=24:00:00
 #SBATCH --output=FiberTools_MergeHeatmaps.%j.out
 #SBATCH --error=FiberTools_MergeHeatmaps.%j.err
 
 # =============================================================================
-# Merge nucs.bam files across replicates + both runs for heatmap generation
+# Merge nucs.bam files across replicates + both runs, then generate
+# normalized TSS heatmaps and multi-sample comparison plots
 # Groups defined in fiber_groups.txt (must be in same dir as this script)
 # Format: GROUP_NAME barcode01 barcode02 ...
 # =============================================================================
@@ -24,7 +25,7 @@ source activate /home/ry00555/fibertools
 FT_RESULTS="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedForHeatmaps"
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
-TSS_BED="/home/ry00555/Research/Genomes/neurospora.bed"
+TSS_BED="/home/ry00555/Research/Genomes/neurospora_TSS_stranded.bed"
 GROUPS_FILE="/home/ry00555/Research/FungiCutAndRun/fiber_groups.txt"
 
 mkdir -p "$OUT_DIR"
@@ -61,43 +62,7 @@ make_bigwig() {
 }
 
 # =============================================================================
-# Helper: computeMatrix + plotHeatmap
-# =============================================================================
-make_heatmap() {
-    local BW="$1"
-    local LABEL="$2"
-    local SUFFIX="$3"
-    local CMAP="$4"
-    local DIR="$5"
-
-    [ -f "$BW" ] || { echo "      ⚠️  $(basename $BW) not found — skipping heatmap"; return 0; }
-
-    local MATRIX="$DIR/${LABEL}.${SUFFIX}.TSS.gz"
-    local PNG="$DIR/${LABEL}.${SUFFIX}.TSS_profile.png"
-
-    if [ ! -f "$MATRIX" ]; then
-        computeMatrix reference-point \
-            --referencePoint TSS \
-            -b 2000 -a 1000 \
-            -R "$TSS_BED" \
-            -S "$BW" \
-            -o "$MATRIX" \
-            --outFileNameMatrix "$DIR/${LABEL}.${SUFFIX}.TSS.tab" \
-            --skipZeros -p 12
-    fi
-
-    plotHeatmap \
-        -m "$MATRIX" \
-        -out "$PNG" \
-        --plotTitle "${LABEL} ${SUFFIX}" \
-        --colorMap "$CMAP" \
-        --whatToShow 'heatmap and colorbar'
-
-    echo "      ✅  $(basename $PNG)"
-}
-
-# =============================================================================
-# Main: read groups file line by line
+# Main: merge BAMs + pileups + BigWigs per group
 # =============================================================================
 echo "============================================================"
 echo " Merging replicates + runs for heatmap generation"
@@ -105,11 +70,12 @@ echo " Groups file: $GROUPS_FILE"
 echo " Output: $OUT_DIR"
 echo "============================================================"
 
+# Track which groups were processed for the heatmap step
+PROCESSED_GROUPS=""
+
 while read -r LINE; do
-    # Skip empty lines and comments
     [[ -z "$LINE" || "$LINE" == \#* ]] && continue
 
-    # First field = group name, remaining fields = barcodes
     GROUP=$(echo "$LINE" | awk '{print $1}')
     BARCODES=$(echo "$LINE" | awk '{$1=""; print $0}' | xargs)
 
@@ -139,7 +105,6 @@ while read -r LINE; do
         done
     done
 
-    # trim leading space
     BAMS_TO_MERGE="${BAMS_TO_MERGE# }"
 
     if [ -z "$BAMS_TO_MERGE" ]; then
@@ -188,21 +153,163 @@ while read -r LINE; do
     make_bigwig "$M6A_BG" "$M6A_BW"
     make_bigwig "$CPG_BG" "$CPG_BW"
 
-    # ── Heatmaps ─────────────────────────────────────────────────
-    echo "  Generating heatmaps..."
-    make_heatmap "$NUC_BW" "$GROUP" "nuc" "Reds"   "$GROUP_DIR"
-    make_heatmap "$M6A_BW" "$GROUP" "m6A" "Greens" "$GROUP_DIR"
-    make_heatmap "$CPG_BW" "$GROUP" "5mC" "Blues"  "$GROUP_DIR"
+    PROCESSED_GROUPS="$PROCESSED_GROUPS $GROUP"
 
 done < "$GROUPS_FILE"
+
+# =============================================================================
+# Heatmaps — per-group normalized + sorted
+# =============================================================================
+echo ""
+echo "============================================================"
+echo " Generating per-group heatmaps"
+echo "============================================================"
+
+for GROUP in $PROCESSED_GROUPS; do
+    GROUP_DIR="$OUT_DIR/${GROUP}"
+    NUC_BW="$GROUP_DIR/${GROUP}.nuc.bw"
+    M6A_BW="$GROUP_DIR/${GROUP}.m6A.bw"
+    CPG_BW="$GROUP_DIR/${GROUP}.5mC.bw"
+
+    [ -f "$M6A_BW" ] || { echo "  ⚠️  $GROUP BigWigs missing — skipping heatmaps"; continue; }
+
+    echo ""
+    echo "  ── $GROUP ──"
+
+    MATRIX="$GROUP_DIR/${GROUP}.TSS.gz"
+    if [ ! -f "$MATRIX" ]; then
+        echo "    computeMatrix..."
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 2000 \
+            -R "$TSS_BED" \
+            -S "$M6A_BW" "$NUC_BW" "$CPG_BW" \
+            -o "$MATRIX" \
+            --outFileNameMatrix "$GROUP_DIR/${GROUP}.TSS.tab" \
+            --missingDataAsZero \
+            --samplesLabel "m6A" "nucleosome" "5mC" \
+            -p 12 \
+            && echo "    ✅  matrix done" \
+            || { echo "    ❌  computeMatrix failed"; continue; }
+    else
+        echo "    ⏭️  matrix exists"
+    fi
+
+    # Heatmap sorted by m6A at TSS
+    plotHeatmap \
+        -m "$MATRIX" \
+        -out "$GROUP_DIR/${GROUP}.TSS_heatmap.png" \
+        --sortUsingSamples 1 \
+        --sortRegions descend \
+        --colorMap Greens Reds Blues \
+        --whatToShow 'heatmap and colorbar' \
+        --plotTitle "$GROUP" \
+        --heatmapHeight 12 \
+        --heatmapWidth 3 \
+        --zMin 0 0 0 \
+        && echo "    ✅  heatmap done" \
+        || echo "    ❌  plotHeatmap failed"
+
+    # Profile plot
+    plotProfile \
+        -m "$MATRIX" \
+        -out "$GROUP_DIR/${GROUP}.TSS_profile.png" \
+        --plotTitle "$GROUP — signal around TSS" \
+        --samplesLabel "m6A (accessibility)" "nucleosome" "5mC" \
+        --colors green red blue \
+        --plotHeight 6 \
+        --plotWidth 8 \
+        && echo "    ✅  profile done" \
+        || echo "    ❌  plotProfile failed"
+
+done
+
+# =============================================================================
+# Multi-sample comparison: all strains on one plot per signal type
+# Excludes controls (gDNA, HMW) from comparison plots
+# =============================================================================
+echo ""
+echo "============================================================"
+echo " Generating multi-sample comparison plots"
+echo "============================================================"
+
+COMPARE_GROUPS="WT_Eddie WT_Rochelle cac-1 cac-2 rtt109 rtt109FLAG"
+
+for SIGNAL in m6A nuc 5mC; do
+
+    BW_LIST=""
+    LABELS=""
+    for GROUP in $COMPARE_GROUPS; do
+        case $SIGNAL in
+            m6A) BW="$OUT_DIR/${GROUP}/${GROUP}.m6A.bw" ;;
+            nuc) BW="$OUT_DIR/${GROUP}/${GROUP}.nuc.bw" ;;
+            5mC) BW="$OUT_DIR/${GROUP}/${GROUP}.5mC.bw" ;;
+        esac
+        [ -f "$BW" ] && BW_LIST="$BW_LIST $BW" && LABELS="$LABELS $GROUP"
+    done
+
+    [ -z "$BW_LIST" ] && { echo "  ⚠️  No BigWigs found for $SIGNAL comparison"; continue; }
+
+    echo ""
+    echo "  ── All strains: $SIGNAL ──"
+
+    MATRIX="$OUT_DIR/allgroups.${SIGNAL}.TSS.gz"
+    if [ ! -f "$MATRIX" ]; then
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 2000 \
+            -R "$TSS_BED" \
+            -S $BW_LIST \
+            -o "$MATRIX" \
+            --missingDataAsZero \
+            --samplesLabel $LABELS \
+            -p 12 \
+            && echo "    ✅  matrix done" \
+            || { echo "    ❌  computeMatrix failed"; continue; }
+    else
+        echo "    ⏭️  matrix exists"
+    fi
+
+    case $SIGNAL in
+        m6A) CMAP="Greens" ;;
+        nuc) CMAP="Reds"   ;;
+        5mC) CMAP="Blues"  ;;
+    esac
+
+    # Comparison profile (all strains, one line each)
+    plotProfile \
+        -m "$MATRIX" \
+        -out "$OUT_DIR/allgroups.${SIGNAL}.TSS_profile.png" \
+        --plotTitle "${SIGNAL} signal around TSS — all strains" \
+        --plotHeight 6 \
+        --plotWidth 10 \
+        --perGroup \
+        && echo "    ✅  comparison profile done" \
+        || echo "    ❌  plotProfile failed"
+
+    # Comparison heatmap (one column per strain, same scale)
+    plotHeatmap \
+        -m "$MATRIX" \
+        -out "$OUT_DIR/allgroups.${SIGNAL}.TSS_heatmap.png" \
+        --sortUsingSamples 1 \
+        --sortRegions descend \
+        --colorMap $CMAP \
+        --whatToShow 'heatmap and colorbar' \
+        --plotTitle "${SIGNAL} — all strains" \
+        --heatmapHeight 12 \
+        --heatmapWidth 2 \
+        && echo "    ✅  comparison heatmap done" \
+        || echo "    ❌  plotHeatmap failed"
+
+done
 
 # =============================================================================
 # Summary
 # =============================================================================
 echo ""
 echo "============================================================"
-echo " All done. Heatmaps generated:"
+echo " All done. Outputs:"
 echo "============================================================"
-find "$OUT_DIR" -name "*.TSS_profile.png" | sort | while read -r PNG; do
+find "$OUT_DIR" -name "*.png" | sort | while read -r PNG; do
     echo "  $(basename $PNG)"
 done
