@@ -1,51 +1,143 @@
 #!/bin/bash
-#SBATCH --job-name=ft_run_all
+#SBATCH --job-name=FiberTools_Pt2_CallNucs
 #SBATCH --partition=batch
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --time=12:00:00
-#SBATCH --output=ft_run_all.%j.out
-#SBATCH --error=ft_run_all.%j.err
+#SBATCH --time=24:00:00
+#SBATCH --output=FiberTools_Pt2_CallNucs.%j.out
+#SBATCH --error=FiberTools_Pt2_CallNucs.%j.err
+
+# =============================================================================
+# FiberTools Part 2 — Call nucleosomes and generate pileups
+# =============================================================================
+# Loops over MergedBams/ONTRun9 and MergedBams/ONTRun10 separately.
+# For each merged BAM:
+#   1. ft add-nucleosomes  → *.nucs.bam
+#   2. ft pileup (m6A, 5mC, nucleosome coverage)
+#
+# Output layout:
+#   fibertools_results/
+#     ONTRun9/
+#       ONTRun9_WT_Eddie_barcode01_merged/
+#         *.nucs.bam
+#         *.m6Apileup.bedgraph
+#         *.5mcpileup.bedgraph
+#         *.nucspileup.bedgraph
+#     ONTRun10/
+#       (same structure)
+# =============================================================================
+
+set -euo pipefail
 
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-IN_DIR="/scratch/ry00555/ONTRun9_10Combined/InputBams"
+MERGED_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedBams"
 OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
-mkdir -p "$OUT_DIR"
-
 THREADS=8
 
-for BAM in "$IN_DIR"/*_merged.bam; do
-    [ -f "$BAM" ] || continue
-    SAMPLE=$(basename "$BAM" .bam)
-    SAMPLE_DIR="$OUT_DIR/$SAMPLE"
-    mkdir -p "$SAMPLE_DIR"
-    echo "Processing $SAMPLE ..."
+mkdir -p "$OUT_DIR"
 
-    # 1) Add nucleosomes (consumes predicted BAM)
-    NUCS_BAM="${SAMPLE_DIR}/${SAMPLE}.nucs.bam"
-#ft add-nucleosomes "$BAM" "$NUCS_BAM" || { echo "add-nucleosomes failed for $SAMPLE"; continue; }
- #samtools index "$NUCS_BAM"
+echo "============================================================"
+echo " FiberTools Pt2: Call nucleosomes + pileups"
+echo " Input : $MERGED_DIR"
+echo " Output: $OUT_DIR"
+echo "============================================================"
 
-    # 3) Make decorated BED/track files
-#ft track-decorators --bed12 "$SAMPLE_DIR/${SAMPLE}.nuctracks.bed" "$NUCS_BAM" --decorator "$SAMPLE_DIR/decorated_${SAMPLE}.nuctracks.bed" || echo "track-decorators failed for $SAMPLE"
-#4) run qc
-#ft qc --m6a-per-msp "$NUCS_BAM" "$SAMPLE_DIR/${SAMPLE}.txt" || echo "qc failed for $SAMPLE"
+for RUN in ONTRun9 ONTRun10; do
 
-    # 5) Make pileup (per-base or per-feature aggregation)
-ft pileup --m6a  --per-base  --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.m6Apileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
-ft pileup --cpg --per-base --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.5mcpileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
-ft pileup --fiber-coverage --per-base --out "$SAMPLE_DIR/${SAMPLE}.nucspileup2.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+    RUN_IN="$MERGED_DIR/$RUN"
+    RUN_OUT="$OUT_DIR/$RUN"
+    mkdir -p "$RUN_OUT"
 
-#ft pileup --m6a --cpg --fiber-coverage --out "$SAMPLE_DIR/${SAMPLE}.totalinfo_pileup.bedgraph" "$NUCS_BAM" || echo "pileup failed for $SAMPLE"
+    if [ ! -d "$RUN_IN" ]; then
+        echo "⚠️  $RUN_IN not found — skipping $RUN"
+        continue
+    fi
 
-#ft extract "$NUCS_BAM" --m6a "$SAMPLE_DIR"/"$SAMPLE"_m6a.bed --cpg "$SAMPLE_DIR"/"$SAMPLE"_cpg.bed --nuc "$SAMPLE_DIR"/"$SAMPLE"_nucleosome.bed --threads $THREADS || echo "extract failed for $SAMPLE"
-#ft extract "$NUCS_BAM" --all "$SAMPLE_DIR"/"$SAMPLE"_totalinfo.bed --threads $THREADS || echo "extract failed for $SAMPLE"
+    echo ""
+    echo "╔══════════════════════════════════════════════════════╗"
+    echo "  Processing $RUN"
+    echo "╚══════════════════════════════════════════════════════╝"
 
+    for BAM in "$RUN_IN"/*_merged.bam; do
+        [ -f "$BAM" ] || continue
 
-    echo "Done $SAMPLE"
+        SAMPLE=$(basename "$BAM" .bam)          # e.g. ONTRun9_WT_Eddie_barcode01_merged
+        SAMPLE_DIR="$RUN_OUT/$SAMPLE"
+        mkdir -p "$SAMPLE_DIR"
+
+        NUCS_BAM="$SAMPLE_DIR/${SAMPLE}.nucs.bam"
+
+        echo ""
+        echo "  ── $SAMPLE ──"
+
+        # ── Step 1: add-nucleosomes ──────────────────────────────
+        if [ ! -f "$NUCS_BAM" ]; then
+            echo "    ft add-nucleosomes..."
+            ft add-nucleosomes "$BAM" "$NUCS_BAM" \
+                || { echo "    ❌ add-nucleosomes failed for $SAMPLE"; continue; }
+            samtools index "$NUCS_BAM"
+        else
+            echo "    ⏭️  nucs.bam already exists — skipping add-nucleosomes"
+        fi
+
+        # ── Step 2: pileups ─────────────────────────────────────
+        M6A_BG="$SAMPLE_DIR/${SAMPLE}.m6Apileup.bedgraph"
+        CPG_BG="$SAMPLE_DIR/${SAMPLE}.5mcpileup.bedgraph"
+        NUC_BG="$SAMPLE_DIR/${SAMPLE}.nucspileup.bedgraph"
+
+        if [ ! -f "$M6A_BG" ]; then
+            echo "    ft pileup — m6A..."
+            ft pileup --m6a --per-base --fiber-coverage \
+                --out "$M6A_BG" "$NUCS_BAM" \
+                || echo "    ❌ m6A pileup failed for $SAMPLE"
+        else
+            echo "    ⏭️  m6A pileup exists — skipping"
+        fi
+
+        if [ ! -f "$CPG_BG" ]; then
+            echo "    ft pileup — 5mC..."
+            ft pileup --cpg --per-base --fiber-coverage \
+                --out "$CPG_BG" "$NUCS_BAM" \
+                || echo "    ❌ 5mC pileup failed for $SAMPLE"
+        else
+            echo "    ⏭️  5mC pileup exists — skipping"
+        fi
+
+        if [ ! -f "$NUC_BG" ]; then
+            echo "    ft pileup — nucleosome coverage..."
+            ft pileup --per-base --fiber-coverage \
+                --out "$NUC_BG" "$NUCS_BAM" \
+                || echo "    ❌ nuc pileup failed for $SAMPLE"
+        else
+            echo "    ⏭️  nuc pileup exists — skipping"
+        fi
+
+        echo "    ✅  $SAMPLE done"
+
+    done
 done
+
+# =============================================================================
+# Summary
+# =============================================================================
+echo ""
+echo "============================================================"
+echo " All done. Results:"
+echo "============================================================"
+for RUN in ONTRun9 ONTRun10; do
+    echo ""
+    echo "  $RUN:"
+    find "$OUT_DIR/$RUN" -name "*.nucs.bam" | sort | while read -r BAM; do
+        SIZE=$(du -h "$BAM" | cut -f1)
+        echo "    $SIZE  $(basename $BAM)"
+    done
+done
+
+echo ""
+echo "Next: run FiberTools_Pt3_ExtractData.sh"
+echo "  Point WORKDIR to: $OUT_DIR"
