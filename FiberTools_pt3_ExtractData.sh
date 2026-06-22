@@ -151,7 +151,7 @@ for RUN in ONTRun9 ONTRun10; do
                     -S "$NUC_BW" \
                     -o "$NUC_MATRIX" \
                     --outFileNameMatrix "$DIR/${SAMPLE}.nuc.TSS.tab" \
-                    --skipZeros -p 12
+                     -p 12
             fi
             plotHeatmap \
                 -m "$NUC_MATRIX" \
@@ -173,7 +173,7 @@ for RUN in ONTRun9 ONTRun10; do
                     -S "$M6A_BW" \
                     -o "$M6A_MATRIX" \
                     --outFileNameMatrix "$DIR/${SAMPLE}.m6A.TSS.tab" \
-                    --skipZeros -p 12
+                     -p 12
             fi
             plotHeatmap \
                 -m "$M6A_MATRIX" \
