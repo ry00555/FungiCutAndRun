@@ -11,23 +11,13 @@
 #SBATCH --error=FiberTools_Pt2_CallNucs.%j.err
 
 # =============================================================================
-# FiberTools Part 2 — Call nucleosomes and generate pileups
+# FiberTools Part 2 — Call nucleosomes, pileups, track decorators, and QC
 # =============================================================================
-# Loops over MergedBams/ONTRun9 and MergedBams/ONTRun10 separately.
 # For each merged BAM:
 #   1. ft add-nucleosomes  → *.nucs.bam
 #   2. ft pileup (m6A, 5mC, nucleosome coverage)
-#
-# Output layout:
-#   fibertools_results/
-#     ONTRun9/
-#       ONTRun9_WT_Eddie_barcode01_merged/
-#         *.nucs.bam
-#         *.m6Apileup.bedgraph
-#         *.5mcpileup.bedgraph
-#         *.nucspileup.bedgraph
-#     ONTRun10/
-#       (same structure)
+#   3. ft track-decorators → *.nuctracks.bed + decorated bed (for IGV)
+#   4. ft qc               → *.qc.txt (QC metrics table)
 # =============================================================================
 
 set -euo pipefail
@@ -42,7 +32,7 @@ THREADS=8
 mkdir -p "$OUT_DIR"
 
 echo "============================================================"
-echo " FiberTools Pt2: Call nucleosomes + pileups"
+echo " FiberTools Pt2: Nucleosomes + pileups + decorators + QC"
 echo " Input : $MERGED_DIR"
 echo " Output: $OUT_DIR"
 echo "============================================================"
@@ -66,7 +56,7 @@ for RUN in ONTRun9 ONTRun10; do
     for BAM in "$RUN_IN"/*_merged.bam; do
         [ -f "$BAM" ] || continue
 
-        SAMPLE=$(basename "$BAM" .bam)          # e.g. ONTRun9_WT_Eddie_barcode01_merged
+        SAMPLE=$(basename "$BAM" .bam)
         SAMPLE_DIR="$RUN_OUT/$SAMPLE"
         mkdir -p "$SAMPLE_DIR"
 
@@ -82,10 +72,10 @@ for RUN in ONTRun9 ONTRun10; do
                 || { echo "    ❌ add-nucleosomes failed for $SAMPLE"; continue; }
             samtools index "$NUCS_BAM"
         else
-            echo "    ⏭️  nucs.bam already exists — skipping add-nucleosomes"
+            echo "    ⏭️  nucs.bam already exists — skipping"
         fi
 
-        # ── Step 2: pileups ─────────────────────────────────────
+        # ── Step 2: pileups ──────────────────────────────────────
         M6A_BG="$SAMPLE_DIR/${SAMPLE}.m6Apileup.bedgraph"
         CPG_BG="$SAMPLE_DIR/${SAMPLE}.5mcpileup.bedgraph"
         NUC_BG="$SAMPLE_DIR/${SAMPLE}.nucspileup.bedgraph"
@@ -117,27 +107,78 @@ for RUN in ONTRun9 ONTRun10; do
             echo "    ⏭️  nuc pileup exists — skipping"
         fi
 
-        echo "    ✅  $SAMPLE done"
+        # ── Step 3: track-decorators (for IGV) ───────────────────
+        NUCTRACKS_BED="$SAMPLE_DIR/${SAMPLE}.nuctracks.bed"
+        DECORATED_BED="$SAMPLE_DIR/decorated_${SAMPLE}.bed"
+
+        if [ ! -f "$NUCTRACKS_BED" ]; then
+            echo "    ft track-decorators..."
+            ft track-decorators \
+                --bed12 "$NUCTRACKS_BED" \
+                --decorator "$DECORATED_BED" \
+                "$NUCS_BAM" \
+                || echo "    ❌ track-decorators failed for $SAMPLE"
+            echo "    ✅  track-decorators done"
+        else
+            echo "    ⏭️  nuctracks.bed already exists — skipping"
+        fi
+
+        # ── Step 4: QC metrics ───────────────────────────────────
+        # ft qc reports per-fiber metrics including:
+        #   - total fibers, mean fiber length
+        #   - m6A count and fraction per fiber
+        #   - number of nucleosomes per fiber
+        #   - MSP (methylated span) length distribution
+        #   - % fibers with 0 m6A (indicates labeling failure if high)
+        # --m6a-per-msp also reports m6A density within each
+        # methylated span (linker/accessible element), useful for
+        # checking Hia5 labeling efficiency
+        QC_OUT="$SAMPLE_DIR/${SAMPLE}.qc.txt"
+
+        if [ ! -f "$QC_OUT" ]; then
+            echo "    ft qc..."
+            ft qc \
+                --m6a-per-msp \
+                "$NUCS_BAM" \
+                "$QC_OUT" \
+                || echo "    ❌ qc failed for $SAMPLE"
+            echo "    ✅  QC done → $(basename $QC_OUT)"
+        else
+            echo "    ⏭️  QC already exists — skipping"
+        fi
+
+        echo "    ✅  $SAMPLE complete"
 
     done
 done
 
 # =============================================================================
-# Summary
+# Summary — print key QC metrics across all samples
 # =============================================================================
 echo ""
 echo "============================================================"
-echo " All done. Results:"
+echo " All done. QC summary:"
 echo "============================================================"
+echo ""
+
 for RUN in ONTRun9 ONTRun10; do
-    echo ""
     echo "  $RUN:"
-    find "$OUT_DIR/$RUN" -name "*.nucs.bam" | sort | while read -r BAM; do
-        SIZE=$(du -h "$BAM" | cut -f1)
-        echo "    $SIZE  $(basename $BAM)"
+    find "$OUT_DIR/$RUN" -name "*.qc.txt" | sort | while read -r QC; do
+        SAMPLE=$(basename "$QC" .qc.txt)
+        echo ""
+        echo "    ── $SAMPLE ──"
+        # Print the header + data rows, indented
+        cat "$QC" | head -20 | sed 's/^/      /'
     done
+    echo ""
 done
 
+echo ""
+echo "IGV tip: load decorated_*.bed to see nucleosome footprints"
+echo "per fiber. Color nucs.bam by: View → Color by → base"
+echo "modification 2-color (6mA)."
+echo ""
+echo "QC tip: check % fibers with 0 m6A — should be <1% for a"
+echo "successful Hia5 labeling. Mean m6A fraction should be ~5-6%."
 echo ""
 echo "Next: run FiberTools_Pt3_ExtractData.sh"
-echo "  Point WORKDIR to: $OUT_DIR"
