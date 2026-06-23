@@ -1,8 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=chromatin_domains
 #SBATCH --partition=inter_p
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=120G
 #SBATCH --time=48:00:00
 #SBATCH --output=chromatin_domains_%j.out
