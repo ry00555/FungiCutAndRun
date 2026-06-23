@@ -1,8 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=chromatin_domains_all
+#SBATCH --job-name=chromatin_domains
 #SBATCH --partition=inter_p
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=120G
@@ -14,139 +12,34 @@
 set -euo pipefail
 
 
-########################################################
+##################################################
 # MODULES
-########################################################
+##################################################
 
 module load HMMER/3.4-gompi-2024a
 module load Foldseek/10-941cd33-GPU
 
 
 
-########################################################
+##################################################
 # PATHS
-########################################################
+##################################################
 
 BASE=/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek
 
 OUT=${BASE}/chromatin_domain_results
 
+mkdir -p ${OUT}/{metadata,domain_lists,domains,foldseek,tmp}
+
+
+
+
+
+##################################################
+# PFAM DATABASE
+##################################################
+
 PFAM=${OUT}/Pfam-A.hmm
-
-
-mkdir -p \
-${OUT}/metadata \
-${OUT}/domain_lists \
-${OUT}/domains \
-${OUT}/foldseek \
-${OUT}/tmp
-
-
-
-########################################################
-# SPECIES METADATA
-########################################################
-
-
-declare -A SPECIES
-
-
-# Fungi
-
-SPECIES[ncr]="Neurospora_crassa,Fungi"
-SPECIES[cne]="Cryptococcus_neoformans,Fungi"
-SPECIES[fgr]="Fusarium_graminearum,Fungi"
-SPECIES[mgr]="Magnaporthe_oryzae,Fungi"
-SPECIES[zt]="Zymoseptoria_tritici,Fungi"
-
-SPECIES[yeast]="Saccharomyces_cerevisiae,Fungi"
-SPECIES[schpo]="Schizosaccharomyces_pombe,Fungi"
-
-
-
-# Metazoa
-
-SPECIES[human]="Homo_sapiens,Metazoa"
-SPECIES[mouse]="Mus_musculus,Metazoa"
-SPECIES[zebrafish]="Danio_rerio,Metazoa"
-
-SPECIES[drome]="Drosophila_melanogaster,Metazoa"
-SPECIES[caeel]="Caenorhabditis_elegans,Metazoa"
-
-
-
-# Plantae
-
-SPECIES[arath]="Arabidopsis_thaliana,Plantae"
-
-
-
-
-########################################################
-# PFAM DOMAINS
-########################################################
-
-
-declare -A DOMAINS
-
-
-DOMAINS[BAH]="PF01426"
-
-DOMAINS[Chromo]="PF00385"
-
-DOMAINS[ChromoShadow]="PF01393"
-
-DOMAINS[MRG]="PF05521"
-
-DOMAINS[PWWP]="PF00855"
-
-DOMAINS[PHD]="PF00628"
-
-DOMAINS[Tudor]="PF00567"
-
-DOMAINS[MBT]="PF02820"
-
-DOMAINS[Bromodomain]="PF00439"
-
-
-DOMAINS[ADD]="PF17980"
-
-DOMAINS[CXXC]="PF02008"
-
-DOMAINS[CW]="PF07496"
-
-
-
-DOMAINS[SET]="PF00856"
-
-DOMAINS[DOT1]="PF08161"
-
-
-DOMAINS[HAT_MYST]="PF01853"
-
-DOMAINS[HAT_GNAT]="PF00583"
-
-
-
-DOMAINS[JmjC]="PF02373"
-
-DOMAINS[JmjN]="PF02375"
-
-
-
-DOMAINS[WD40]="PF00400"
-
-
-
-
-
-########################################################
-# DOWNLOAD PFAM
-########################################################
-
-
-echo "Preparing Pfam database"
-
 
 
 if [ ! -f ${PFAM}.h3i ]
@@ -157,16 +50,9 @@ wget -q \
 -O ${PFAM}.gz \
 https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 
-
 gunzip ${PFAM}.gz
 
-
 hmmpress ${PFAM}
-
-
-else
-
-echo "Pfam already prepared"
 
 fi
 
@@ -174,12 +60,11 @@ fi
 
 
 
-########################################################
+##################################################
 # COMBINE ALL PROTEOMES
-########################################################
+##################################################
 
-
-echo "Combining all FASTA files"
+echo "Combining proteomes"
 
 
 ALL_FASTA=${OUT}/metadata/all_species.fasta
@@ -188,20 +73,16 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 > ${ALL_FASTA}
 
 
-
 for f in ${BASE}/*_proteome.fasta
 
 do
 
-
 species=$(basename ${f} _proteome.fasta)
-
 
 echo "Adding ${species}"
 
 
 sed "s/^>/>${species}|/" ${f} >> ${ALL_FASTA}
-
 
 
 done
@@ -210,12 +91,12 @@ done
 
 
 
-########################################################
-# RUN HMMER
-########################################################
+##################################################
+# HMMER
+##################################################
 
+echo "Running hmmscan"
 
-echo "Running HMMER"
 
 
 hmmscan \
@@ -230,67 +111,69 @@ ${ALL_FASTA}
 
 
 
-########################################################
-# PARSE DOMAIN HITS
-########################################################
+##################################################
+# PARSE HMMER DOMAINS
+##################################################
+
+echo "Parsing chromatin domains"
 
 
-echo "Parsing domains"
 
-
-
-python3 <<'EOF'
+python3 <<'PY'
 
 
 import csv
 
 
 
-PFAM={
+DOMAINS={
 
 
-"PF01426":"BAH",
+"BAH":"BAH",
 
-"PF00385":"Chromo",
+"Chromo":"Chromo",
 
-"PF01393":"ChromoShadow",
+"Chromo_shadow":"ChromoShadow",
 
-"PF05521":"MRG",
+"MRG":"MRG",
 
-"PF00855":"PWWP",
+"PWWP":"PWWP",
 
-"PF00628":"PHD",
+"PHD":"PHD",
 
-"PF00567":"Tudor",
+"Tudor":"Tudor",
 
-"PF02820":"MBT",
+"MBT":"MBT",
 
-"PF00439":"Bromodomain",
-
-
-"PF17980":"ADD",
-
-"PF02008":"CXXC",
-
-"PF07496":"CW",
+"Bromodomain":"Bromodomain",
 
 
-"PF00856":"SET",
+"ADD":"ADD",
 
-"PF08161":"DOT1",
+"zf-CXXC":"CXXC",
 
-
-"PF01853":"HAT_MYST",
-
-"PF00583":"HAT_GNAT",
+"CW":"CW",
 
 
-"PF02373":"JmjC",
 
-"PF02375":"JmjN",
+"SET":"SET",
+
+"DOT1":"DOT1",
 
 
-"PF00400":"WD40"
+"HAT":"HAT_MYST",
+
+"GNAT":"HAT_GNAT",
+
+
+
+"JmjC":"JmjC",
+
+"JmjN":"JmjN",
+
+
+
+"WD40":"WD40"
 
 
 }
@@ -304,60 +187,72 @@ out="chromatin_domain_results/metadata/domain_occurrences.tsv"
 
 
 
-rows=[]
+hits=[]
 
 
 
-with open(inp) as f:
+for line in open(inp):
 
 
-    for line in f:
+    if line.startswith("#"):
+        continue
 
 
-        if line.startswith("#"):
-            continue
+    x=line.split()
 
 
-        x=line.split()
-
-
-        if len(x)<23:
-            continue
+    if len(x)<23:
+        continue
 
 
 
-        pfam=x[1].split(".")[0]
-
-
-        if pfam not in PFAM:
-            continue
+    pfam=x[0]
 
 
 
-        protein=x[3]
-
-
-        species=protein.split("|")[0]
-
-        gene=protein.split("|")[1]
+    if pfam not in DOMAINS:
+        continue
 
 
 
-        rows.append([
+    protein=x[3]
 
-        species,
 
-        gene,
 
-        PFAM[pfam],
+    parts=protein.split("|")
 
-        x[19],
 
-        x[20],
 
-        x[6]
+    species=parts[0]
 
-        ])
+
+
+    accession=parts[2]
+
+
+
+    gene=parts[3]
+
+
+
+    hits.append([
+
+    species,
+
+    accession,
+
+    gene,
+
+    DOMAINS[pfam],
+
+    x[19],
+
+    x[20],
+
+    x[12]
+
+    ])
+
 
 
 
@@ -372,7 +267,9 @@ with open(out,"w") as f:
 
     "species",
 
-    "protein",
+    "accession",
+
+    "gene",
 
     "domain",
 
@@ -386,42 +283,40 @@ with open(out,"w") as f:
 
 
 
-    w.writerows(rows)
+    w.writerows(hits)
 
 
 
-print("domain hits:",len(rows))
+print("Domain hits:",len(hits))
 
-
-EOF
-
-
+print("Proteins:",len(set(x[2] for x in hits)))
 
 
 
-########################################################
-# DOMAIN PROTEIN LISTS
-########################################################
-
-
-echo "Creating domain protein lists"
+PY
 
 
 
-cut -f3 ${OUT}/metadata/domain_occurrences.tsv \
-| tail -n +2 \
-| sort -u \
-| while read domain
 
+
+##################################################
+# CREATE DOMAIN PROTEIN LISTS
+##################################################
+
+echo "Creating protein lists"
+
+
+
+for d in $(cut -f4 ${OUT}/metadata/domain_occurrences.tsv | tail -n +2 | sort -u)
 
 do
 
 
-grep -w ${domain} \
+grep -w ${d} \
 ${OUT}/metadata/domain_occurrences.tsv \
-| cut -f2 \
+| cut -f3 \
 | sort -u \
-> ${OUT}/domain_lists/${domain}.txt
+> ${OUT}/domain_lists/${d}.txt
 
 
 
@@ -431,39 +326,35 @@ done
 
 
 
-########################################################
-# DOMAIN ARCHITECTURES
-########################################################
+##################################################
+# DOMAIN ARCHITECTURE
+##################################################
 
-
-python3 <<'EOF'
+python3 <<'PY'
 
 
 from collections import defaultdict
 
 
-d={}
+
+d=defaultdict(list)
 
 
 
-with open(
+for line in open(
 "chromatin_domain_results/metadata/domain_occurrences.tsv"
-) as f:
+):
 
 
-    next(f)
+    if line.startswith("species"):
+        continue
 
 
-    for line in f:
+
+    s,a,g,dom,*_=line.strip().split("\t")
 
 
-        s,p,dom,*_=line.strip().split("\t")
-
-
-        d.setdefault(
-        (s,p),
-        []
-        ).append(dom)
+    d[(s,g)].append(dom)
 
 
 
@@ -474,41 +365,40 @@ with open(
 
 
     out.write(
-    "species\tprotein\tdomains\n"
+    "species\tgene\tarchitecture\n"
     )
 
 
-    for (s,p),v in d.items():
+    for (s,g),v in d.items():
 
 
         out.write(
 
-        f"{s}\t{p}\t{';'.join(sorted(set(v)))}\n"
+        f"{s}\t{g}\t{';'.join(sorted(set(v)))}\n"
 
         )
 
 
-EOF
+PY
 
 
 
 
 
-########################################################
-# LINK CIF STRUCTURES BY DOMAIN
-########################################################
+##################################################
+# FIND CIFS
+##################################################
+
+echo "Linking structures"
 
 
-echo "Finding CIF structures"
 
-
-
-while IFS=$'\t' read species protein domain start end evalue
+while IFS=$'\t' read species accession gene domain start end evalue
 
 do
 
 
-if [ "$protein" == "protein" ]; then
+if [ "$gene" = "gene" ]; then
 continue
 fi
 
@@ -519,10 +409,9 @@ mkdir -p ${OUT}/domains/${domain}/${species}
 
 
 find ${BASE}/cif_* \
--name "*${protein}*.cif" \
+-name "*${accession}*.cif" \
 -exec ln -sf {} \
 ${OUT}/domains/${domain}/${species}/ \;
-
 
 
 done < ${OUT}/metadata/domain_occurrences.tsv
@@ -531,10 +420,9 @@ done < ${OUT}/metadata/domain_occurrences.tsv
 
 
 
-########################################################
-# FOLDSEEK PER DOMAIN CLASS
-########################################################
-
+##################################################
+# FOLDSEEK PER DOMAIN
+##################################################
 
 echo "Running FoldSeek"
 
@@ -546,7 +434,8 @@ for d in ${OUT}/domains/*
 do
 
 
-domain=$(basename $d)
+domain=$(basename ${d})
+
 
 
 n=$(find ${d} -name "*.cif" | wc -l)
@@ -557,12 +446,11 @@ if [ ${n} -lt 2 ]
 
 then
 
-echo "Skipping ${domain}: ${n} structures"
+echo "Skip ${domain}: ${n}"
 
 continue
 
 fi
-
 
 
 
@@ -587,8 +475,6 @@ done
 
 
 
-echo "====================================="
-echo " COMPLETE"
-echo " Results:"
+echo "DONE"
+
 echo ${OUT}
-echo "====================================="
