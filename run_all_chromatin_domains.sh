@@ -47,64 +47,94 @@ ${OUT}/tmp
 
 PFAM=${OUT}/Pfam-A.hmm
 
-
 if [ ! -f ${PFAM}.h3i ]
-
 then
 
-wget -q \
--O ${PFAM}.gz \
-https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+    wget -q \
+        -O ${PFAM}.gz \
+        https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 
-gunzip ${PFAM}.gz
+    gunzip ${PFAM}.gz
 
-hmmpress ${PFAM}
+    hmmpress ${PFAM}
 
 fi
+
 
 ##################################################
 # MAKE CHROMATIN-ONLY PFAM DATABASE
 ##################################################
 
-CHROM_PFAM=${OUT}/metadata/chromatin_Pfam.hmm
-
-
-if [ ! -f ${CHROM_PFAM}.h3i ]
-
+if [ ! -f "${CHROM_PFAM}.h3i" ]
 then
+
+echo "Creating chromatin Pfam database"
+
+cat > "${DOMAIN_LIST}" << EOF
+BAH
+CBAH
+PHD
+PHD_2
+PHD_3
+PHD_4
+PHD_5
+PHD_like
+PHD_JHD1
+PHD_ash2p_like
+zf-PHD-like
+PWWP
+MUM1-like_PWWP
+Chromo
+Chromo_2
+Chromo_shadow
+Bromodomain
+MRG
+PHF12_MRG_bd
+MBT
+Tudor_2
+Tudor_3
+Tudor_4
+Tudor_5
+53-BP1_Tudor
+Crb2_Tudor
+SGF29_Tudor
+SMN_Tudor
+JmjC
+JmjC_2
+JmjN
+SET
+N-SET
+Pre-SET
+preSET_CXC
+SET_assoc
+SET7_N
+DOT1
+WD40
+EOF
+
+
+echo "Indexing Pfam"
+
+hmmfetch --index "${PFAM}"
+
 
 echo "Extracting chromatin Pfam models"
 
-
 hmmfetch \
---index \
-${PFAM} \
-BAH \
-Chromo \
-Chromo_shadow \
-MRG \
-PWWP \
-PHD \
-Tudor \
-MBT \
-Bromodomain \
-ADD \
-zf-CXXC \
-CW \
-SET \
-DOT1 \
-MYST \
-GNAT \
-JmjC \
-JmjN \
-WD40 \
-> ${CHROM_PFAM}
+    -f \
+    "${PFAM}" \
+    "${DOMAIN_LIST}" \
+    > "${CHROM_PFAM}"
 
 
-hmmpress ${CHROM_PFAM}
+echo "Pressing chromatin Pfam database"
+
+hmmpress "${CHROM_PFAM}"
+
+
+echo "Chromatin Pfam database created"
 
 fi
-
 ##################################################
 # COMBINE PROTEOMES
 ##################################################
@@ -150,30 +180,56 @@ python3 <<'PY'
 
 import csv
 
-
 DOMAINS={
 
 "BAH":"BAH",
-"Chromo":"Chromo",
-"Chromo_shadow":"ChromoShadow",
-"MRG":"MRG",
-"PWWP":"PWWP",
+"CBAH":"BAH",
+
 "PHD":"PHD",
-"Tudor":"Tudor",
-"MBT":"MBT",
+"PHD_2":"PHD",
+"PHD_3":"PHD",
+"PHD_4":"PHD",
+"PHD_5":"PHD",
+"PHD_like":"PHD",
+"PHD_JHD1":"PHD",
+"PHD_ash2p_like":"PHD",
+"zf-PHD-like":"PHD",
+
+"PWWP":"PWWP",
+"MUM1-like_PWWP":"PWWP",
+
+"Chromo":"Chromo",
+"Chromo_2":"Chromo",
+"Chromo_shadow":"ChromoShadow",
+
 "Bromodomain":"Bromodomain",
 
-"SET":"SET",
-"DOT1":"DOT1",
+"MRG":"MRG",
+"PHF12_MRG_bd":"MRG",
 
-"HAT":"HAT",
-"GNAT":"GNAT",
+"MBT":"MBT",
 
 "JmjC":"JmjC",
+"JmjC_2":"JmjC",
 "JmjN":"JmjN",
 
-"WD40":"WD40"
+"SET":"SET",
+"N-SET":"SET",
+"Pre-SET":"SET",
+"preSET_CXC":"SET",
+"SET_assoc":"SET",
+"SET7_N":"SET",
 
+"DOT1":"DOT1"
+"53-BP1_Tudor":"Tudor",
+"Crb2_Tudor":"Tudor",
+"SGF29_Tudor":"Tudor",
+"SMN_Tudor":"Tudor",
+"Tudor_2":"Tudor",
+"Tudor_3":"Tudor",
+"Tudor_4":"Tudor",
+"Tudor_5":"Tudor",
+"WD40":"WD40"
 }
 
 
@@ -213,10 +269,12 @@ for line in open(inp):
     parts=protein.split("|")
 
 
+    if len(parts) < 4:
+        continue
+
     species=parts[0]
     accession=parts[2]
     gene=parts[3]
-
 
     rows.append([
 
@@ -339,6 +397,13 @@ do
 
 domain=$(basename $f .fasta)
 
+nseq=$(grep -c "^>" $f)
+
+if [ $nseq -lt 2 ]
+then
+    echo "Skipping ${domain} (only ${nseq} sequence)"
+    continue
+fi
 
 mafft \
 --auto \
@@ -567,6 +632,15 @@ ROOT=Path(
 
 CIFS=list(ROOT.glob("cif_*"))
 
+print("Indexing CIF files...")
+
+cif_index={}
+
+for c in CIFS:
+    for f in c.rglob("*.cif"):
+        cif_index[f.name]=f
+
+print("Indexed",len(cif_index),"CIFs")
 
 out=ROOT/"chromatin_domain_results/domains_extracted"
 
@@ -587,17 +661,13 @@ delimiter="\t"
         continue
 
 
-    cif=None
+        cif=None
 
+        for name,path in cif_index.items():
 
-    for c in CIFS:
-
-        hits=list(c.rglob(f"*{accession}*.cif"))
-
-        if hits:
-            cif=hits[0]
-            break
-
+            if accession in name:
+                cif=path
+                break
 
     if cif is None:
         continue
@@ -682,8 +752,7 @@ do
 domain=$(basename ${d})
 
 
-n=$(ls ${d}/*.pdb | wc -l)
-
+n=$(find ${d} -name "*.pdb" | wc -l)
 
 if [ ${n} -lt 2 ]
 then
