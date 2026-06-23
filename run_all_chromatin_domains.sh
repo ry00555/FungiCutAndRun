@@ -224,7 +224,7 @@ DOMAINS={
 "SET_assoc":"SET",
 "SET7_N":"SET",
 
-"DOT1":"DOT1"
+"DOT1":"DOT1",
 "53-BP1_Tudor":"Tudor",
 "Crb2_Tudor":"Tudor",
 "SGF29_Tudor":"Tudor",
