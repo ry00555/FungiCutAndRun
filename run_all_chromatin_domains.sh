@@ -62,7 +62,48 @@ hmmpress ${PFAM}
 
 fi
 
+##################################################
+# MAKE CHROMATIN-ONLY PFAM DATABASE
+##################################################
 
+CHROM_PFAM=${OUT}/metadata/chromatin_Pfam.hmm
+
+
+if [ ! -f ${CHROM_PFAM}.h3i ]
+
+then
+
+echo "Extracting chromatin Pfam models"
+
+
+hmmfetch \
+--index \
+${PFAM} \
+BAH \
+Chromo \
+Chromo_shadow \
+MRG \
+PWWP \
+PHD \
+Tudor \
+MBT \
+Bromodomain \
+ADD \
+zf-CXXC \
+CW \
+SET \
+DOT1 \
+MYST \
+GNAT \
+JmjC \
+JmjN \
+WD40 \
+> ${CHROM_PFAM}
+
+
+hmmpress ${CHROM_PFAM}
+
+fi
 
 ##################################################
 # COMBINE PROTEOMES
@@ -93,10 +134,10 @@ done
 
 hmmscan \
 --cpu ${SLURM_CPUS_PER_TASK} \
---domtblout ${OUT}/metadata/pfam_hits.domtbl \
+--domtblout ${OUT}/metadata/chromatin_hits.domtbl \
 -E 1e-3 \
 --domE 1e-3 \
-${PFAM} \
+${CHROM_PFAM} \
 ${ALL_FASTA}
 
 
@@ -137,7 +178,7 @@ DOMAINS={
 
 
 
-inp="chromatin_domain_results/metadata/pfam_hits.domtbl"
+inp="chromatin_domain_results/metadata/chromatin_hits.domtbl"
 
 out="chromatin_domain_results/metadata/domain_occurrences.tsv"
 
