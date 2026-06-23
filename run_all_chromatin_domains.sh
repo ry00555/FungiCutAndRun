@@ -65,6 +65,10 @@ fi
 # MAKE CHROMATIN-ONLY PFAM DATABASE
 ##################################################
 
+CHROM_PFAM=${OUT}/metadata/chromatin_Pfam.hmm
+
+DOMAIN_LIST=${OUT}/metadata/chromatin_pfams.txt
+
 if [ ! -f "${CHROM_PFAM}.h3i" ]
 then
 
