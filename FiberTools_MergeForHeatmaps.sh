@@ -13,6 +13,14 @@
 # =============================================================================
 # Merge nucs.bam files across replicates + both runs, then generate
 # normalized TSS heatmaps and multi-sample comparison plots
+#
+# Key fixes vs previous version:
+#   - ft pileup WITHOUT --fiber-coverage → outputs fraction of reads
+#     methylated/nucleosome-occupied at each base (0-1), not raw depth
+#   - Stranded TSS BED (neurospora_TSS_stranded.bed) for correct anchoring
+#   - --missingDataAsZero and symmetric 2kb window
+#   - Sorted by m6A signal, plotProfile for average line plots
+#
 # Groups defined in fiber_groups.txt (must be in same dir as this script)
 # Format: GROUP_NAME barcode01 barcode02 ...
 # =============================================================================
@@ -32,6 +40,16 @@ mkdir -p "$OUT_DIR"
 
 if [ ! -f "$GROUPS_FILE" ]; then
     echo "❌  Groups file not found: $GROUPS_FILE"
+    exit 1
+fi
+
+if [ ! -f "$TSS_BED" ]; then
+    echo "❌  TSS BED not found: $TSS_BED"
+    echo "    Generate it with:"
+    echo "    awk '!/^#/ && \$3==\"gene\" && /gene_biotype=protein_coding/ && \$1~/^CM|^KC|^KI/' \\"
+    echo "        GCA_000182925.2_NC12_genomic_WithExtras.gff | \\"
+    echo "    awk 'BEGIN{OFS=\"\t\"} { match(\$9,/Name=([^;]+)/,n); name=(n[1]!=\"\")?n[1]:\".\"; if (\$7==\"+\") print \$1,\$4-1,\$4,name,\".\",\$7,\$4-1,\$5,\$4-1,\$5; else print \$1,\$5-1,\$5,name,\".\",\$7,\$4-1,\$5,\$4-1,\$5 }' \\"
+    echo "        | sort -k1,1 -k2,2n > neurospora_TSS_stranded.bed"
     exit 1
 fi
 
@@ -62,15 +80,15 @@ make_bigwig() {
 }
 
 # =============================================================================
-# Main: merge BAMs + pileups + BigWigs per group
+# Main: merge BAMs + pileups (fractional) + BigWigs per group
 # =============================================================================
 echo "============================================================"
 echo " Merging replicates + runs for heatmap generation"
-echo " Groups file: $GROUPS_FILE"
-echo " Output: $OUT_DIR"
+echo " Groups file : $GROUPS_FILE"
+echo " TSS BED     : $TSS_BED"
+echo " Output      : $OUT_DIR"
 echo "============================================================"
 
-# Track which groups were processed for the heatmap step
 PROCESSED_GROUPS=""
 
 while read -r LINE; do
@@ -128,20 +146,42 @@ while read -r LINE; do
         echo "  ⏭️  Merged BAM already exists"
     fi
 
-    # ── Pileups ──────────────────────────────────────────────────
-    echo "  Running pileups..."
+    # ── Pileups — FRACTIONAL (no --fiber-coverage) ───────────────
+    # Without --fiber-coverage, ft pileup outputs the FRACTION of
+    # reads with m6A / nucleosome / CpG at each base (0-1 scale).
+    # This is what you want for biological interpretation — not raw depth.
+    echo "  Running fractional pileups..."
+
     M6A_BG="$GROUP_DIR/${GROUP}.m6Apileup.bedgraph"
     CPG_BG="$GROUP_DIR/${GROUP}.5mcpileup.bedgraph"
     NUC_BG="$GROUP_DIR/${GROUP}.nucspileup.bedgraph"
 
-    [ -f "$M6A_BG" ] || ft pileup --m6a --per-base --fiber-coverage \
-        --out "$M6A_BG" "$MERGED_BAM" || echo "  ❌ m6A pileup failed"
+    if [ ! -f "$M6A_BG" ]; then
+        echo "    ft pileup — m6A fraction..."
+        ft pileup --m6a --per-base \
+            --out "$M6A_BG" "$MERGED_BAM" \
+            || echo "  ❌ m6A pileup failed"
+    else
+        echo "    ⏭️  m6A pileup exists"
+    fi
 
-    [ -f "$CPG_BG" ] || ft pileup --cpg --per-base --fiber-coverage \
-        --out "$CPG_BG" "$MERGED_BAM" || echo "  ❌ 5mC pileup failed"
+    if [ ! -f "$CPG_BG" ]; then
+        echo "    ft pileup — 5mC fraction..."
+        ft pileup --cpg --per-base \
+            --out "$CPG_BG" "$MERGED_BAM" \
+            || echo "  ❌ 5mC pileup failed"
+    else
+        echo "    ⏭️  5mC pileup exists"
+    fi
 
-    [ -f "$NUC_BG" ] || ft pileup --per-base --fiber-coverage \
-        --out "$NUC_BG" "$MERGED_BAM" || echo "  ❌ nuc pileup failed"
+    if [ ! -f "$NUC_BG" ]; then
+        echo "    ft pileup — nucleosome fraction..."
+        ft pileup --nuc --per-base \
+            --out "$NUC_BG" "$MERGED_BAM" \
+            || echo "  ❌ nuc pileup failed"
+    else
+        echo "    ⏭️  nuc pileup exists"
+    fi
 
     # ── BigWigs ──────────────────────────────────────────────────
     echo "  Converting to BigWig..."
@@ -158,7 +198,7 @@ while read -r LINE; do
 done < "$GROUPS_FILE"
 
 # =============================================================================
-# Heatmaps — per-group normalized + sorted
+# Per-group heatmaps — sorted by m6A signal, symmetric 2kb window
 # =============================================================================
 echo ""
 echo "============================================================"
@@ -171,7 +211,7 @@ for GROUP in $PROCESSED_GROUPS; do
     M6A_BW="$GROUP_DIR/${GROUP}.m6A.bw"
     CPG_BW="$GROUP_DIR/${GROUP}.5mC.bw"
 
-    [ -f "$M6A_BW" ] || { echo "  ⚠️  $GROUP BigWigs missing — skipping heatmaps"; continue; }
+    [ -f "$M6A_BW" ] || { echo "  ⚠️  $GROUP BigWigs missing — skipping"; continue; }
 
     echo ""
     echo "  ── $GROUP ──"
@@ -195,7 +235,7 @@ for GROUP in $PROCESSED_GROUPS; do
         echo "    ⏭️  matrix exists"
     fi
 
-    # Heatmap sorted by m6A at TSS
+    # Heatmap — sorted by m6A accessibility (most accessible genes on top)
     plotHeatmap \
         -m "$MATRIX" \
         -out "$GROUP_DIR/${GROUP}.TSS_heatmap.png" \
@@ -210,7 +250,7 @@ for GROUP in $PROCESSED_GROUPS; do
         && echo "    ✅  heatmap done" \
         || echo "    ❌  plotHeatmap failed"
 
-    # Profile plot
+    # Profile — average line plot showing NDR dip + nucleosome phasing
     plotProfile \
         -m "$MATRIX" \
         -out "$GROUP_DIR/${GROUP}.TSS_profile.png" \
@@ -225,8 +265,8 @@ for GROUP in $PROCESSED_GROUPS; do
 done
 
 # =============================================================================
-# Multi-sample comparison: all strains on one plot per signal type
-# Excludes controls (gDNA, HMW) from comparison plots
+# Multi-sample comparison — all strains on one plot per signal type
+# Excludes controls (gDNA, HMW)
 # =============================================================================
 echo ""
 echo "============================================================"
@@ -248,7 +288,7 @@ for SIGNAL in m6A nuc 5mC; do
         [ -f "$BW" ] && BW_LIST="$BW_LIST $BW" && LABELS="$LABELS $GROUP"
     done
 
-    [ -z "$BW_LIST" ] && { echo "  ⚠️  No BigWigs found for $SIGNAL comparison"; continue; }
+    [ -z "$BW_LIST" ] && { echo "  ⚠️  No BigWigs for $SIGNAL — skipping"; continue; }
 
     echo ""
     echo "  ── All strains: $SIGNAL ──"
@@ -276,7 +316,7 @@ for SIGNAL in m6A nuc 5mC; do
         5mC) CMAP="Blues"  ;;
     esac
 
-    # Comparison profile (all strains, one line each)
+    # All-strain profile (one line per strain — key comparison figure)
     plotProfile \
         -m "$MATRIX" \
         -out "$OUT_DIR/allgroups.${SIGNAL}.TSS_profile.png" \
@@ -287,7 +327,7 @@ for SIGNAL in m6A nuc 5mC; do
         && echo "    ✅  comparison profile done" \
         || echo "    ❌  plotProfile failed"
 
-    # Comparison heatmap (one column per strain, same scale)
+    # All-strain heatmap (one column per strain, same color scale)
     plotHeatmap \
         -m "$MATRIX" \
         -out "$OUT_DIR/allgroups.${SIGNAL}.TSS_heatmap.png" \
