@@ -18,7 +18,7 @@ set -euo pipefail
 
 module load HMMER/3.4-gompi-2024a
 module load Foldseek/10-941cd33-GPU
-
+module load MAFFT/7.505-GCC-11.3.0-with-extensions
 
 
 ##################################################
@@ -29,14 +29,20 @@ BASE=/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek
 
 OUT=${BASE}/chromatin_domain_results
 
-mkdir -p ${OUT}/{metadata,domain_lists,domains,foldseek,tmp}
 
-
+mkdir -p \
+${OUT}/metadata \
+${OUT}/domains \
+${OUT}/domain_sequences \
+${OUT}/domain_hmms \
+${OUT}/domains_extracted \
+${OUT}/foldseek \
+${OUT}/tmp
 
 
 
 ##################################################
-# PFAM DATABASE
+# PFAM
 ##################################################
 
 PFAM=${OUT}/Pfam-A.hmm
@@ -58,17 +64,11 @@ fi
 
 
 
-
-
 ##################################################
-# COMBINE ALL PROTEOMES
+# COMBINE PROTEOMES
 ##################################################
-
-echo "Combining proteomes"
-
 
 ALL_FASTA=${OUT}/metadata/all_species.fasta
-
 
 > ${ALL_FASTA}
 
@@ -81,23 +81,15 @@ species=$(basename ${f} _proteome.fasta)
 
 echo "Adding ${species}"
 
-
 sed "s/^>/>${species}|/" ${f} >> ${ALL_FASTA}
-
 
 done
 
 
 
-
-
 ##################################################
-# HMMER
+# PFAM SCAN
 ##################################################
-
-echo "Running hmmscan"
-
-
 
 hmmscan \
 --cpu ${SLURM_CPUS_PER_TASK} \
@@ -109,72 +101,37 @@ ${ALL_FASTA}
 
 
 
-
-
 ##################################################
-# PARSE HMMER DOMAINS
+# PARSE PFAM DOMAINS
 ##################################################
-
-echo "Parsing chromatin domains"
-
-
 
 python3 <<'PY'
-
 
 import csv
 
 
-
 DOMAINS={
 
-
 "BAH":"BAH",
-
 "Chromo":"Chromo",
-
 "Chromo_shadow":"ChromoShadow",
-
 "MRG":"MRG",
-
 "PWWP":"PWWP",
-
 "PHD":"PHD",
-
 "Tudor":"Tudor",
-
 "MBT":"MBT",
-
 "Bromodomain":"Bromodomain",
 
-
-"ADD":"ADD",
-
-"zf-CXXC":"CXXC",
-
-"CW":"CW",
-
-
-
 "SET":"SET",
-
 "DOT1":"DOT1",
 
-
-"HAT":"HAT_MYST",
-
-"GNAT":"HAT_GNAT",
-
-
+"HAT":"HAT",
+"GNAT":"GNAT",
 
 "JmjC":"JmjC",
-
 "JmjN":"JmjN",
 
-
-
 "WD40":"WD40"
-
 
 }
 
@@ -182,17 +139,14 @@ DOMAINS={
 
 inp="chromatin_domain_results/metadata/pfam_hits.domtbl"
 
-
 out="chromatin_domain_results/metadata/domain_occurrences.tsv"
 
 
 
-hits=[]
-
+rows=[]
 
 
 for line in open(inp):
-
 
     if line.startswith("#"):
         continue
@@ -205,91 +159,128 @@ for line in open(inp):
         continue
 
 
-
     pfam=x[0]
-
 
 
     if pfam not in DOMAINS:
         continue
 
 
-
     protein=x[3]
-
 
 
     parts=protein.split("|")
 
 
-
     species=parts[0]
-
-
-
     accession=parts[2]
-
-
-
     gene=parts[3]
 
 
+    rows.append([
 
-    hits.append([
-
-    species,
-
-    accession,
-
-    gene,
-
-    DOMAINS[pfam],
-
-    x[19],
-
-    x[20],
-
-    x[11]
+        species,
+        accession,
+        gene,
+        DOMAINS[pfam],
+        x[17],
+        x[18],
+        x[6]
 
     ])
-
-
 
 
 
 with open(out,"w") as f:
 
-
     w=csv.writer(f,delimiter="\t")
 
-
     w.writerow([
-
     "species",
-
     "accession",
-
     "gene",
-
     "domain",
-
     "start",
-
     "end",
-
     "evalue"
-
     ])
 
-
-
-    w.writerows(hits)
+    w.writerows(rows)
 
 
 
-print("Domain hits:",len(hits))
+print("PFAM domains:",len(rows))
 
-print("Proteins:",len(set(x[2] for x in hits)))
+
+PY
+
+
+
+##################################################
+# EXTRACT DOMAIN SEQUENCES
+##################################################
+
+python3 <<'PY'
+
+
+from Bio import SeqIO
+import csv
+
+
+fasta="chromatin_domain_results/metadata/all_species.fasta"
+
+dom="chromatin_domain_results/metadata/domain_occurrences.tsv"
+
+
+records={}
+
+for r in SeqIO.parse(fasta,"fasta"):
+
+    records[r.id]=r
+
+
+out={}
+
+
+with open(dom) as f:
+
+    for row in csv.DictReader(f,delimiter="\t"):
+
+
+        key=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
+
+
+        if key not in records:
+            continue
+
+
+        seq=records[key].seq
+
+
+        start=int(row["start"])
+        end=int(row["end"])
+
+
+        domain=row["domain"]
+
+
+        new=records[key][start-1:end]
+
+
+        new.id=f"{row['gene']}_{domain}"
+
+
+        out.setdefault(domain,[]).append(new)
+
+
+
+for domain,seqs in out.items():
+
+    SeqIO.write(
+    seqs,
+    f"chromatin_domain_results/domain_sequences/{domain}.fasta",
+    "fasta"
+    )
 
 
 
@@ -297,31 +288,171 @@ PY
 
 
 
+##################################################
+# BUILD DOMAIN HMMs
+##################################################
+
+for f in ${OUT}/domain_sequences/*.fasta
+
+do
+
+domain=$(basename $f .fasta)
+
+
+mafft \
+--auto \
+$f \
+> ${OUT}/domain_sequences/${domain}.aln.fasta
+
+
+hmmbuild \
+${OUT}/domain_hmms/${domain}.hmm \
+${OUT}/domain_sequences/${domain}.aln.fasta
+
+
+done
+
+
 
 
 ##################################################
-# CREATE DOMAIN PROTEIN LISTS
+# SEARCH FUNGAL DISTANT RELATIVES
 ##################################################
 
-echo "Creating protein lists"
+FUNGAL_FASTA=${OUT}/metadata/fungal_proteomes.fasta
+
+
+> ${FUNGAL_FASTA}
+
+
+for f in \
+${BASE}/ncr_proteome.fasta \
+${BASE}/fgr_proteome.fasta \
+${BASE}/mgr_proteome.fasta \
+${BASE}/cne_proteome.fasta \
+${BASE}/zt_proteome.fasta
+
+
+do
+
+species=$(basename ${f} _proteome.fasta)
+
+sed "s/^>/>${species}|/" ${f} >> ${FUNGAL_FASTA}
+
+
+done
 
 
 
-for d in $(cut -f4 ${OUT}/metadata/domain_occurrences.tsv | tail -n +2 | sort -u)
+for hmm in ${OUT}/domain_hmms/*.hmm
 
 do
 
 
-grep -w ${d} \
-${OUT}/metadata/domain_occurrences.tsv \
-| cut -f3 \
-| sort -u \
-> ${OUT}/domain_lists/${d}.txt
+domain=$(basename ${hmm} .hmm)
+
+
+hmmsearch \
+--cpu ${SLURM_CPUS_PER_TASK} \
+--domtblout ${OUT}/metadata/${domain}_fungal_hits.domtbl \
+-E 1e-3 \
+${hmm} \
+${FUNGAL_FASTA}
 
 
 
 done
 
+
+
+
+##################################################
+# MERGE ALL DOMAIN HITS
+##################################################
+
+python3 <<'PY'
+
+import csv
+from pathlib import Path
+
+
+base=Path(
+"chromatin_domain_results"
+)
+
+
+out=base/"metadata/domain_occurrences_extended.tsv"
+
+
+rows=[]
+
+
+with open(base/"metadata/domain_occurrences.tsv") as f:
+
+    rows=list(csv.reader(f,delimiter="\t"))
+
+
+
+for domtbl in Path(base/"metadata").glob("*_fungal_hits.domtbl"):
+
+
+    domain=domtbl.name.replace("_fungal_hits.domtbl","")
+
+
+    for line in open(domtbl):
+
+
+        if line.startswith("#"):
+            continue
+
+
+        x=line.split()
+
+
+        if len(x)<23:
+            continue
+
+
+        prot=x[0]
+
+        parts=prot.split("|")
+
+
+        rows.append([
+
+        parts[0],
+        parts[2],
+        parts[3],
+        domain,
+        x[17],
+        x[18],
+        x[6]
+
+        ])
+
+
+
+with open(out,"w") as f:
+
+    w=csv.writer(f,delimiter="\t")
+
+    w.writerow([
+    "species",
+    "accession",
+    "gene",
+    "domain",
+    "start",
+    "end",
+    "evalue"
+    ])
+
+    w.writerows(rows)
+
+
+
+print("Extended hits:",len(rows))
+
+PY
 
 
 
@@ -336,19 +467,16 @@ python3 <<'PY'
 from collections import defaultdict
 
 
-
 d=defaultdict(list)
 
 
-
 for line in open(
-"chromatin_domain_results/metadata/domain_occurrences.tsv"
+"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
 ):
 
 
     if line.startswith("species"):
         continue
-
 
 
     s,a,g,dom,*_=line.strip().split("\t")
@@ -359,23 +487,18 @@ for line in open(
 
 
 with open(
-"chromatin_domain_results/metadata/domain_architectures.tsv",
+"chromatin_domain_results/metadata/domain_architecture.tsv",
 "w"
 ) as out:
 
 
-    out.write(
-    "species\tgene\tarchitecture\n"
-    )
+    out.write("species\tgene\tarchitecture\n")
 
 
-    for (s,g),v in d.items():
-
+    for k,v in d.items():
 
         out.write(
-
-        f"{s}\t{g}\t{';'.join(sorted(set(v)))}\n"
-
+        f"{k[0]}\t{k[1]}\t{';'.join(sorted(set(v)))}\n"
         )
 
 
@@ -384,53 +507,9 @@ PY
 
 
 
-
 ##################################################
-# FIND CIFS
+# EXTRACT STRUCTURAL DOMAINS
 ##################################################
-
-echo "Linking structures"
-
-
-
-while IFS=$'\t' read species accession gene domain start end evalue
-
-do
-
-
-if [ "$gene" = "gene" ]; then
-continue
-fi
-
-
-
-mkdir -p ${OUT}/domains/${domain}/${species}
-
-
-
-find ${BASE}/cif_* \
--name "*${accession}*.cif" \
--exec ln -sf {} \
-${OUT}/domains/${domain}/${species}/ \;
-
-
-done < ${OUT}/metadata/domain_occurrences.tsv
-
-
-
-
-##################################################
-# EXTRACT DOMAIN STRUCTURES FROM HMMER BOUNDARIES
-##################################################
-
-echo "Extracting domain-only structures"
-
-
-DOMAIN_PDB=${OUT}/domains_extracted
-
-mkdir -p ${DOMAIN_PDB}
-
-
 
 python3 <<'PY'
 
@@ -440,209 +519,121 @@ from pathlib import Path
 import re
 
 
-BASE=Path(
-"chromatin_domain_results"
+ROOT=Path(
+"/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek"
 )
 
-MANIFEST_DIR=BASE/"metadata"
-DOMAIN_TABLE=MANIFEST_DIR/"domain_occurrences.tsv"
 
-CIF_ROOT=BASE/"domains"
-
-OUT=BASE/"domains_extracted"
+CIFS=list(ROOT.glob("cif_*"))
 
 
+out=ROOT/"chromatin_domain_results/domains_extracted"
 
-def read_cif_ca(path):
+
+out.mkdir(exist_ok=True)
+
+
+
+for row in csv.DictReader(
+open(ROOT/"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"),
+delimiter="\t"
+):
+
+
+    accession=row["accession"]
+
+    if not accession:
+        continue
+
+
+    cif=None
+
+
+    for c in CIFS:
+
+        hits=list(c.rglob(f"*{accession}*.cif"))
+
+        if hits:
+            cif=hits[0]
+            break
+
+
+    if cif is None:
+        continue
+
+
 
     atoms=[]
 
-    lines=open(path).read().splitlines()
 
-    atom_started=False
-    cols={}
+    for line in open(cif):
 
-    for i,line in enumerate(lines):
-
-        if line.startswith("_atom_site."):
-
-            atom_started=True
-            key=line.strip().replace("_atom_site.","")
-            cols[key]=len(cols)
-
-
-        elif atom_started and line.startswith("ATOM"):
-
-            x=line.split()
-
-            try:
-
-                atom_name=x[cols["label_atom_id"]]
-
-                if atom_name != "CA":
-                    continue
-
-
-                residue=int(
-                    x[cols["label_seq_id"]]
-                )
-
-
-                atoms.append(
-                    (
-                    residue,
-                    float(x[cols["Cartn_x"]]),
-                    float(x[cols["Cartn_y"]]),
-                    float(x[cols["Cartn_z"]]),
-                    x[cols["label_comp_id"]]
-                    )
-                )
-
-
-            except:
-                continue
-
-
-    return atoms
-
-
-
-
-
-def write_pdb(atoms,out):
-
-
-    lines=[]
-
-
-    for i,a in enumerate(atoms,1):
-
-        res,x,y,z,name=a
-
-
-        lines.append(
-        f"ATOM  {i:5d}  CA  {name:3s} A{res:4d}    "
-        f"{x:8.3f}{y:8.3f}{z:8.3f}"
-        )
-
-
-    lines.append("END")
-
-
-    out.write_text(
-        "\n".join(lines)
-    )
-
-
-
-
-
-written=0
-
-
-with open(DOMAIN_TABLE) as f:
-
-
-    for row in csv.DictReader(f,delimiter="\t"):
-
-
-        gene=row["gene"]
-        domain=row["domain"]
-
-        start=int(row["start"])
-        end=int(row["end"])
-
-
-
-        # find CIF
-        matches=list(
-            CIF_ROOT.rglob("*.cif")
-        )
-
-        matches=[
-            m for m in matches
-            if row["gene"] in m.name
-            or row["accession"] in m.name
-        ]
-
-
-        if not matches:
+        if not line.startswith("ATOM"):
             continue
 
 
-
-        cif=matches[0]
-
+        x=line.split()
 
 
-        atoms=read_cif_ca(cif)
-
-
-
-        domain_atoms=[
-            a for a in atoms
-            if start-5 <= a[0] <= end+5
-        ]
-
-
-
-        if len(domain_atoms)<10:
+        if len(x)<12:
             continue
 
 
-
-        outdir=OUT/domain
-        outdir.mkdir(
-            parents=True,
-            exist_ok=True
-        )
+        if x[3]!="CA":
+            continue
 
 
-        safe=re.sub(
-            "[^A-Za-z0-9_-]",
-            "_",
-            gene
-        )
+        try:
+
+            res=int(x[8])
+
+            if int(row["start"]) <= res <= int(row["end"]):
+
+                atoms.append(line)
 
 
-        outfile=outdir / (
-        f"{safe}_{domain}_{start}-{end}.pdb"
-        )
-
-
-        write_pdb(
-            domain_atoms,
-            outfile
-        )
-
-
-        written+=1
+        except:
+            pass
 
 
 
-print(
-"Domain structures written:",
-written
-)
+    if len(atoms)<10:
+        continue
 
-if written == 0:
-    raise RuntimeError(
-    "No domain PDBs extracted. Check CIF parser or accession matching."
-    )
+
+
+    domain=row["domain"]
+
+
+    d=out/domain
+
+    d.mkdir(exist_ok=True)
+
+
+
+    name=f"{row['gene']}_{domain}_{row['start']}-{row['end']}.pdb"
+
+
+    with open(d/name,"w") as f:
+
+        f.writelines(atoms)
+
+        f.write("END\n")
+
+
+print("done")
+
+
 PY
 
 
 
 
 ##################################################
-# FOLDSEEK DOMAIN-ONLY COMPARISONS
+# FOLDSEEK
 ##################################################
 
-echo "Running FoldSeek on extracted domains"
-
-
-
-for d in ${DOMAIN_PDB}/*
+for d in ${OUT}/domains_extracted/*
 
 do
 
@@ -650,41 +641,29 @@ do
 domain=$(basename ${d})
 
 
-n=$(find ${d} -name "*.pdb" | wc -l)
+n=$(ls ${d}/*.pdb | wc -l)
 
 
 if [ ${n} -lt 2 ]
-
 then
-
-echo "Skip ${domain}: ${n}"
-
 continue
-
 fi
-
-
-
-echo "FoldSeek ${domain}"
 
 
 
 foldseek easy-search \
 ${d} \
 ${d} \
-${OUT}/foldseek/${domain}_domain_allvall.tsv \
-${OUT}/tmp/${domain}_domain \
+${OUT}/foldseek/${domain}_allvall.tsv \
+${OUT}/tmp/${domain} \
 --format-output \
 "query,target,fident,alnlen,qstart,qend,tstart,tend,evalue,bits,alntmscore,qtmscore,ttmscore,rmsd" \
---alignment-type 1 \
 --threads ${SLURM_CPUS_PER_TASK}
-
 
 
 done
 
 
 
-echo "DOMAIN LEVEL FOLDSEEK COMPLETE"
-
+echo "COMPLETE"
 echo ${OUT}
