@@ -249,7 +249,7 @@ for line in open(inp):
 
     x[20],
 
-    x[12]
+    x[11]
 
     ])
 
@@ -419,17 +419,230 @@ done < ${OUT}/metadata/domain_occurrences.tsv
 
 
 
+##################################################
+# EXTRACT DOMAIN STRUCTURES FROM HMMER BOUNDARIES
+##################################################
+
+echo "Extracting domain-only structures"
+
+
+DOMAIN_PDB=${OUT}/domains_extracted
+
+mkdir -p ${DOMAIN_PDB}
+
+
+
+python3 <<'PY'
+
+
+import csv
+from pathlib import Path
+import re
+
+
+BASE=Path(
+"chromatin_domain_results"
+)
+
+MANIFEST_DIR=BASE/"metadata"
+DOMAIN_TABLE=MANIFEST_DIR/"domain_occurrences.tsv"
+
+CIF_ROOT=BASE/"domains"
+
+OUT=BASE/"domains_extracted"
+
+
+
+def read_cif_ca(path):
+
+    atoms=[]
+
+    lines=open(path).read().splitlines()
+
+    atom_started=False
+    cols={}
+
+    for i,line in enumerate(lines):
+
+        if line.startswith("_atom_site."):
+
+            atom_started=True
+            key=line.strip().replace("_atom_site.","")
+            cols[key]=len(cols)
+
+
+        elif atom_started and line.startswith("ATOM"):
+
+            x=line.split()
+
+            try:
+
+                atom_name=x[cols["label_atom_id"]]
+
+                if atom_name != "CA":
+                    continue
+
+
+                residue=int(
+                    x[cols["label_seq_id"]]
+                )
+
+
+                atoms.append(
+                    (
+                    residue,
+                    float(x[cols["Cartn_x"]]),
+                    float(x[cols["Cartn_y"]]),
+                    float(x[cols["Cartn_z"]]),
+                    x[cols["label_comp_id"]]
+                    )
+                )
+
+
+            except:
+                continue
+
+
+    return atoms
+
+
+
+
+
+def write_pdb(atoms,out):
+
+
+    lines=[]
+
+
+    for i,a in enumerate(atoms,1):
+
+        res,x,y,z,name=a
+
+
+        lines.append(
+        f"ATOM  {i:5d}  CA  {name:3s} A{res:4d}    "
+        f"{x:8.3f}{y:8.3f}{z:8.3f}"
+        )
+
+
+    lines.append("END")
+
+
+    out.write_text(
+        "\n".join(lines)
+    )
+
+
+
+
+
+written=0
+
+
+with open(DOMAIN_TABLE) as f:
+
+
+    for row in csv.DictReader(f,delimiter="\t"):
+
+
+        gene=row["gene"]
+        domain=row["domain"]
+
+        start=int(row["start"])
+        end=int(row["end"])
+
+
+
+        # find CIF
+        matches=list(
+            CIF_ROOT.rglob("*.cif")
+        )
+
+        matches=[
+            m for m in matches
+            if row["gene"] in m.name
+            or row["accession"] in m.name
+        ]
+
+
+        if not matches:
+            continue
+
+
+
+        cif=matches[0]
+
+
+
+        atoms=read_cif_ca(cif)
+
+
+
+        domain_atoms=[
+            a for a in atoms
+            if start-5 <= a[0] <= end+5
+        ]
+
+
+
+        if len(domain_atoms)<10:
+            continue
+
+
+
+        outdir=OUT/domain
+        outdir.mkdir(
+            parents=True,
+            exist_ok=True
+        )
+
+
+        safe=re.sub(
+            "[^A-Za-z0-9_-]",
+            "_",
+            gene
+        )
+
+
+        outfile=outdir / (
+        f"{safe}_{domain}_{start}-{end}.pdb"
+        )
+
+
+        write_pdb(
+            domain_atoms,
+            outfile
+        )
+
+
+        written+=1
+
+
+
+print(
+"Domain structures written:",
+written
+)
+
+if written == 0:
+    raise RuntimeError(
+    "No domain PDBs extracted. Check CIF parser or accession matching."
+    )
+PY
+
+
+
 
 ##################################################
-# FOLDSEEK PER DOMAIN
+# FOLDSEEK DOMAIN-ONLY COMPARISONS
 ##################################################
 
-echo "Running FoldSeek"
+echo "Running FoldSeek on extracted domains"
 
 
 
-for d in ${OUT}/domains/*
-
+for d in ${DOMAIN_PDB}/*
 
 do
 
@@ -437,9 +650,7 @@ do
 domain=$(basename ${d})
 
 
-
-n=$(find ${d} -name "*.cif" | wc -l)
-
+n=$(find ${d} -name "*.pdb" | wc -l)
 
 
 if [ ${n} -lt 2 ]
@@ -461,10 +672,11 @@ echo "FoldSeek ${domain}"
 foldseek easy-search \
 ${d} \
 ${d} \
-${OUT}/foldseek/${domain}_allvall.tsv \
-${OUT}/tmp/${domain} \
+${OUT}/foldseek/${domain}_domain_allvall.tsv \
+${OUT}/tmp/${domain}_domain \
 --format-output \
-"query,target,evalue,bits,alntmscore,rmsd" \
+"query,target,fident,alnlen,qstart,qend,tstart,tend,evalue,bits,alntmscore,qtmscore,ttmscore,rmsd" \
+--alignment-type 1 \
 --threads ${SLURM_CPUS_PER_TASK}
 
 
@@ -473,8 +685,6 @@ done
 
 
 
-
-
-echo "DONE"
+echo "DOMAIN LEVEL FOLDSEEK COMPLETE"
 
 echo ${OUT}
