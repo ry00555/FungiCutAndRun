@@ -414,39 +414,27 @@ with open(dom) as f:
                 collapsed[collapse_key][1],
                 end
             )
-
-
 print("Collapsed domains:",len(collapsed))
-
-
 
 ##################################################
 # EXTRACT SEQUENCES
 ##################################################
 
-domain_out={}
-
+domain_out = {}
 
 for (key,domain),(start,end) in collapsed.items():
 
+    record = records[key]
 
-    record=records[key]
+    newrec = record[start-1:end]
 
+    gene = key.split("|")[3]
 
-    seq=record.seq[start-1:end]
+    newrec.id = f"{gene}_{domain}"
+    newrec.name = ""
+    newrec.description = key
 
-
-    gene=key.split("|")[3]
-
-
-    seq.id=f"{gene}_{domain}"
-
-    seq.description=key
-
-
-    domain_out.setdefault(domain,[]).append(seq)
-
-
+    domain_out.setdefault(domain, []).append(newrec)
 
 ##################################################
 # WRITE SAME FILE NAMES
@@ -456,18 +444,13 @@ for domain,seqs in domain_out.items():
 
     outfile=f"{outdir}/{domain}.fasta"
 
-
     SeqIO.write(
         seqs,
         outfile,
         "fasta"
     )
 
-
-    print(domain,len(seqs))
-
-
-PY
+    print(domain, len(seqs))
 
 ##################################################
 # BUILD DOMAIN HMMs
