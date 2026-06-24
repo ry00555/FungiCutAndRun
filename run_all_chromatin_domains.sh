@@ -326,71 +326,88 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 # # EXTRACT DOMAIN SEQUENCES
 # ##################################################
 #
-# python3 <<'PY'
-#
-#
-# from Bio import SeqIO
-# import csv
-#
-#
-# fasta="chromatin_domain_results/metadata/all_species.fasta"
-#
-# dom="chromatin_domain_results/metadata/domain_occurrences.tsv"
-#
-#
-# records={}
-#
-# for r in SeqIO.parse(fasta,"fasta"):
-#
-#     records[r.id]=r
-#
-#
-# out={}
-#
-#
-# with open(dom) as f:
-#
-#     for row in csv.DictReader(f,delimiter="\t"):
-#
-#
-#         key=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
-#
-#
-#         if key not in records:
-#             continue
-#
-#
-#         seq=records[key].seq
-#
-#
-#         start=int(row["start"])
-#         end=int(row["end"])
-#
-#
-#         domain=row["domain"]
-#
-#
-#         new=records[key][start-1:end]
-#
-#
-#         new.id=f"{row['gene']}_{domain}"
-#
-#
-#         out.setdefault(domain,[]).append(new)
-#
-#
-#
-# for domain,seqs in out.items():
-#
-#     SeqIO.write(
-#     seqs,
-#     f"chromatin_domain_results/domain_sequences/{domain}.fasta",
-#     "fasta"
-#     )
-#
-#
-#
-# PY
+python3 <<'PY'
+
+from Bio import SeqIO
+import csv
+import os
+
+
+fasta="chromatin_domain_results/metadata/all_species.fasta"
+
+dom="chromatin_domain_results/metadata/domain_occurrences.tsv"
+
+outdir="chromatin_domain_results/domain_sequences"
+
+os.makedirs(outdir,exist_ok=True)
+
+
+# load fasta
+records={}
+
+for r in SeqIO.parse(fasta,"fasta"):
+    records[r.id]=r
+
+
+print("FASTA proteins:",len(records))
+
+
+domains={}
+
+
+with open(dom) as f:
+
+    for row in csv.DictReader(f,delimiter="\t"):
+
+
+        # rebuild actual fasta ID
+        fasta_id=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
+
+
+        # find matching header
+        matches=[x for x in records if x.startswith(fasta_id)]
+
+
+        if len(matches)==0:
+            continue
+
+
+        seq=records[matches[0]].seq
+
+
+        start=int(row["start"])
+        end=int(row["end"])
+
+
+        domain=row["domain"]
+
+
+        new=records[matches[0]][start-1:end]
+
+
+        new.id=f"{row['gene']}_{domain}_{row['species']}"
+
+
+        domains.setdefault(domain,[]).append(new)
+
+
+
+for d,seqs in domains.items():
+
+    SeqIO.write(
+        seqs,
+        f"{outdir}/{d}.fasta",
+        "fasta"
+    )
+
+
+    print(
+        d,
+        len(seqs)
+    )
+
+
+PY
 
 
 
@@ -837,69 +854,69 @@ FUNGAL_FASTA=${OUT}/metadata/fungal_proteomes.fasta
 # MERGE FOLDSEEK RESULTS
 ##################################################
 
-python3 <<'PY'
-
-from pathlib import Path
-import pandas as pd
-
-
-ROOT=Path(
-"/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results"
-)
-
-
-files=list(
-(ROOT/"foldseek").glob("*_allvall.tsv")
-)
-
-
-print("Foldseek files:",len(files))
-
-
-dfs=[]
-
-
-for f in files:
-
-    domain=f.name.replace("_allvall.tsv","")
-
-    try:
-
-        df=pd.read_csv(
-            f,
-            sep="\t"
-        )
-
-        df["domain"]=domain
-
-        dfs.append(df)
-
-
-        print(domain,len(df))
-
-
-    except Exception as e:
-
-        print("FAILED",f,e)
-
-
-
-merged=pd.concat(
-    dfs,
-    ignore_index=True
-)
-
-
-merged.to_csv(
-ROOT/"metadata/foldseek_all_domains.csv",
-index=False
-)
-
-
-print(
-"Total structural comparisons:",
-len(merged)
-)
-
-
-PY
+# python3 <<'PY'
+#
+# from pathlib import Path
+# import pandas as pd
+#
+#
+# ROOT=Path(
+# "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results"
+# )
+#
+#
+# files=list(
+# (ROOT/"foldseek").glob("*_allvall.tsv")
+# )
+#
+#
+# print("Foldseek files:",len(files))
+#
+#
+# dfs=[]
+#
+#
+# for f in files:
+#
+#     domain=f.name.replace("_allvall.tsv","")
+#
+#     try:
+#
+#         df=pd.read_csv(
+#             f,
+#             sep="\t"
+#         )
+#
+#         df["domain"]=domain
+#
+#         dfs.append(df)
+#
+#
+#         print(domain,len(df))
+#
+#
+#     except Exception as e:
+#
+#         print("FAILED",f,e)
+#
+#
+#
+# merged=pd.concat(
+#     dfs,
+#     ignore_index=True
+# )
+#
+#
+# merged.to_csv(
+# ROOT/"metadata/foldseek_all_domains.csv",
+# index=False
+# )
+#
+#
+# print(
+# "Total structural comparisons:",
+# len(merged)
+# )
+#
+#
+# PY
