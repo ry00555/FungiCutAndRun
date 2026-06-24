@@ -330,24 +330,31 @@ python3 <<'PY'
 
 from Bio import SeqIO
 import csv
-from collections import defaultdict
+import os
 
 
-fasta = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
+fasta="chromatin_domain_results/metadata/all_species.fasta"
 
-dom = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+dom="chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
 
-outdir = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/domain_sequences"
+outdir="chromatin_domain_results/domain_sequences"
+
+os.makedirs(outdir, exist_ok=True)
 
 
 ##################################################
-# LOAD PROTEINS
+# LOAD FASTA
 ##################################################
 
 records={}
 
 for r in SeqIO.parse(fasta,"fasta"):
-    records[r.id]=r
+
+    # keep only:
+    # species|db|accession|gene
+    key="|".join(r.id.split("|")[:4])
+
+    records[key]=r
 
 
 print("Proteins loaded:",len(records))
@@ -357,8 +364,7 @@ print("Proteins loaded:",len(records))
 # COLLAPSE DOMAINS
 ##################################################
 
-domains=defaultdict(list)
-
+collapsed={}
 
 with open(dom) as f:
 
@@ -366,98 +372,90 @@ with open(dom) as f:
 
     for row in reader:
 
-        key=(
-            row["species"],
-            row["accession"],
-            row["gene"],
-            row["domain"]
-        )
+        key=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
 
-        domains[key].append(
-            (
-            int(row["start"]),
-            int(row["end"])
+        # handle tr proteins too
+        if key not in records:
+
+            key=f"{row['species']}|tr|{row['accession']}|{row['gene']}"
+
+
+        if key not in records:
+
+            print("MISSING:",key)
+            continue
+
+
+        domname=row["domain"]
+
+        start=int(row["start"])
+        end=int(row["end"])
+
+
+        # collapse same protein/domain
+        collapse_key=(key,domname)
+
+
+        if collapse_key not in collapsed:
+
+            collapsed[collapse_key]=[
+                start,
+                end
+            ]
+
+        else:
+
+            collapsed[collapse_key][0]=min(
+                collapsed[collapse_key][0],
+                start
             )
-        )
 
-
-collapsed=[]
-
-
-for key,hits in domains.items():
-
-    species,acc,gene,domain=key
-
-    starts=[x[0] for x in hits]
-    ends=[x[1] for x in hits]
-
-    collapsed.append(
-        [
-        species,
-        acc,
-        gene,
-        domain,
-        min(starts),
-        max(ends)
-        ]
-    )
+            collapsed[collapse_key][1]=max(
+                collapsed[collapse_key][1],
+                end
+            )
 
 
 print("Collapsed domains:",len(collapsed))
 
 
+
 ##################################################
-# EXTRACT DOMAIN SEQUENCES
+# EXTRACT SEQUENCES
 ##################################################
 
-out={}
+domain_out={}
 
 
-for species,acc,gene,domain,start,end in collapsed:
+for (key,domain),(start,end) in collapsed.items():
 
 
-    # EXACT FASTA ID SEARCH
-    prefix=f"{species}|sp|{acc}|{gene}"
+    record=records[key]
 
 
-    match=None
+    seq=record.seq[start-1:end]
 
 
-    for rid in records:
-
-        if rid.startswith(prefix):
-            match=records[rid]
-            break
+    gene=key.split("|")[3]
 
 
-    if match is None:
-        print("MISSING:",prefix)
-        continue
+    seq.id=f"{gene}_{domain}"
+
+    seq.description=key
 
 
-    seq=match.seq[start-1:end]
-
-
-    seq.id=f"{species}|{acc}|{gene}|{domain}"
-
-    seq.description=""
-
-
-    out.setdefault(domain,[]).append(seq)
+    domain_out.setdefault(domain,[]).append(seq)
 
 
 
 ##################################################
-# WRITE FASTAS
+# WRITE SAME FILE NAMES
 ##################################################
 
-import os
-os.makedirs(outdir,exist_ok=True)
-
-
-for domain,seqs in out.items():
+for domain,seqs in domain_out.items():
 
     outfile=f"{outdir}/{domain}.fasta"
+
 
     SeqIO.write(
         seqs,
@@ -465,7 +463,9 @@ for domain,seqs in out.items():
         "fasta"
     )
 
-    print(domain,len(seqs),outfile)
+
+    print(domain,len(seqs))
+
 
 PY
 
