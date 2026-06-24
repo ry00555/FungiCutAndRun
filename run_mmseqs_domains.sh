@@ -30,33 +30,33 @@ mkdir -p $OUT
 # 1. DOMAIN SEQUENCE IDENTITY
 ##################################################
 
-# echo "Extracting domain FASTAs..."
+echo "Extracting domain FASTAs..."
 #
 #
 #
-# for fasta in ${DOMAIN_FASTA}/*_fixed.fasta
+for fasta in ${DOMAIN_FASTA}/*_fixed.fasta
 #
-# do
+do
 #
-# domain=$(basename "$fasta" _fixed.fasta)
-#
-#
-# echo "Running domain: $domain"
+ domain=$(basename "$fasta" _fixed.fasta)
 #
 #
+ echo "Running domain: $domain"
 #
-# mmseqs easy-search \
-# $fasta \
-# $fasta \
-# ${OUT}/${domain}_identity.tsv \
-# tmp_${domain} \
-# -e 1e-3 \
-# -c 0.5 \
-# --cov-mode 0 \
-# --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
 #
+#
+ mmseqs easy-search \
+ $fasta \
+ $fasta \
+ ${OUT}/${domain}_identity.tsv \
+ tmp_${domain} \
+ -e 1e-3 \
+ -c 0.5 \
+ --cov-mode 0 \
+ --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
 
-#done
+
+done
 
 
 

@@ -335,7 +335,7 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 #
 # fasta="chromatin_domain_results/metadata/all_species.fasta"
 #
-# dom="chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+# dom="chromatin_domain_results/metadata/domain_occurrences.tsv"
 #
 # outdir="chromatin_domain_results/domain_sequences"
 #
@@ -457,69 +457,69 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 ##################################################
 # BUILD DOMAIN HMMs
 ##################################################
-#
-for f in ${OUT}/domain_sequences/*.fasta
-#
-do
-#
- domain=$(basename $f .fasta)
-#
- nseq=$(grep -c "^>" $f)
-#
- if [ $nseq -lt 2 ]
- then
-     echo "Skipping ${domain} (only ${nseq} sequence)"
-     continue
- fi
-#
- mafft \
- --auto \
- $f \
- > ${OUT}/domain_sequences/${domain}.aln.fasta
-#
-#
- hmmbuild \
- ${OUT}/domain_hmms/${domain}.hmm \
- ${OUT}/domain_sequences/${domain}.aln.fasta
- done
-
-
-
-
-##################################################
-# SEARCH FUNGAL DISTANT RELATIVES
-##################################################
-
-FUNGAL_FASTA=${OUT}/metadata/fungal_proteomes.fasta
-
-
- > ${FUNGAL_FASTA}
-
- for f in \
- ${BASE}/ncr_proteome.fasta \
- ${BASE}/fgr_proteome.fasta \
- ${BASE}/mgr_proteome.fasta \
- ${BASE}/cne_proteome.fasta \
- ${BASE}/zt_proteome.fasta
+# #
+# for f in ${OUT}/domain_sequences/*.fasta
+# #
+# do
+# #
+#  domain=$(basename $f .fasta)
+# #
+#  nseq=$(grep -c "^>" $f)
+# #
+#  if [ $nseq -lt 2 ]
+#  then
+#      echo "Skipping ${domain} (only ${nseq} sequence)"
+#      continue
+#  fi
+# #
+#  mafft \
+#  --auto \
+#  $f \
+#  > ${OUT}/domain_sequences/${domain}.aln.fasta
+# #
+# #
+#  hmmbuild \
+#  ${OUT}/domain_hmms/${domain}.hmm \
+#  ${OUT}/domain_sequences/${domain}.aln.fasta
+#  done
 #
 #
- do
- species=$(basename ${f} _proteome.fasta)
 #
- sed "s/^>/>${species}|/" ${f} >> ${FUNGAL_FASTA}
-done
 #
-for hmm in ${OUT}/domain_hmms/*.hmm
- do
- domain=$(basename ${hmm} .hmm)
-
- hmmsearch \
- --cpu ${SLURM_CPUS_PER_TASK} \
- --domtblout ${OUT}/metadata/${domain}_fungal_hits.domtbl \
- -E 1e-3 \
- ${hmm} \
- ${FUNGAL_FASTA}
-done
+# ##################################################
+# # SEARCH FUNGAL DISTANT RELATIVES
+# ##################################################
+#
+# FUNGAL_FASTA=${OUT}/metadata/fungal_proteomes.fasta
+#
+#
+#  > ${FUNGAL_FASTA}
+#
+#  for f in \
+#  ${BASE}/ncr_proteome.fasta \
+#  ${BASE}/fgr_proteome.fasta \
+#  ${BASE}/mgr_proteome.fasta \
+#  ${BASE}/cne_proteome.fasta \
+#  ${BASE}/zt_proteome.fasta
+# #
+# #
+#  do
+#  species=$(basename ${f} _proteome.fasta)
+# #
+#  sed "s/^>/>${species}|/" ${f} >> ${FUNGAL_FASTA}
+# done
+# #
+# for hmm in ${OUT}/domain_hmms/*.hmm
+#  do
+#  domain=$(basename ${hmm} .hmm)
+#
+#  hmmsearch \
+#  --cpu ${SLURM_CPUS_PER_TASK} \
+#  --domtblout ${OUT}/metadata/${domain}_fungal_hits.domtbl \
+#  -E 1e-3 \
+#  ${hmm} \
+#  ${FUNGAL_FASTA}
+# done
 
 
 
@@ -528,90 +528,66 @@ done
 # MERGE ALL DOMAIN HITS
 ##################################################
 
-# python3 <<'PY'
-#
-# import csv
-# from pathlib import Path
-#
-#
-# base=Path(
-# "chromatin_domain_results"
-# )
-#
-#
-# out=base/"metadata/domain_occurrences_extended.tsv"
-#
-#
-# rows=[]
-#
-#
-# with open(base/"metadata/domain_occurrences.tsv") as f:
-#
-#     rows=list(csv.reader(f,delimiter="\t"))
-#
-#
-#
-# for domtbl in Path(base/"metadata").glob("*_fungal_hits.domtbl"):
-#
-#
-#     domain=domtbl.name.replace("_fungal_hits.domtbl","")
-#
-#
-#     for line in open(domtbl):
-#
-#
-#         if line.startswith("#"):
-#             continue
-#
-#
-#         x=line.split()
-#
-#
-#         if len(x)<23:
-#             continue
-#
-#
-#         prot=x[0]
-#
-#         parts=prot.split("|")
-#
-#
-#         rows.append([
-#
-#         parts[0],
-#         parts[2],
-#         parts[3],
-#         domain,
-#         x[17],
-#         x[18],
-#         x[6]
-#
-#         ])
-#
-#
-#
-# with open(out,"w") as f:
-#
-#     w=csv.writer(f,delimiter="\t")
-#
-#     w.writerow([
-#     "species",
-#     "accession",
-#     "gene",
-#     "domain",
-#     "start",
-#     "end",
-#     "evalue"
-#     ])
-#
-#     w.writerows(rows)
-#
-#
-#
-# print("Extended hits:",len(rows))
-#
-# PY
+python3 <<'PY'
 
+import csv
+from pathlib import Path
+
+base=Path("chromatin_domain_results")
+
+out=base/"metadata/domain_occurrences_extended.tsv"
+
+rows=[]
+
+with open(base/"metadata/domain_occurrences.tsv") as f:
+    rows=list(csv.reader(f,delimiter="\t"))
+
+for domtbl in Path(base/"metadata").glob("*_fungal_hits.domtbl"):
+
+    domain=domtbl.name.replace("_fungal_hits.domtbl","")
+
+    for line in open(domtbl):
+
+        if line.startswith("#"):
+            continue
+
+        x=line.split()
+
+        if len(x)<23:
+            continue
+
+        prot=x[0]
+        parts=prot.split("|")
+
+        rows.append([
+            parts[0],
+            parts[2],
+            parts[3],
+            domain,
+            x[17],
+            x[18],
+            x[6]
+        ])
+
+with open(out,"w") as f:
+
+    w=csv.writer(f,delimiter="\t")
+
+    w.writerow([
+        "species",
+        "accession",
+        "gene",
+        "domain",
+        "start",
+        "end",
+        "evalue"
+    ])
+
+    w.writerows(rows)
+
+print("Extended hits:",len(rows))
+
+PY
 
 
 
@@ -619,48 +595,41 @@ done
 # DOMAIN ARCHITECTURE
 ##################################################
 
-# python3 <<'PY'
-#
-#
-# from collections import defaultdict
-#
-#
-# d=defaultdict(list)
-#
-#
-# for line in open(
-# "chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-# ):
-#
-#
-#     if line.startswith("species"):
-#         continue
-#
-#
-#     s,a,g,dom,*_=line.strip().split("\t")
-#
-#
-#     d[(s,g)].append(dom)
-#
-#
-#
-# with open(
-# "chromatin_domain_results/metadata/domain_architecture.tsv",
-# "w"
-# ) as out:
-#
-#
-#     out.write("species\tgene\tarchitecture\n")
-#
-#
-#     for k,v in d.items():
-#
-#         out.write(
-#         f"{k[0]}\t{k[1]}\t{';'.join(sorted(set(v)))}\n"
-#         )
-#
-#
-# PY
+python3 <<'PY'
+
+from collections import defaultdict
+
+d=defaultdict(list)
+
+for line in open(
+    "chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+):
+
+    if line.startswith("species"):
+        continue
+
+    s,a,g,dom,*_=line.strip().split("\t")
+
+    d[(s,g)].append(dom)
+
+
+with open(
+    "chromatin_domain_results/metadata/domain_architecture.tsv",
+    "w"
+) as out:
+
+    out.write("species\tgene\tarchitecture\n")
+
+    for k,v in d.items():
+
+        out.write(
+            f"{k[0]}\t{k[1]}\t{';'.join(sorted(set(v)))}\n"
+        )
+
+
+print("Wrote domain architecture:", len(d))
+
+PY
 
 
 
@@ -669,173 +638,194 @@ done
 # EXTRACT STRUCTURAL DOMAINS
 ##################################################
 
-# python3 <<'PY'
-#
-# import csv
-# from pathlib import Path
-#
-# from Bio.PDB import MMCIFParser
-# from Bio.PDB import PDBIO
-# from Bio.PDB import Select
-#
-#
-# ROOT=Path(
-# "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek"
-# )
-#
-#
-# SEARCH_DIRS=[
-# ROOT/"cif_human",
-# ROOT/"cif_mouse",
-# ROOT/"cif_zebrafish",
-# ROOT/"cif_fungi"
-# ]
-#
-#
-# OUT=ROOT/"chromatin_domain_results/domains_extracted"
-#
-# OUT.mkdir(exist_ok=True)
-#
-#
-# print("Indexing CIF files...")
-#
-#
-# CIF_INDEX={}
-#
-# for directory in SEARCH_DIRS:
-#
-#     for cif in directory.rglob("*.cif"):
-#
-#         CIF_INDEX[cif.name]=cif
-#
-#
-# print("Indexed",len(CIF_INDEX),"CIF files")
-#
-#
-# class DomainSelect(Select):
-#
-#     def __init__(self,start,end):
-#
-#         self.start=start
-#         self.end=end
-#
-#
-#     def accept_residue(self,residue):
-#
-#         try:
-#
-#             resnum=residue.id[1]
-#
-#             return self.start <= resnum <= self.end
-#
-#         except:
-#
-#             return False
-#
-#
-#
-# parser=MMCIFParser(QUIET=True)
-#
-# count=0
-# missing=0
-# failed=0
-#
-#
-# with open(
-# ROOT/"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-# ) as f:
-#
-#
-#     reader=csv.DictReader(f,delimiter="\t")
-#
-#
-#     for row in reader:
-#
-#
-#         accession=row["accession"]
-#
-#         gene=row["gene"]
-#
-#         domain=row["domain"]
-#
-#         start=int(row["start"])
-#         end=int(row["end"])
-#
-#
-#         cif_file=None
-#
-#
-#         for name,path in CIF_INDEX.items():
-#
-#             if accession in name:
-#
-#                 cif_file=path
-#                 break
-#
-#
-#         if cif_file is None:
-#
-#             missing += 1
-#             continue
-#
-#
-#         try:
-#
-#
-#             structure=parser.get_structure(
-#                 accession,
-#                 str(cif_file)
-#             )
-#
-#
-#             domain_dir=OUT/domain
-#
-#             domain_dir.mkdir(exist_ok=True)
-#
-#
-#             outfile=domain_dir / (
-#                 f"{gene}_{accession}_{domain}_{start}-{end}.pdb"
-#             )
-#
-#
-#             io=PDBIO()
-#
-#             io.set_structure(structure)
-#
-#             io.save(
-#                 str(outfile),
-#                 DomainSelect(start,end)
-#             )
-#
-#
-#             count += 1
-#
-#
-#             if count % 100 == 0:
-#
-#                 print(
-#                     f"Extracted {count} domains"
-#                 )
-#
-#
-#         except Exception as e:
-#
-#             failed += 1
-#
-#             print(
-#                 "FAILED",
-#                 accession,
-#                 str(e)
-#             )
-#
-#
-# print()
-# print("Extraction complete")
-# print("Extracted:",count)
-# print("Missing CIF:",missing)
-# print("Failed:",failed)
-#
-# PY
+python3 <<'PY'
+
+import csv
+from pathlib import Path
+
+from Bio.PDB import MMCIFParser
+from Bio.PDB import PDBIO
+from Bio.PDB import Select
+
+
+ROOT = Path(
+    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek"
+)
+
+
+SEARCH_DIRS = [
+    ROOT/"cif_human",
+    ROOT/"cif_mouse",
+    ROOT/"cif_zebrafish",
+    ROOT/"cif_fungi"
+]
+
+
+OUT = ROOT/"chromatin_domain_results/domains_extracted"
+OUT.mkdir(exist_ok=True)
+
+
+print("Indexing CIF files...")
+
+
+CIF_INDEX = {}
+
+
+for directory in SEARCH_DIRS:
+
+    if not directory.exists():
+        continue
+
+    for cif in directory.rglob("*.cif"):
+
+        CIF_INDEX[cif.stem] = cif
+        CIF_INDEX[cif.name] = cif
+
+
+print("Indexed", len(CIF_INDEX), "CIF files")
+
+
+class DomainSelect(Select):
+
+    def __init__(self, start, end):
+
+        self.start = start
+        self.end = end
+
+
+    def accept_residue(self, residue):
+
+        try:
+
+            resnum = residue.id[1]
+
+            return self.start <= resnum <= self.end
+
+        except:
+
+            return False
+
+
+
+parser = MMCIFParser(QUIET=True)
+
+
+count = 0
+missing = 0
+failed = 0
+
+
+
+with open(
+    ROOT/"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+) as f:
+
+
+    reader = csv.DictReader(
+        f,
+        delimiter="\t"
+    )
+
+
+    for row in reader:
+
+
+        accession = row["accession"]
+        gene = row["gene"]
+        domain = row["domain"]
+
+        start = int(row["start"])
+        end = int(row["end"])
+
+
+        cif_file = None
+
+
+        # find matching CIF
+        for name,path in CIF_INDEX.items():
+
+            if accession in name:
+
+                cif_file = path
+                break
+
+
+
+        if cif_file is None:
+
+            missing += 1
+            continue
+
+
+
+        try:
+
+
+            structure = parser.get_structure(
+                accession,
+                str(cif_file)
+            )
+
+
+            domain_dir = OUT/domain
+
+            domain_dir.mkdir(
+                exist_ok=True
+            )
+
+
+            outfile = domain_dir / (
+                f"{gene}_{accession}_{domain}_{start}-{end}.pdb"
+            )
+
+
+
+            io = PDBIO()
+
+            io.set_structure(
+                structure
+            )
+
+
+            io.save(
+                str(outfile),
+                DomainSelect(start,end)
+            )
+
+
+            count += 1
+
+
+            if count % 100 == 0:
+
+                print(
+                    "Extracted",
+                    count,
+                    "domains"
+                )
+
+
+        except Exception as e:
+
+
+            failed += 1
+
+            print(
+                "FAILED",
+                accession,
+                e
+            )
+
+
+
+print()
+print("Extraction complete")
+print("Extracted:", count)
+print("Missing CIF:", missing)
+print("Failed:", failed)
+
+
+PY
 
 
 
@@ -844,107 +834,140 @@ done
 # FOLDSEEK
 ##################################################
 
-# for d in ${OUT}/domains_extracted/*
-#
-# do
-#
-#
-# domain=$(basename ${d})
+ for d in ${OUT}/domains_extracted/*
+
+ do
 #
 #
-# n=$(find ${d} -name "*.pdb" | wc -l)
-#
-# if [ ${n} -lt 2 ]
-# then
-# continue
-# fi
+ domain=$(basename ${d})
 #
 #
+ n=$(find ${d} -name "*.pdb" | wc -l)
 #
-# foldseek easy-search \
-# ${d} \
-# ${d} \
-# ${OUT}/foldseek/${domain}_allvall.tsv \
-# ${OUT}/tmp/${domain} \
-# --format-output \
-# "query,target,fident,alnlen,qstart,qend,tstart,tend,evalue,bits,alntmscore,qtmscore,ttmscore,rmsd" \
-# --threads ${SLURM_CPUS_PER_TASK}
-#
-#
-# done
+ if [ ${n} -lt 2 ]
+ then
+ continue
+ fi
 #
 #
 #
-# echo "COMPLETE"
-# echo ${OUT}
+ foldseek easy-search \
+ ${d} \
+ ${d} \
+ ${OUT}/foldseek/${domain}_allvall.tsv \
+ ${OUT}/tmp/${domain} \
+ --format-output \
+ "query,target,fident,alnlen,qstart,qend,tstart,tend,evalue,bits,alntmscore,qtmscore,ttmscore,rmsd" \
+ --threads ${SLURM_CPUS_PER_TASK}
+#
+#
+ done
+#
+#
+#
+ echo "COMPLETE"
+ echo ${OUT}
 
 ##################################################
 # MERGE FOLDSEEK RESULTS
 ##################################################
 
-# python3 <<'PY'
-#
-# from pathlib import Path
-# import pandas as pd
-#
-#
-# ROOT=Path(
-# "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results"
-# )
-#
-#
-# files=list(
-# (ROOT/"foldseek").glob("*_allvall.tsv")
-# )
-#
-#
-# print("Foldseek files:",len(files))
-#
-#
-# dfs=[]
-#
-#
-# for f in files:
-#
-#     domain=f.name.replace("_allvall.tsv","")
-#
-#     try:
-#
-#         df=pd.read_csv(
-#             f,
-#             sep="\t"
-#         )
-#
-#         df["domain"]=domain
-#
-#         dfs.append(df)
-#
-#
-#         print(domain,len(df))
-#
-#
-#     except Exception as e:
-#
-#         print("FAILED",f,e)
-#
-#
-#
-# merged=pd.concat(
-#     dfs,
-#     ignore_index=True
-# )
-#
-#
-# merged.to_csv(
-# ROOT/"metadata/foldseek_all_domains.csv",
-# index=False
-# )
-#
-#
-# print(
-# "Total structural comparisons:",
-# len(merged)
-# )
-#
-#
-# PY
+python3 <<'PY'
+
+from pathlib import Path
+import pandas as pd
+
+
+ROOT = Path(
+    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results"
+)
+
+
+FOLDSEEK_DIR = ROOT / "foldseek"
+OUT = ROOT / "metadata/foldseek_all_domains.csv"
+
+
+files = list(
+    FOLDSEEK_DIR.glob("*_allvall.tsv")
+)
+
+
+print("Foldseek files:", len(files))
+
+
+dfs = []
+
+
+for f in files:
+
+
+    domain = f.name.replace("_allvall.tsv","")
+
+
+    try:
+
+
+        df = pd.read_csv(
+            f,
+            sep="\t"
+        )
+
+
+        df["domain"] = domain
+
+
+        dfs.append(df)
+
+
+        print(
+            domain,
+            len(df)
+        )
+
+
+    except Exception as e:
+
+
+        print(
+            "FAILED",
+            f.name,
+            e
+        )
+
+
+
+if len(dfs) == 0:
+
+    raise RuntimeError(
+        "No Foldseek files loaded"
+    )
+
+
+
+merged = pd.concat(
+    dfs,
+    ignore_index=True
+)
+
+
+
+merged.to_csv(
+    OUT,
+    index=False
+)
+
+
+
+print()
+print(
+    "Total structural comparisons:",
+    len(merged)
+)
+
+print(
+    "Saved:",
+    OUT
+)
+
+
+PY
