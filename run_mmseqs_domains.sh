@@ -53,40 +53,6 @@ done
 
 
 #########################################
-# Combine domain identity files
-#########################################
-
-
-echo "Combining domain tables"
-
-
-DOMAIN_OUT="${OUT}/all_domain_sequence_identity.tsv"
-
-
-echo -e "query_id\ttarget_id\tdomain_pident\tdomain_alnlen\tdomain_qcov\tdomain_tcov\tdomain_evalue\tdomain_bits\tdomain" \
-> $DOMAIN_OUT
-
-
-
-for file in ${OUT}/*_identity.tsv
-
-do
-
-domain=$(basename "$file" _identity.tsv)
-
-
-awk -v d="$domain" \
-'BEGIN{OFS="\t"}
-{
-print $1,$2,$3,$4,$5,$6,$7,$8,d
-}' "$file" >> $DOMAIN_OUT
-
-
-done
-
-
-
-#########################################
 # Combine domain MMseqs2 results
 #########################################
 
@@ -113,10 +79,6 @@ done
 echo "Domain identity complete"
 
 
-
-#########################################
-# Extract full-length chromatin proteins
-#########################################
 
 #########################################
 # Extract full length proteins by domain
@@ -209,19 +171,6 @@ PY
 
 
 echo "Full length domain-specific proteins complete"
-
-#########################################
-# Whole protein MMseqs2 by domain family
-#########################################
-
-PROTEIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
-
-
-echo "Running full length protein MMseqs by domain"
-
-
-mkdir -p ${OUT}/protein_results
-
 
 #########################################
 # Whole protein MMseqs2 by domain family
