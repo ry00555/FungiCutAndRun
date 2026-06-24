@@ -12,94 +12,80 @@
 
 ml MMseqs2/18-8cc5c-gompi-2025a
 
-DOMAIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/domain_sequences"
 
-OUT="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity"
+BASE="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results"
+
+FOLDSEEK_MASTER="${BASE}/annotated_hits_expanded.csv"
+
+DOMAIN_FASTA="${BASE}/domain_sequences"
+
+PROTEIN_FASTA="${BASE}/protein_sequences"
+
+OUT="${BASE}/mmseqs_identity"
 
 mkdir -p $OUT
 
 
-#########################################
-# DOMAIN SEQUENCE IDENTITY
-#########################################
+##################################################
+# 1. DOMAIN SEQUENCE IDENTITY
+##################################################
 
-echo "Running domain MMseqs"
+echo "Extracting domain FASTAs..."
 
 
-for fasta in $DOMAIN_DIR/*_fixed.fasta
+
+for fasta in ${DOMAIN_FASTA}/*.fasta
 
 do
 
-domain=$(basename "$fasta" _fixed.fasta)
+domain=$(basename "$fasta" .fasta)
 
-echo "Running $domain"
+
+echo "Running domain: $domain"
+
 
 
 mmseqs createdb \
 $fasta \
-${OUT}/${domain}_db
+${OUT}/${domain}_domain_db
+
 
 
 mmseqs easy-search \
-$fasta \
-$fasta \
+${OUT}/${domain}_domain_db \
+${OUT}/${domain}_domain_db \
 ${OUT}/${domain}_identity.tsv \
 tmp_${domain} \
---format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
+-e 1e-3 \
+-c 0.5 \
+--cov-mode 0 \
+--format-output \
+"query,target,pident,alnlen,qcov,tcov,evalue,bits"
+
 
 
 done
 
 
 
-#########################################
-# Combine domain MMseqs2 results
-#########################################
-
-echo "Combining domain identity tables..."
-
-OUTFILE="${OUT}/all_domain_sequence_identity.tsv"
-
-echo -e "query_id\ttarget_id\tpident\talnlen\tqcov\ttcov\tevalue\tbits\tdomain" > $OUTFILE
-
-
-for file in ${OUT}/*_identity.tsv
-do
-
-    domain=$(basename "$file" _identity.tsv)
-
-    awk -v d="$domain" \
-    'BEGIN{OFS="\t"}
-    {print $1,$2,$3,$4,$5,$6,$7,$8,d}' \
-    "$file" >> $OUTFILE
-
-done
-
-
-echo "Domain identity complete"
-
 
 
 #########################################
-# Extract full length proteins by domain
+# Extract full-length proteins by domain
 #########################################
 
-echo "Extracting full length proteins by domain..."
-
+echo "Extracting full-length proteins..."
 
 python3 <<'PY'
-
 
 from Bio import SeqIO
 import csv
 import os
 
 
-fasta="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
+fasta = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
 
-
-domain_file="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-
+domains = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
 
 outdir="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
 
@@ -107,9 +93,9 @@ outdir="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/
 os.makedirs(outdir,exist_ok=True)
 
 
+# load proteins
 
 records={}
-
 
 for r in SeqIO.parse(fasta,"fasta"):
 
@@ -121,38 +107,43 @@ domain_proteins={}
 
 
 
-with open(domain_file) as f:
+with open(domains) as f:
 
-    for row in csv.DictReader(f,delimiter="\t"):
+    reader=csv.DictReader(f,delimiter="\t")
+
+    for row in reader:
+
+
+        accession=row["accession"]
+        domain=row["domain"]
+        gene=row["gene"]
 
 
         for rid,rec in records.items():
 
-
-            if f"|{row['accession']}|" in rid:
+            if f"|{accession}|" in rid:
 
 
                 new=rec[:]
 
-                new.id=f"{row['gene']}_{row['accession']}"
-
+                new.id=f"{gene}_{accession}"
 
                 new.description=""
 
 
-                domain=row["domain"]
-
-
-                domain_proteins.setdefault(domain,{})[row["accession"]] = new
+                domain_proteins.setdefault(
+                    domain,
+                    {}
+                )[accession]=new
 
 
                 break
 
 
 
+# write one fasta per domain
 
 for domain,proteins in domain_proteins.items():
-
 
     outfile=f"{outdir}/{domain}_proteins.fasta"
 
@@ -170,59 +161,69 @@ for domain,proteins in domain_proteins.items():
 PY
 
 
-echo "Full length domain-specific proteins complete"
+
+echo "Full-length protein FASTAs created"
+
+
 
 #########################################
-# Whole protein MMseqs2 by domain family
+# Whole protein identity by domain class
 #########################################
+
+echo "Running full protein MMseqs"
+
 
 PROTEIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
-
-
-echo "Running full length protein MMseqs by domain"
 
 
 mkdir -p ${OUT}/protein_results
 
 
-for fasta in ${PROTEIN_DIR}/*.fasta
+
+for fasta in ${PROTEIN_DIR}/*_proteins.fasta
 
 do
 
-domain=$(basename "$fasta" .fasta)
 
-echo "Running full protein identity for $domain"
-
+domain=$(basename "$fasta" _proteins.fasta)
 
 
-# Full length protein database
+echo "Running full protein identity: $domain"
+
+
+
+# unique database per domain
+
 mmseqs createdb \
 $fasta \
 ${OUT}/protein_results/${domain}_protein_db
 
 
 
-# Full length protein vs same domain-containing proteins
 mmseqs easy-search \
 ${OUT}/protein_results/${domain}_protein_db \
 ${OUT}/protein_results/${domain}_protein_db \
 ${OUT}/protein_results/${domain}_protein_identity.tsv \
 tmp_${domain}_protein \
---format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
+-e 1e-5 \
+-c 0.3 \
+--cov-mode 0 \
+--format-output \
+"query,target,pident,alnlen,qcov,tcov,evalue,bits"
+
 
 
 done
 
 
-echo "Protein identity complete"
+
+echo "Full protein MMseqs complete"
 
 
 
 #########################################
-# Combine protein identity tables
+# Combine full protein identity
 #########################################
-
-echo "Combining protein identities"
 
 
 PROTEIN_OUT="${OUT}/all_protein_sequence_identity.tsv"
@@ -236,6 +237,7 @@ echo -e "query_id\ttarget_id\tprotein_pident\tprotein_alnlen\tprotein_qcov\tprot
 for file in ${OUT}/protein_results/*_protein_identity.tsv
 
 do
+
 
 domain=$(basename "$file" _protein_identity.tsv)
 
@@ -252,11 +254,9 @@ print $1,$2,$3,$4,$5,$6,$7,$8,d
 done
 
 
+
 echo "Saved:"
-
-
 echo $PROTEIN_OUT
-
 #########################################
 # Merge with FoldSeek master
 #########################################
@@ -266,11 +266,6 @@ python3 <<'PY'
 
 
 import pandas as pd
-
-mmseqs_fullprotein_identity = pd.read_csv(
-    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/all_protein_sequence_identity.tsv",
-    sep="\t"
-)
 
 
 foldseek_master = foldseek_master.merge(
