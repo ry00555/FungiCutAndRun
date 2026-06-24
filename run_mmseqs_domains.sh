@@ -28,7 +28,7 @@ mkdir -p $OUT
 echo "Running domain MMseqs"
 
 
-for fasta in $DOMAIN_DIR/*.fasta
+for fasta in $DOMAIN_DIR/*_fixed.fasta
 
 do
 
@@ -89,11 +89,38 @@ done
 
 
 #########################################
-# WHOLE PROTEIN MMSEQS
+# Combine domain MMseqs2 results
 #########################################
 
+echo "Combining domain identity tables..."
 
-echo "Running whole protein MMseqs"
+OUTFILE="${OUT}/all_domain_sequence_identity.tsv"
+
+echo -e "query_id\ttarget_id\tpident\talnlen\tqcov\ttcov\tevalue\tbits\tdomain" > $OUTFILE
+
+
+for file in ${OUT}/*_identity.tsv
+do
+
+    domain=$(basename "$file" _identity.tsv)
+
+    awk -v d="$domain" \
+    'BEGIN{OFS="\t"}
+    {print $1,$2,$3,$4,$5,$6,$7,$8,d}' \
+    "$file" >> $OUTFILE
+
+done
+
+
+echo "Domain identity complete"
+
+
+
+#########################################
+# Whole protein MMseqs2
+#########################################
+
+echo "Running whole protein identity"
 
 
 mmseqs createdb \
@@ -101,18 +128,15 @@ $FULL_FASTA \
 ${OUT}/proteins_db
 
 
-
 mmseqs easy-search \
-${OUT}/proteins_db \
-${OUT}/proteins_db \
+$FULL_FASTA \
+$FULL_FASTA \
 ${OUT}/protein_identity.tsv \
 tmp_protein \
 --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
 
 
-
-echo "Whole protein complete"
-
+echo "Protein identity complete"
 
 
 #########################################
@@ -131,7 +155,6 @@ foldseek_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/
 
 
 domain_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/all_domain_sequence_identity.tsv"
-
 
 protein_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/protein_identity.tsv"
 
