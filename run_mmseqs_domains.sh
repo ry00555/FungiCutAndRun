@@ -130,10 +130,10 @@ import pandas as pd
 foldseek_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded.csv"
 
 
-domain_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/mmseqs_identity/all_domain_sequence_identity.tsv"
+domain_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/all_domain_sequence_identity.tsv"
 
 
-protein_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/mmseqs_identity/protein_identity.tsv"
+protein_file = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/protein_identity.tsv"
 
 
 
