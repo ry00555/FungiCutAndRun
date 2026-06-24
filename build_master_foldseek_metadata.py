@@ -11,9 +11,9 @@ from pathlib import Path
 # Paths
 #########################################
 
-BASE = Path("/lustre2/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek")
+BASE = Path("/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek")
 
-FASTA = BASE / "all_species.fasta"
+FASTA = BASE / "chromatin_domain_results/metadata/all_species.fasta"
 
 PDB_DIR = BASE / "chromatin_domain_results/domains_extracted"
 
