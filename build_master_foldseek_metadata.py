@@ -75,93 +75,69 @@ print("FASTA proteins:",len(fasta_meta))
 
 
 #########################################
-# 2. Parse extracted domain PDB files
+# Parse domain extracted structures
 #########################################
 
 print("Reading domain PDBs...")
 
+domain_rows=[]
 
-pdb_rows=[]
-
-
-pdb_files = glob.glob(
+for pdb in glob.glob(
     str(PDB_DIR / "**" / "*.pdb"),
     recursive=True
-)
+):
 
+    filename=os.path.basename(pdb).replace(".pdb","")
 
-print("Found PDB files:",len(pdb_files))
-
-
-for pdb in pdb_files:
-
-
-    filename=os.path.basename(pdb)
-
-    fid=filename.replace(".pdb","")
-
+    parts=filename.split("_")
 
     # Example:
-    # V5IPW0_NEUCR_V5IPW0_WD40_311-343
+    # JADE1_MOUSE_Q6ZPI0_PHD_207-251
 
-    m=re.match(
-        r"(.+?)_([A-Za-z0-9_]+)_(\d+-\d+)$",
-        fid
-    )
+    gene = parts[0]
 
+    species = parts[1]
 
-    if not m:
-        continue
+    accession = parts[2]
 
+    domain = parts[3]
 
-    prefix=m.group(1)
-
-    domain=m.group(2)
-
-    coords=m.group(3)
+    coords = parts[4]
 
 
-    accession=prefix.split("_")[0]
+    domain_rows.append({
 
+        "foldseek_id": filename,
 
-    start,end=coords.split("-")
+        "gene_from_pdb": gene,
 
+        "species_code": species,
 
-    pdb_rows.append({
+        "accession": accession,
 
-        "foldseek_id":fid,
+        "domain": domain,
 
-        "accession":accession,
-
-        "domain":domain,
-
-        "start":int(start),
-
-        "end":int(end)
+        "coords": coords
 
     })
 
 
-domain_map=pd.DataFrame(pdb_rows)
+domain_map=pd.DataFrame(domain_rows)
 
-
-print("Domain structures:",len(domain_map))
+print("Domain structures:", len(domain_map))
 
 
 #########################################
-# Merge FASTA annotations
+# Merge FASTA metadata
 #########################################
 
-print("Merging FASTA annotations...")
-
-
-domain_map=domain_map.merge(
+domain_map = domain_map.merge(
     fasta_meta,
     on="accession",
     how="left"
 )
 
-
+print(domain_map.head())
 
 #########################################
 # 3. Read FoldSeek all-vs-all results
@@ -224,96 +200,73 @@ foldseek=pd.concat(all_hits,ignore_index=True)
 print("FoldSeek comparisons:",len(foldseek))
 
 
-
 #########################################
 # 4. Annotate query and target proteins
 #########################################
 
-
 print("Annotating query/target IDs...")
 
 
-query_map=domain_map.rename(
-    columns={
-        "foldseek_id":"query_id",
-        "gene":"query_gene",
-        "organism":"query_organism",
-        "domain":"query_domain"
-    }
-)
-
-
-target_map=domain_map.rename(
-    columns={
-        "foldseek_id":"target_id",
-        "gene":"target_gene",
-        "organism":"target_organism",
-        "domain":"target_domain"
-    }
-)
-
-
-
-hits=foldseek.merge(
-    query_map[
-        [
-        "query_id",
-        "query_gene",
-        "query_organism",
-        "query_domain"
-        ]
-    ],
-    on="query_id",
+hits = foldseek.merge(
+    domain_map.add_prefix("query_"),
+    left_on="query_id",
+    right_on="query_foldseek_id",
     how="left"
 )
 
 
-
-hits=hits.merge(
-    target_map[
-        [
-        "target_id",
-        "target_gene",
-        "target_organism",
-        "target_domain"
-        ]
-    ],
-    on="target_id",
+hits = hits.merge(
+    domain_map.add_prefix("target_"),
+    left_on="target_id",
+    right_on="target_foldseek_id",
     how="left"
 )
 
 
 
 #########################################
-# 5. Add classifications
+# Rename final fields
 #########################################
 
+hits_final = hits.rename(columns={
 
-hits["same_domain"] = (
-    hits.query_domain ==
-    hits.target_domain
+    "query_gene_from_pdb":"query_gene",
+    "target_gene_from_pdb":"target_gene",
+
+    "query_organism":"query_organism",
+    "target_organism":"target_organism",
+
+    "query_domain":"query_domain",
+    "target_domain":"target_domain"
+
+})
+
+
+#########################################
+# Add classifications
+#########################################
+
+hits_final["same_domain"] = (
+    hits_final["query_domain"] ==
+    hits_final["target_domain"]
 )
 
 
-hits["cross_species"] = (
-    hits.query_organism !=
-    hits.target_organism
+hits_final["cross_species"] = (
+    hits_final["query_organism"] !=
+    hits_final["target_organism"]
 )
 
 
 
 #########################################
-# 6. Save
+# Save
 #########################################
 
-
-hits.to_csv(
-    OUT,
+hits_final.to_csv(
+    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded.csv",
     index=False
 )
 
 
-print("DONE")
-print("Saved:",OUT)
-
-print(hits.head())
+print(hits_final.head())
