@@ -326,164 +326,162 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 # # EXTRACT DOMAIN SEQUENCES
 # ##################################################
 #
-python3 <<'PY'
-
-from Bio import SeqIO
-import csv
-import os
-
-
-fasta="chromatin_domain_results/metadata/all_species.fasta"
-
-dom="chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-
-outdir="chromatin_domain_results/domain_sequences"
-
-os.makedirs(outdir, exist_ok=True)
-
-
-##################################################
-# LOAD FASTA
-##################################################
-
-records={}
-
-for r in SeqIO.parse(fasta,"fasta"):
-
-    # keep only:
-    # species|db|accession|gene
-    key="|".join(r.id.split("|")[:4])
-
-    records[key]=r
-
-
-print("Proteins loaded:",len(records))
-
-
-##################################################
-# COLLAPSE DOMAINS
-##################################################
-
-collapsed={}
-
-with open(dom) as f:
-
-    reader=csv.DictReader(f,delimiter="\t")
-
-    for row in reader:
-
-        key=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
-
-        # handle tr proteins too
-        if key not in records:
-
-            key=f"{row['species']}|tr|{row['accession']}|{row['gene']}"
-
-
-        if key not in records:
-
-            print("MISSING:",key)
-            continue
-
-
-        domname=row["domain"]
-
-        start=int(row["start"])
-        end=int(row["end"])
-
-
-        # collapse same protein/domain
-        collapse_key=(key,domname)
-
-
-        if collapse_key not in collapsed:
-
-            collapsed[collapse_key]=[
-                start,
-                end
-            ]
-
-        else:
-
-            collapsed[collapse_key][0]=min(
-                collapsed[collapse_key][0],
-                start
-            )
-
-            collapsed[collapse_key][1]=max(
-                collapsed[collapse_key][1],
-                end
-            )
-print("Collapsed domains:",len(collapsed))
-
-##################################################
-# EXTRACT SEQUENCES
-##################################################
-
-domain_out = {}
-
-for (key,domain),(start,end) in collapsed.items():
-
-    record = records[key]
-
-    newrec = record[start-1:end]
-
-    gene = key.split("|")[3]
-
-    newrec.id = f"{gene}_{domain}"
-    newrec.name = ""
-    newrec.description = key
-
-    domain_out.setdefault(domain, []).append(newrec)
-
-##################################################
-# WRITE SAME FILE NAMES
-##################################################
-
-for domain,seqs in domain_out.items():
-
-    outfile=f"{outdir}/{domain}.fasta"
-
-    SeqIO.write(
-        seqs,
-        outfile,
-        "fasta"
-    )
-
-    print(domain, len(seqs))
-
-
-PY
+# python3 <<'PY'
+#
+# from Bio import SeqIO
+# import csv
+# import os
+#
+#
+# fasta="chromatin_domain_results/metadata/all_species.fasta"
+#
+# dom="chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+#
+# outdir="chromatin_domain_results/domain_sequences"
+#
+# os.makedirs(outdir, exist_ok=True)
+#
+#
+# ##################################################
+# # LOAD FASTA
+# ##################################################
+#
+# records={}
+#
+# for r in SeqIO.parse(fasta,"fasta"):
+#
+#     # keep only:
+#     # species|db|accession|gene
+#     key="|".join(r.id.split("|")[:4])
+#
+#     records[key]=r
+#
+#
+# print("Proteins loaded:",len(records))
+#
+#
+# ##################################################
+# # COLLAPSE DOMAINS
+# ##################################################
+#
+# collapsed={}
+#
+# with open(dom) as f:
+#
+#     reader=csv.DictReader(f,delimiter="\t")
+#
+#     for row in reader:
+#
+#         key=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
+#
+#         # handle tr proteins too
+#         if key not in records:
+#
+#             key=f"{row['species']}|tr|{row['accession']}|{row['gene']}"
+#
+#
+#         if key not in records:
+#
+#             print("MISSING:",key)
+#             continue
+#
+#
+#         domname=row["domain"]
+#
+#         start=int(row["start"])
+#         end=int(row["end"])
+#
+#
+#         # collapse same protein/domain
+#         collapse_key=(key,domname)
+#
+#
+#         if collapse_key not in collapsed:
+#
+#             collapsed[collapse_key]=[
+#                 start,
+#                 end
+#             ]
+#
+#         else:
+#
+#             collapsed[collapse_key][0]=min(
+#                 collapsed[collapse_key][0],
+#                 start
+#             )
+#
+#             collapsed[collapse_key][1]=max(
+#                 collapsed[collapse_key][1],
+#                 end
+#             )
+# print("Collapsed domains:",len(collapsed))
+#
+# ##################################################
+# # EXTRACT SEQUENCES
+# ##################################################
+#
+# domain_out = {}
+#
+# for (key,domain),(start,end) in collapsed.items():
+#
+#     record = records[key]
+#
+#     newrec = record[start-1:end]
+#
+#     gene = key.split("|")[3]
+#
+#     newrec.id = f"{gene}_{domain}"
+#     newrec.name = ""
+#     newrec.description = key
+#
+#     domain_out.setdefault(domain, []).append(newrec)
+#
+# ##################################################
+# # WRITE SAME FILE NAMES
+# ##################################################
+#
+# for domain,seqs in domain_out.items():
+#
+#     outfile=f"{outdir}/{domain}.fasta"
+#
+#     SeqIO.write(
+#         seqs,
+#         outfile,
+#         "fasta"
+#     )
+#
+#     print(domain, len(seqs))
+#
+#
+# PY
 ##################################################
 # BUILD DOMAIN HMMs
 ##################################################
 #
-# for f in ${OUT}/domain_sequences/*.fasta
+for f in ${OUT}/domain_sequences/*.fasta
 #
-# do
+do
 #
-# domain=$(basename $f .fasta)
+ domain=$(basename $f .fasta)
 #
-# nseq=$(grep -c "^>" $f)
+ nseq=$(grep -c "^>" $f)
 #
-# if [ $nseq -lt 2 ]
-# then
-#     echo "Skipping ${domain} (only ${nseq} sequence)"
-#     continue
-# fi
+ if [ $nseq -lt 2 ]
+ then
+     echo "Skipping ${domain} (only ${nseq} sequence)"
+     continue
+ fi
 #
-# mafft \
-# --auto \
-# $f \
-# > ${OUT}/domain_sequences/${domain}.aln.fasta
-#
-#
-# hmmbuild \
-# ${OUT}/domain_hmms/${domain}.hmm \
-# ${OUT}/domain_sequences/${domain}.aln.fasta
+ mafft \
+ --auto \
+ $f \
+ > ${OUT}/domain_sequences/${domain}.aln.fasta
 #
 #
-# done
+ hmmbuild \
+ ${OUT}/domain_hmms/${domain}.hmm \
+ ${OUT}/domain_sequences/${domain}.aln.fasta
+ done
 
 
 
@@ -495,46 +493,33 @@ PY
 FUNGAL_FASTA=${OUT}/metadata/fungal_proteomes.fasta
 
 
-# > ${FUNGAL_FASTA}
+ > ${FUNGAL_FASTA}
+
+ for f in \
+ ${BASE}/ncr_proteome.fasta \
+ ${BASE}/fgr_proteome.fasta \
+ ${BASE}/mgr_proteome.fasta \
+ ${BASE}/cne_proteome.fasta \
+ ${BASE}/zt_proteome.fasta
 #
 #
-# for f in \
-# ${BASE}/ncr_proteome.fasta \
-# ${BASE}/fgr_proteome.fasta \
-# ${BASE}/mgr_proteome.fasta \
-# ${BASE}/cne_proteome.fasta \
-# ${BASE}/zt_proteome.fasta
+ do
+ species=$(basename ${f} _proteome.fasta)
 #
+ sed "s/^>/>${species}|/" ${f} >> ${FUNGAL_FASTA}
+done
 #
-# do
-#
-# species=$(basename ${f} _proteome.fasta)
-#
-# sed "s/^>/>${species}|/" ${f} >> ${FUNGAL_FASTA}
-#
-#
-# done
-#
-#
-#
-# for hmm in ${OUT}/domain_hmms/*.hmm
-#
-# do
-#
-#
-# domain=$(basename ${hmm} .hmm)
-#
-#
-# hmmsearch \
-# --cpu ${SLURM_CPUS_PER_TASK} \
-# --domtblout ${OUT}/metadata/${domain}_fungal_hits.domtbl \
-# -E 1e-3 \
-# ${hmm} \
-# ${FUNGAL_FASTA}
-#
-#
-#
-# done
+for hmm in ${OUT}/domain_hmms/*.hmm
+ do
+ domain=$(basename ${hmm} .hmm)
+
+ hmmsearch \
+ --cpu ${SLURM_CPUS_PER_TASK} \
+ --domtblout ${OUT}/metadata/${domain}_fungal_hits.domtbl \
+ -E 1e-3 \
+ ${hmm} \
+ ${FUNGAL_FASTA}
+done
 
 
 
