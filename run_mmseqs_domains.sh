@@ -10,6 +10,7 @@
 #SBATCH --output=seq_identity%j.out
 #SBATCH --error=seq_identity%j.err
 
+ml MMseqs2/18-8cc5c-gompi-2025a
 
 DOMAIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/domain_sequences"
 
