@@ -13,33 +13,49 @@ import re
 from pathlib import Path
 
 
-# FoldSeek data location
-FOLDSEEK = Path(
-    "/scratch/ry00555/RNASeqPaper2026/"
-    "Proteome/StructuralSimilarity/FoldSeek"
+BASE = Path(
+    "/lustre2/scratch/ry00555/"
+    "RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek"
 )
 
 
-FASTA = FOLDSEEK / "all_species.fasta"
+# FASTA annotation source
+FASTA = (
+    BASE /
+    "chromatin_domain_results" /
+    "metadata" /
+    "all_species.fasta"
+)
 
 
+# HMMER domain metadata
 DOMAIN_META = (
-    FOLDSEEK /
+    BASE /
     "chromatin_domain_results" /
     "metadata" /
     "domain_occurrences_extended.tsv"
 )
 
 
+# extracted domain structures
 PDB_DIR = (
-    FOLDSEEK /
+    BASE /
     "chromatin_domain_results" /
     "domains_extracted"
 )
 
 
+# FoldSeek output files
+FOLDSEEK_DIR = (
+    BASE /
+    "chromatin_domain_results" /
+    "foldseek"
+)
+
+
+# final output
 OUTPUT = (
-    FOLDSEEK /
+    BASE /
     "annotated_hits_expanded.csv"
 )
 
@@ -227,7 +243,7 @@ print("Reading FoldSeek results...")
 
 
 glob.glob(
-    str(FOLDSEEK / "*allvall.tsv")
+    str(FOLDSEEK_DIR / "*allvall.tsv")
 )
 
 
