@@ -223,6 +223,19 @@ echo "Running full length protein MMseqs by domain"
 mkdir -p ${OUT}/protein_results
 
 
+#########################################
+# Whole protein MMseqs2 by domain family
+#########################################
+
+PROTEIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
+
+
+echo "Running full length protein MMseqs by domain"
+
+
+mkdir -p ${OUT}/protein_results
+
+
 for fasta in ${PROTEIN_DIR}/*.fasta
 
 do
@@ -232,16 +245,19 @@ domain=$(basename "$fasta" .fasta)
 echo "Running full protein identity for $domain"
 
 
+
+# Full length protein database
 mmseqs createdb \
 $fasta \
-${OUT}/protein_results/${domain}_db
+${OUT}/protein_results/${domain}_protein_db
 
 
 
+# Full length protein vs same domain-containing proteins
 mmseqs easy-search \
-${OUT}/protein_results/${domain}_db \
-${OUT}/protein_results/${domain}_db \
-${OUT}/protein_results/${domain}_identity.tsv \
+${OUT}/protein_results/${domain}_protein_db \
+${OUT}/protein_results/${domain}_protein_db \
+${OUT}/protein_results/${domain}_protein_identity.tsv \
 tmp_${domain}_protein \
 --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
 
@@ -250,6 +266,8 @@ done
 
 
 echo "Protein identity complete"
+
+
 
 #########################################
 # Combine protein identity tables
@@ -261,15 +279,17 @@ echo "Combining protein identities"
 PROTEIN_OUT="${OUT}/all_protein_sequence_identity.tsv"
 
 
-echo -e "query_id\ttarget_id\tprotein_pident\tprotein_alnlen\tprotein_qcov\tprotein_tcov\tprotein_evalue\tprotein_bits\tdomain" > $PROTEIN_OUT
+echo -e "query_id\ttarget_id\tprotein_pident\tprotein_alnlen\tprotein_qcov\tprotein_tcov\tprotein_evalue\tprotein_bits\tdomain" \
+> $PROTEIN_OUT
 
 
 
-for file in ${OUT}/protein_results/*_identity.tsv
+for file in ${OUT}/protein_results/*_protein_identity.tsv
 
 do
 
-domain=$(basename "$file" _identity.tsv)
+domain=$(basename "$file" _protein_identity.tsv)
+
 
 
 awk -v d="$domain" \
@@ -279,7 +299,11 @@ print $1,$2,$3,$4,$5,$6,$7,$8,d
 }' "$file" >> $PROTEIN_OUT
 
 
+
 done
+
+
+echo "Saved:"
 
 
 echo $PROTEIN_OUT
