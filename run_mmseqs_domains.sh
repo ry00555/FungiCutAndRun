@@ -12,11 +12,11 @@
 
 ml MMseqs2/18-8cc5c-gompi-2025a
 
-DOMAIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/domain_sequences"
+DOMAIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/domain_sequences"
 
-FULL_FASTA="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/metadata/all_species.fasta"
+FULL_FASTA="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
 
-OUT="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/mmseqs_identity"
+OUT="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity"
 
 mkdir -p $OUT
 
