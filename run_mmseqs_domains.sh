@@ -34,11 +34,11 @@ echo "Extracting domain FASTAs..."
 
 
 
-for fasta in ${DOMAIN_FASTA}/*.fasta
+for fasta in ${DOMAIN_FASTA}/*_fixed.fasta
 
 do
 
-domain=$(basename "$fasta" .fasta)
+domain=$(basename "$fasta" _fixed.fasta)
 
 
 echo "Running domain: $domain"
