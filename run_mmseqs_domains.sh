@@ -210,37 +210,37 @@ mkdir -p $OUT
 #########################################
 
 
-PROTEIN_OUT="${OUT}/all_protein_sequence_identity.tsv"
-
-
-echo -e "query_id\ttarget_id\tprotein_pident\tprotein_alnlen\tprotein_qcov\tprotein_tcov\tprotein_evalue\tprotein_bits\tdomain" \
-> $PROTEIN_OUT
-
-
-
-for file in ${OUT}/protein_results/*_protein_identity.tsv
-
-do
-
-
-domain=$(basename "$file" _protein_identity.tsv)
-
-
-
-awk -v d="$domain" \
-'BEGIN{OFS="\t"}
-{
-print $1,$2,$3,$4,$5,$6,$7,$8,d
-}' "$file" >> $PROTEIN_OUT
-
-
-
-done
-
-
-
-echo "Saved:"
-echo $PROTEIN_OUT
+# PROTEIN_OUT="${OUT}/all_protein_sequence_identity.tsv"
+#
+#
+# echo -e "query_id\ttarget_id\tprotein_pident\tprotein_alnlen\tprotein_qcov\tprotein_tcov\tprotein_evalue\tprotein_bits\tdomain" \
+# > $PROTEIN_OUT
+#
+#
+#
+# for file in ${OUT}/protein_results/*_protein_identity.tsv
+#
+# do
+#
+#
+# domain=$(basename "$file" _protein_identity.tsv)
+#
+#
+#
+# awk -v d="$domain" \
+# 'BEGIN{OFS="\t"}
+# {
+# print $1,$2,$3,$4,$5,$6,$7,$8,d
+# }' "$file" >> $PROTEIN_OUT
+#
+#
+#
+# done
+#
+#
+#
+# echo "Saved:"
+# echo $PROTEIN_OUT
 #########################################
 # Merge with FoldSeek master
 #########################################
@@ -254,43 +254,69 @@ foldseek_master = pd.read_csv(
 )
 
 
-mmseqs_fullprotein_identity = pd.read_csv(
+mmseqs = pd.read_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/all_protein_sequence_identity.tsv",
     sep="\t"
 )
 
 
-# clean headers
-foldseek_master.columns = foldseek_master.columns.str.strip()
-mmseqs_fullprotein_identity.columns = mmseqs_fullprotein_identity.columns.str.strip()
+# extract accession from FoldSeek IDs
+# JADE1_MOUSE_Q6ZPI0_PHD_207-251 -> Q6ZPI0
+foldseek_master["query_accession"] = (
+    foldseek_master["query_id"]
+    .str.extract(r"_([A-Z0-9]+)_")[0]
+)
 
-print("FoldSeek examples")
-print(foldseek_master[['query_id','target_id']].head())
+foldseek_master["target_accession"] = (
+    foldseek_master["target_id"]
+    .str.extract(r"_([A-Z0-9]+)_")[0]
+)
 
-print("\nMMseqs examples")
-print(mmseqs_fullprotein_identity[['query_id','target_id']].head())
+
+# extract accession from MMseqs IDs
+# A0ACI8T6I3_HUMAN_A0ACI8T6I3 -> A0ACI8T6I3
+mmseqs["query_accession"] = (
+    mmseqs["query_id"]
+    .str.split("_")
+    .str[-1]
+)
+
+mmseqs["target_accession"] = (
+    mmseqs["target_id"]
+    .str.split("_")
+    .str[-1]
+)
 
 
-foldseek_master = foldseek_master.merge(
-    mmseqs_fullprotein_identity,
-    on=["query_id","target_id"],
+print("FoldSeek accession:")
+print(foldseek_master[["query_id","query_accession"]].head())
+
+
+print("MMseqs accession:")
+print(mmseqs[["query_id","query_accession"]].head())
+
+
+merged = foldseek_master.merge(
+    mmseqs,
+    on=["query_accession","target_accession"],
     how="left"
 )
 
-merged_ids = foldseek_master.merge(
-    mmseqs_fullprotein_identity[['query_id','target_id']],
-    on=["query_id","target_id"],
-    how="inner"
+
+print("Rows:", merged.shape)
+
+print(
+    merged[
+        ["protein_pident",
+         "protein_qcov",
+         "protein_tcov"]
+    ].notna().sum()
 )
 
-print("Matching rows:", len(merged_ids))
 
-foldseek_master.to_csv(
+merged.to_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded_with_seqid.csv",
     index=False
 )
-
-print(foldseek_master.shape)
-print(foldseek_master[['protein_pident','protein_qcov','protein_tcov']].head())
 
 PY
