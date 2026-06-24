@@ -1,73 +1,34 @@
 #!/usr/bin/env python3
 
-import pandas as pd
-import glob
 import os
+import glob
 import re
-
-
-#########################################
-# PATHS
-#########################################
-
+import pandas as pd
 from pathlib import Path
 
 
-BASE = Path(
-    "/lustre2/scratch/ry00555/"
-    "RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek"
-)
+#########################################
+# Paths
+#########################################
 
+BASE = Path("/lustre2/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek")
 
-# FASTA annotation source
-FASTA = (
-    BASE /
-    "chromatin_domain_results" /
-    "metadata" /
-    "all_species.fasta"
-)
+FASTA = BASE / "all_species.fasta"
 
+PDB_DIR = BASE / "chromatin_domain_results/domains_extracted"
 
-# HMMER domain metadata
-DOMAIN_META = (
-    BASE /
-    "chromatin_domain_results" /
-    "metadata" /
-    "domain_occurrences_extended.tsv"
-)
+FOLDSEEK_DIR = BASE / "chromatin_domain_results/foldseek"
 
+OUT = BASE / "annotated_hits_expanded.csv"
 
-# extracted domain structures
-PDB_DIR = (
-    BASE /
-    "chromatin_domain_results" /
-    "domains_extracted"
-)
-
-
-# FoldSeek output files
-FOLDSEEK_DIR = (
-    BASE /
-    "chromatin_domain_results" /
-    "foldseek"
-)
-
-
-# final output
-OUTPUT = (
-    BASE /
-    "annotated_hits_expanded.csv"
-)
 
 #########################################
-# 1. Parse all_species.fasta
+# 1. Parse FASTA metadata
 #########################################
 
 print("Reading FASTA metadata...")
 
-
 fasta_rows=[]
-
 
 with open(FASTA) as f:
 
@@ -75,74 +36,65 @@ with open(FASTA) as f:
 
         if line.startswith(">"):
 
-            h=line.strip()[1:]
+            header=line.strip()
+
+            accession = re.search(r"\|sp\|([^|]+)",header)
+
+            if accession:
+                accession=accession.group(1)
+            else:
+                continue
 
 
-            accession=re.search(
-                r'\|([A-Z0-9]+)\|',
-                h
-            )
+            gene = re.search(r"GN=([^\s]+)",header)
 
-            entry=re.search(
-                r'\|([A-Z0-9]+_[A-Z]+)',
-                h
-            )
+            organism = re.search(r"OS=(.*?) OX=",header)
 
-            gene=re.search(
-                r'GN=([^\s]+)',
-                h
-            )
-
-            organism=re.search(
-                r'OS=(.*?) OX=',
-                h
-            )
-
-            description=h.split(" ",1)[1]
+            description = header.split(" ",1)[1].split(" OS=")[0]
 
 
             fasta_rows.append({
 
-                "accession":
-                    accession.group(1)
-                    if accession else None,
-
-                "uniprot_entry":
-                    entry.group(1)
-                    if entry else None,
+                "accession":accession,
 
                 "gene":
-                    gene.group(1)
-                    if gene else None,
-
-                "organism":
-                    organism.group(1)
-                    if organism else None,
+                    gene.group(1) if gene else accession,
 
                 "description":
-                    description
+                    description,
+
+                "organism":
+                    organism.group(1) if organism else "unknown"
 
             })
 
 
 fasta_meta=pd.DataFrame(fasta_rows)
 
+print("FASTA proteins:",len(fasta_meta))
 
 
 #########################################
-# 2. Parse domain extracted structures
+# 2. Parse extracted domain PDB files
 #########################################
 
-print("Reading domain PDB IDs...")
+print("Reading domain PDBs...")
 
 
-domain_rows=[]
+pdb_rows=[]
 
 
-for pdb in glob.glob(
-    PDB_DIR+"/**/*.pdb",
+pdb_files = glob.glob(
+    str(PDB_DIR / "**" / "*.pdb"),
     recursive=True
-):
+)
+
+
+print("Found PDB files:",len(pdb_files))
+
+
+for pdb in pdb_files:
+
 
     filename=os.path.basename(pdb)
 
@@ -152,18 +104,30 @@ for pdb in glob.glob(
     # Example:
     # V5IPW0_NEUCR_V5IPW0_WD40_311-343
 
-    parts=fid.split("_")
+    m=re.match(
+        r"(.+?)_([A-Za-z0-9_]+)_(\d+-\d+)$",
+        fid
+    )
 
 
-    accession=parts[0]
-
-    domain=parts[-2]
-
-
-    coords=parts[-1]
+    if not m:
+        continue
 
 
-    domain_rows.append({
+    prefix=m.group(1)
+
+    domain=m.group(2)
+
+    coords=m.group(3)
+
+
+    accession=prefix.split("_")[0]
+
+
+    start,end=coords.split("-")
+
+
+    pdb_rows.append({
 
         "foldseek_id":fid,
 
@@ -171,18 +135,21 @@ for pdb in glob.glob(
 
         "domain":domain,
 
-        "coords":coords
+        "start":int(start),
+
+        "end":int(end)
 
     })
 
 
+domain_map=pd.DataFrame(pdb_rows)
 
-domain_map=pd.DataFrame(domain_rows)
 
+print("Domain structures:",len(domain_map))
 
 
 #########################################
-# 3. Merge FASTA metadata
+# Merge FASTA annotations
 #########################################
 
 print("Merging FASTA annotations...")
@@ -197,320 +164,156 @@ domain_map=domain_map.merge(
 
 
 #########################################
-# 4. Add domain information
+# 3. Read FoldSeek all-vs-all results
 #########################################
 
-print("Adding domain metadata...")
+print("Reading FoldSeek TSVs...")
 
 
-domains=pd.read_csv(
-    DOMAIN_META,
-    sep="\t"
+tsvs=glob.glob(
+    str(FOLDSEEK_DIR / "*_allvall.tsv")
 )
 
 
-domains=domains.rename(
-columns={
-"accession":"accession"
-}
-)
+all_hits=[]
 
 
-domain_map=domain_map.merge(
-    domains[
-        [
-        "accession",
-        "domain",
-        "start",
-        "end",
-        "evalue"
-        ]
-    ],
-    on=[
-        "accession",
-        "domain"
-    ],
-    how="left"
-)
+for tsv in tsvs:
 
 
-
-#########################################
-# 5. Read ALL FoldSeek results
-#########################################
-
-print("Reading FoldSeek results...")
+    domain=os.path.basename(tsv).replace("_allvall.tsv","")
 
 
-glob.glob(
-    str(FOLDSEEK_DIR / "*allvall.tsv")
-)
-
-
-
-results=[]
-
-
-for f in allvall_files:
-
-
-    domain=os.path.basename(f)\
-        .replace("_allvall.tsv","")
-
-
-    x=pd.read_csv(
-        f,
+    df=pd.read_csv(
+        tsv,
         sep="\t",
         header=None
     )
 
 
-    x.columns=[
+    df.columns=[
 
         "query_id",
         "target_id",
-
-        "alnlen",
-
+        "mean_tmscore",
+        "aln_len",
         "qstart",
         "qend",
-
         "tstart",
         "tend",
-
         "evalue",
-
         "bits",
-
         "qtmscore",
-
         "ttmscore",
-
         "lddt",
-
-        "rmsd",
-
-        "fident"
+        "rmsd"
 
     ]
 
 
-    x["query_domain"]=domain
-
-    x["target_domain"]=domain
+    df["domain"]=domain
 
 
-    results.append(x)
+    all_hits.append(df)
 
 
 
-foldseek=pd.concat(results)
+foldseek=pd.concat(all_hits,ignore_index=True)
+
+
+print("FoldSeek comparisons:",len(foldseek))
 
 
 
 #########################################
-# 6. Annotate query proteins
+# 4. Annotate query and target proteins
 #########################################
 
-print("Annotating queries...")
+
+print("Annotating query/target IDs...")
 
 
-foldseek=foldseek.merge(
+query_map=domain_map.rename(
+    columns={
+        "foldseek_id":"query_id",
+        "gene":"query_gene",
+        "organism":"query_organism",
+        "domain":"query_domain"
+    }
+)
 
-    domain_map,
 
-    left_on="query_id",
+target_map=domain_map.rename(
+    columns={
+        "foldseek_id":"target_id",
+        "gene":"target_gene",
+        "organism":"target_organism",
+        "domain":"target_domain"
+    }
+)
 
-    right_on="foldseek_id",
 
+
+hits=foldseek.merge(
+    query_map[
+        [
+        "query_id",
+        "query_gene",
+        "query_organism",
+        "query_domain"
+        ]
+    ],
+    on="query_id",
     how="left"
-
 )
 
 
-foldseek=foldseek.rename(
 
-columns={
-
-"gene":"query_gene",
-
-"organism":"query_organism",
-
-"accession":"query_accession",
-
-"description":"query_description",
-
-"uniprot_entry":"query_entry"
-
-}
-
+hits=hits.merge(
+    target_map[
+        [
+        "target_id",
+        "target_gene",
+        "target_organism",
+        "target_domain"
+        ]
+    ],
+    on="target_id",
+    how="left"
 )
 
 
 
 #########################################
-# 7. Annotate targets
+# 5. Add classifications
 #########################################
 
-print("Annotating targets...")
 
-
-foldseek=foldseek.merge(
-
-    domain_map,
-
-    left_on="target_id",
-
-    right_on="foldseek_id",
-
-    how="left",
-
-    suffixes=("","_target")
-
+hits["same_domain"] = (
+    hits.query_domain ==
+    hits.target_domain
 )
 
 
-
-foldseek=foldseek.rename(
-
-columns={
-
-"gene":"target_gene",
-
-"organism":"target_organism",
-
-"accession":"target_accession",
-
-"description":"target_description",
-
-"uniprot_entry":"target_entry"
-
-}
-
+hits["cross_species"] = (
+    hits.query_organism !=
+    hits.target_organism
 )
 
 
 
 #########################################
-# 8. Add biology fields
+# 6. Save
 #########################################
 
-print("Adding comparison labels...")
 
-
-foldseek["mean_tmscore"]=(
-
-    foldseek.qtmscore +
-
-    foldseek.ttmscore
-
-)/2
-
-
-
-foldseek["same_domain"]=(
-
-    foldseek.query_domain ==
-
-    foldseek.target_domain
-
-)
-
-
-
-foldseek["same_modification"]=False
-
-
-
-foldseek["cross_kingdom"]=(
-
-    foldseek.query_organism !=
-
-    foldseek.target_organism
-
-)
-
-
-
-# placeholder until your modification table
-
-foldseek["query_modification"]="unknown"
-
-foldseek["target_modification"]="unknown"
-
-
-
-#########################################
-# 9. Output
-#########################################
-
-final=foldseek[
-
-[
-
-"query_gene",
-
-"target_gene",
-
-"query_organism",
-
-"target_organism",
-
-"query_modification",
-
-"target_modification",
-
-"query_domain",
-
-"target_domain",
-
-"mean_tmscore",
-
-"qtmscore",
-
-"ttmscore",
-
-"lddt",
-
-"rmsd",
-
-"fident",
-
-"evalue",
-
-"same_modification",
-
-"same_domain",
-
-"cross_kingdom",
-
-"query_accession",
-
-"target_accession",
-
-"query_entry",
-
-"target_entry",
-
-"query_description",
-
-"target_description"
-
-]
-
-]
-
-
-
-final.to_csv(
-    OUTPUT,
+hits.to_csv(
+    OUT,
     index=False
 )
 
 
-print("\nDONE")
-print(final.head())
-print(
-"Rows:",
-len(final)
-)
+print("DONE")
+print("Saved:",OUT)
+
+print(hits.head())
