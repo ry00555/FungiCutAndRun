@@ -244,24 +244,38 @@ echo $PROTEIN_OUT
 #########################################
 # Merge with FoldSeek master
 #########################################
-
-
 python3 <<'PY'
 
 import pandas as pd
 
+
 foldseek_master = pd.read_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded.csv"
 )
+
 
 mmseqs_fullprotein_identity = pd.read_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/mmseqs_identity/all_protein_sequence_identity.tsv",
     sep="\t"
 )
 
+
+# remove accidental spaces in headers
+foldseek_master.columns = foldseek_master.columns.str.strip()
+mmseqs_fullprotein_identity.columns = mmseqs_fullprotein_identity.columns.str.strip()
+
+
+print("FoldSeek columns:")
+print(foldseek_master.columns.tolist())
+
+print("MMseqs columns:")
+print(mmseqs_fullprotein_identity.columns.tolist())
+
+
 foldseek_master = foldseek_master.merge(
     mmseqs_fullprotein_identity,
-    on=["query_accession","target_accession"],
+    left_on=["query_accession","target_accession"],
+    right_on=["query","target"],
     how="left"
 )
 
@@ -269,3 +283,5 @@ foldseek_master.to_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded_with_seqid.csv",
     index=False
 )
+
+PY
