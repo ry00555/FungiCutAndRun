@@ -452,6 +452,8 @@ for domain,seqs in domain_out.items():
 
     print(domain, len(seqs))
 
+
+PY
 ##################################################
 # BUILD DOMAIN HMMs
 ##################################################
