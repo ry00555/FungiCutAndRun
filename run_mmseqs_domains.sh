@@ -260,28 +260,24 @@ mmseqs_fullprotein_identity = pd.read_csv(
 )
 
 
-# remove accidental spaces in headers
+# clean headers
 foldseek_master.columns = foldseek_master.columns.str.strip()
 mmseqs_fullprotein_identity.columns = mmseqs_fullprotein_identity.columns.str.strip()
 
 
-print("FoldSeek columns:")
-print(foldseek_master.columns.tolist())
-
-print("MMseqs columns:")
-print(mmseqs_fullprotein_identity.columns.tolist())
-
-
 foldseek_master = foldseek_master.merge(
     mmseqs_fullprotein_identity,
-    left_on=["query_accession","target_accession"],
-    right_on=["query","target"],
+    on=["query_id","target_id"],
     how="left"
 )
+
 
 foldseek_master.to_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded_with_seqid.csv",
     index=False
 )
+
+print(foldseek_master.shape)
+print(foldseek_master[['protein_pident','protein_qcov','protein_tcov']].head())
 
 PY
