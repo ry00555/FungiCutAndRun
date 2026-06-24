@@ -385,7 +385,7 @@ with open(dom) as f:
         new=records[matches[0]][start-1:end]
 
 
-        new.id=f"{row['gene']}_{domain}_{row['species']}"
+        new.id=f"{row['species']}|{row['accession']}|{row['gene']}|{domain}"
 
 
         domains.setdefault(domain,[]).append(new)
