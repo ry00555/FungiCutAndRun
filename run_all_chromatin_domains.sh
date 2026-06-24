@@ -330,86 +330,144 @@ python3 <<'PY'
 
 from Bio import SeqIO
 import csv
-import os
+from collections import defaultdict
 
 
-fasta="chromatin_domain_results/metadata/all_species.fasta"
+fasta = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
 
-dom="chromatin_domain_results/metadata/domain_occurrences.tsv"
+dom = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
 
-outdir="chromatin_domain_results/domain_sequences"
-
-os.makedirs(outdir,exist_ok=True)
+outdir = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/domain_sequences"
 
 
-# load fasta
+##################################################
+# LOAD PROTEINS
+##################################################
+
 records={}
 
 for r in SeqIO.parse(fasta,"fasta"):
     records[r.id]=r
 
 
-print("FASTA proteins:",len(records))
+print("Proteins loaded:",len(records))
 
 
-domains={}
+##################################################
+# COLLAPSE DOMAINS
+##################################################
+
+domains=defaultdict(list)
 
 
 with open(dom) as f:
 
-    for row in csv.DictReader(f,delimiter="\t"):
+    reader=csv.DictReader(f,delimiter="\t")
+
+    for row in reader:
+
+        key=(
+            row["species"],
+            row["accession"],
+            row["gene"],
+            row["domain"]
+        )
+
+        domains[key].append(
+            (
+            int(row["start"]),
+            int(row["end"])
+            )
+        )
 
 
-        # rebuild actual fasta ID
-        fasta_id=f"{row['species']}|sp|{row['accession']}|{row['gene']}"
+collapsed=[]
 
 
-        # find matching header
-        matches=[x for x in records if x.startswith(fasta_id)]
+for key,hits in domains.items():
+
+    species,acc,gene,domain=key
+
+    starts=[x[0] for x in hits]
+    ends=[x[1] for x in hits]
+
+    collapsed.append(
+        [
+        species,
+        acc,
+        gene,
+        domain,
+        min(starts),
+        max(ends)
+        ]
+    )
 
 
-        if len(matches)==0:
-            continue
+print("Collapsed domains:",len(collapsed))
 
 
-        seq=records[matches[0]].seq
+##################################################
+# EXTRACT DOMAIN SEQUENCES
+##################################################
+
+out={}
 
 
-        start=int(row["start"])
-        end=int(row["end"])
+for species,acc,gene,domain,start,end in collapsed:
 
 
-        domain=row["domain"]
+    # EXACT FASTA ID SEARCH
+    prefix=f"{species}|sp|{acc}|{gene}"
 
 
-        new=records[matches[0]][start-1:end]
+    match=None
 
 
-        new.id=f"{row['species']}|{row['accession']}|{row['gene']}|{domain}"
+    for rid in records:
+
+        if rid.startswith(prefix):
+            match=records[rid]
+            break
 
 
-        domains.setdefault(domain,[]).append(new)
+    if match is None:
+        print("MISSING:",prefix)
+        continue
+
+
+    seq=match.seq[start-1:end]
+
+
+    seq.id=f"{species}|{acc}|{gene}|{domain}"
+
+    seq.description=""
+
+
+    out.setdefault(domain,[]).append(seq)
 
 
 
-for d,seqs in domains.items():
+##################################################
+# WRITE FASTAS
+##################################################
+
+import os
+os.makedirs(outdir,exist_ok=True)
+
+
+for domain,seqs in out.items():
+
+    outfile=f"{outdir}/{domain}.fasta"
 
     SeqIO.write(
         seqs,
-        f"{outdir}/{d}.fasta",
+        outfile,
         "fasta"
     )
 
-
-    print(
-        d,
-        len(seqs)
-    )
-
+    print(domain,len(seqs),outfile)
 
 PY
-
-
 
 ##################################################
 # BUILD DOMAIN HMMs
