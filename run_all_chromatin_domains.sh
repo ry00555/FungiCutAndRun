@@ -628,7 +628,10 @@ python3 <<'PY'
 
 import csv
 from pathlib import Path
-import re
+
+from Bio.PDB import MMCIFParser
+from Bio.PDB import PDBIO
+from Bio.PDB import Select
 
 
 ROOT=Path(
@@ -636,7 +639,7 @@ ROOT=Path(
 )
 
 
-CIFS=[
+SEARCH_DIRS=[
 ROOT/"cif_human",
 ROOT/"cif_mouse",
 ROOT/"cif_zebrafish",
@@ -649,135 +652,143 @@ OUT=ROOT/"chromatin_domain_results/domains_extracted"
 OUT.mkdir(exist_ok=True)
 
 
-# load fasta headers to recover gene names
-fasta_headers={}
-
-with open(ROOT/"chromatin_domain_results/metadata/all_species.fasta") as f:
-
-    for line in f:
-
-        if line.startswith(">"):
-
-            ID=line.strip()[1:]
-
-            gene="NA"
-
-            match=re.search(r"GN=([^\s]+)",ID)
-
-            if match:
-                gene=match.group(1)
-
-            fasta_headers[ID]=gene
+print("Indexing CIF files...")
 
 
+CIF_INDEX={}
 
-for row in csv.DictReader(
-    open(ROOT/"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"),
-    delimiter="\t"
-):
+for directory in SEARCH_DIRS:
 
+    for cif in directory.rglob("*.cif"):
 
-    accession=row["accession"]
-
-    if not accession:
-        continue
+        CIF_INDEX[cif.name]=cif
 
 
-    cif=None
+print("Indexed",len(CIF_INDEX),"CIF files")
 
 
-    # search all CIF folders recursively
-    for c in CIFS:
+class DomainSelect(Select):
 
-        hits=list(c.rglob(f"*{accession}*.cif"))
+    def __init__(self,start,end):
 
-        if hits:
+        self.start=start
+        self.end=end
 
-            cif=hits[0]
-            break
+
+    def accept_residue(self,residue):
+
+        try:
+
+            resnum=residue.id[1]
+
+            return self.start <= resnum <= self.end
+
+        except:
+
+            return False
 
 
 
-    if cif is None:
-        continue
+parser=MMCIFParser(QUIET=True)
+
+count=0
+missing=0
+failed=0
 
 
-
-    atoms=[]
-
-
-    for line in open(cif):
-
-        if not line.startswith("ATOM"):
-            continue
+with open(
+ROOT/"chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+) as f:
 
 
-        x=line.split()
+    reader=csv.DictReader(f,delimiter="\t")
 
 
-        if len(x)<12:
-            continue
+    for row in reader:
 
 
-        if x[3]!="CA":
+        accession=row["accession"]
+
+        gene=row["gene"]
+
+        domain=row["domain"]
+
+        start=int(row["start"])
+        end=int(row["end"])
+
+
+        cif_file=None
+
+
+        for name,path in CIF_INDEX.items():
+
+            if accession in name:
+
+                cif_file=path
+                break
+
+
+        if cif_file is None:
+
+            missing += 1
             continue
 
 
         try:
 
-            res=int(x[8])
+
+            structure=parser.get_structure(
+                accession,
+                str(cif_file)
+            )
 
 
-            if int(row["start"]) <= res <= int(row["end"]):
+            domain_dir=OUT/domain
 
-                atoms.append(line)
-
-
-        except:
-
-            pass
+            domain_dir.mkdir(exist_ok=True)
 
 
-
-    if len(atoms)<10:
-        continue
-
-
-
-    protein=row["gene"]
+            outfile=domain_dir / (
+                f"{gene}_{accession}_{domain}_{start}-{end}.pdb"
+            )
 
 
-    # recover actual gene name
-    gene=fasta_headers.get(
-        f"{row['species']}|sp|{accession}|{protein}",
-        protein
-    )
+            io=PDBIO()
+
+            io.set_structure(structure)
+
+            io.save(
+                str(outfile),
+                DomainSelect(start,end)
+            )
 
 
-    domain=row["domain"]
+            count += 1
 
 
-    d=OUT/domain
+            if count % 100 == 0:
 
-    d.mkdir(exist_ok=True)
-
-
-
-    name=(
-        f"{gene}_{protein}_{domain}_"
-        f"{row['start']}-{row['end']}.pdb"
-    )
+                print(
+                    f"Extracted {count} domains"
+                )
 
 
-    with open(d/name,"w") as f:
+        except Exception as e:
 
-        f.writelines(atoms)
+            failed += 1
 
-        f.write("END\n")
+            print(
+                "FAILED",
+                accession,
+                str(e)
+            )
 
 
-
-print("Finished extracting domains")
+print()
+print("Extraction complete")
+print("Extracted:",count)
+print("Missing CIF:",missing)
+print("Failed:",failed)
 
 PY
 
