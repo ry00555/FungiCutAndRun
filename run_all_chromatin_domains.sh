@@ -528,108 +528,108 @@ ALL_FASTA=${OUT}/metadata/all_species.fasta
 # MERGE ALL DOMAIN HITS
 ##################################################
 
-python3 <<'PY'
-
-import csv
-from pathlib import Path
-
-base=Path("chromatin_domain_results")
-
-out=base/"metadata/domain_occurrences_extended.tsv"
-
-rows=[]
-
-with open(base/"metadata/domain_occurrences.tsv") as f:
-    rows=list(csv.reader(f,delimiter="\t"))
-
-for domtbl in Path(base/"metadata").glob("*_fungal_hits.domtbl"):
-
-    domain=domtbl.name.replace("_fungal_hits.domtbl","")
-
-    for line in open(domtbl):
-
-        if line.startswith("#"):
-            continue
-
-        x=line.split()
-
-        if len(x)<23:
-            continue
-
-        prot=x[0]
-        parts=prot.split("|")
-
-        rows.append([
-            parts[0],
-            parts[2],
-            parts[3],
-            domain,
-            x[17],
-            x[18],
-            x[6]
-        ])
-
-with open(out,"w") as f:
-
-    w=csv.writer(f,delimiter="\t")
-
-    w.writerow([
-        "species",
-        "accession",
-        "gene",
-        "domain",
-        "start",
-        "end",
-        "evalue"
-    ])
-
-    w.writerows(rows)
-
-print("Extended hits:",len(rows))
-
-PY
-
-
-
-##################################################
-# DOMAIN ARCHITECTURE
-##################################################
-
-python3 <<'PY'
-
-from collections import defaultdict
-
-d=defaultdict(list)
-
-for line in open(
-    "chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-):
-
-    if line.startswith("species"):
-        continue
-
-    s,a,g,dom,*_=line.strip().split("\t")
-
-    d[(s,g)].append(dom)
-
-
-with open(
-    "chromatin_domain_results/metadata/domain_architecture.tsv",
-    "w"
-) as out:
-
-    out.write("species\tgene\tarchitecture\n")
-
-    for k,v in d.items():
-
-        out.write(
-            f"{k[0]}\t{k[1]}\t{';'.join(sorted(set(v)))}\n"
-        )
-
-
-print("Wrote domain architecture:", len(d))
-
-PY
+# python3 <<'PY'
+#
+# import csv
+# from pathlib import Path
+#
+# base=Path("chromatin_domain_results")
+#
+# out=base/"metadata/domain_occurrences_extended.tsv"
+#
+# rows=[]
+#
+# with open(base/"metadata/domain_occurrences.tsv") as f:
+#     rows=list(csv.reader(f,delimiter="\t"))
+#
+# for domtbl in Path(base/"metadata").glob("*_fungal_hits.domtbl"):
+#
+#     domain=domtbl.name.replace("_fungal_hits.domtbl","")
+#
+#     for line in open(domtbl):
+#
+#         if line.startswith("#"):
+#             continue
+#
+#         x=line.split()
+#
+#         if len(x)<23:
+#             continue
+#
+#         prot=x[0]
+#         parts=prot.split("|")
+#
+#         rows.append([
+#             parts[0],
+#             parts[2],
+#             parts[3],
+#             domain,
+#             x[17],
+#             x[18],
+#             x[6]
+#         ])
+#
+# with open(out,"w") as f:
+#
+#     w=csv.writer(f,delimiter="\t")
+#
+#     w.writerow([
+#         "species",
+#         "accession",
+#         "gene",
+#         "domain",
+#         "start",
+#         "end",
+#         "evalue"
+#     ])
+#
+#     w.writerows(rows)
+#
+# print("Extended hits:",len(rows))
+#
+# PY
+#
+#
+#
+# ##################################################
+# # DOMAIN ARCHITECTURE
+# ##################################################
+#
+# python3 <<'PY'
+#
+# from collections import defaultdict
+#
+# d=defaultdict(list)
+#
+# for line in open(
+#     "chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+# ):
+#
+#     if line.startswith("species"):
+#         continue
+#
+#     s,a,g,dom,*_=line.strip().split("\t")
+#
+#     d[(s,g)].append(dom)
+#
+#
+# with open(
+#     "chromatin_domain_results/metadata/domain_architecture.tsv",
+#     "w"
+# ) as out:
+#
+#     out.write("species\tgene\tarchitecture\n")
+#
+#     for k,v in d.items():
+#
+#         out.write(
+#             f"{k[0]}\t{k[1]}\t{';'.join(sorted(set(v)))}\n"
+#         )
+#
+#
+# print("Wrote domain architecture:", len(d))
+#
+# PY
 
 
 
@@ -730,11 +730,20 @@ with open(
     for row in reader:
 
 
+        # skip duplicate header lines
+        if row["accession"] == "accession":
+            continue
+
+
         accession = row["accession"]
+
         gene = row["gene"]
+
         domain = row["domain"]
 
+
         start = int(row["start"])
+
         end = int(row["end"])
 
 
