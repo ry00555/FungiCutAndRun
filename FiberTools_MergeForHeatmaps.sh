@@ -12,17 +12,17 @@
 
 # =============================================================================
 # Merge nucs.bam files across replicates + both runs, then generate
-# normalized TSS heatmaps.
+# fractional TSS heatmaps and multi-sample comparison plots.
 #
 # Bedgraph column layout from ft pileup --m6a --cpg:
 #   col1=chrom col2=start col3=end col4=coverage col5=fire_coverage
 #   col6=score col7=nuc_count col8=msp_count col9=m6a_count col10=cpg_count
 #
-# Signal is RAW COUNTS — we divide by col4 (total coverage) to get fraction.
-# Fraction = signal_col / coverage (col4), giving 0-1 values per base.
+# Signal is RAW COUNTS — divided by col4 (total coverage) to get 0-1 fraction.
+# NOTE: set -e is intentionally NOT used so one group failure doesn't kill all.
 # =============================================================================
 
-set -euo pipefail
+set -uo pipefail
 
 module load Miniforge3/24.11.3-0 ucsc/443
 source activate /home/ry00555/fibertools
@@ -43,16 +43,14 @@ if [ ! -f "$TSS_BED" ]; then
 fi
 
 # =============================================================================
-# Helper: extract fractional signal (signal_col / coverage) → 4-col bedgraph
-# and BigWig. Skips positions with 0 coverage to avoid division by zero.
+# Helper: extract fractional signal (signal_col / coverage) → bedgraph + BigWig
 # =============================================================================
 make_fraction_tracks() {
-    local BG="$1"      # input multi-column pileup bedgraph
-    local BG4="$2"     # output 4-col fractional bedgraph
-    local BW="$3"      # output BigWig
-    local COL="$4"     # signal column (7=nuc, 8=msp, 9=m6a, 10=cpg)
+    local BG="$1"
+    local BG4="$2"
+    local BW="$3"
+    local COL="$4"
 
-    # ── 4-col fractional bedgraph ─────────────────────────────────
     if [ ! -f "$BG4" ]; then
         echo "      Extracting fraction (col$COL / col4) → $(basename $BG4)"
         awk -v col="$COL" '
@@ -67,30 +65,29 @@ make_fraction_tracks() {
                 { if ($2<0) $2=0
                   if (chromlen[$1] && $3>chromlen[$1]) $3=chromlen[$1]
                   if ($2<$3) print }
-            ' > "$BG4"
+            ' > "$BG4" || { echo "      ❌  awk failed"; return 1; }
 
         if [ ! -s "$BG4" ]; then
-            echo "      ❌  Empty output — check column numbers"
-            rm -f "$BG4"; return 1
+            echo "      ❌  Empty output"; rm -f "$BG4"; return 1
         fi
         echo "      ✅  $(basename $BG4)"
     else
         echo "      ⏭️  $(basename $BG4) exists"
     fi
 
-    # ── BigWig ───────────────────────────────────────────────────
     if [ ! -f "$BW" ]; then
         echo "      Converting → $(basename $BW)"
         bedGraphToBigWig "$BG4" "$GENOME" "$BW" \
             && echo "      ✅  $(basename $BW)" \
-            || echo "      ❌  bedGraphToBigWig failed"
+            || echo "      ❌  bedGraphToBigWig failed (non-fatal)"
     else
         echo "      ⏭️  $(basename $BW) exists"
     fi
+    return 0
 }
 
 # =============================================================================
-# Main: merge BAMs + pileup + fractional tracks per group
+# Main: process all groups — merge, pileup, fractional tracks
 # =============================================================================
 echo "============================================================"
 echo " Merging replicates + runs for heatmap generation"
@@ -145,24 +142,23 @@ while read -r LINE; do
     if [ ! -f "$MERGED_BAM" ]; then
         BAM_COUNT=$(echo "$BAMS_TO_MERGE" | wc -w)
         if [ "$BAM_COUNT" -eq 1 ]; then
-            cp $BAMS_TO_MERGE "$MERGED_BAM"
+            cp $BAMS_TO_MERGE "$MERGED_BAM" && samtools index "$MERGED_BAM"
         else
-            samtools merge -f -@ 8 "$MERGED_BAM" $BAMS_TO_MERGE
+            samtools merge -f -@ 8 "$MERGED_BAM" $BAMS_TO_MERGE && samtools index "$MERGED_BAM"
         fi
-        samtools index "$MERGED_BAM"
         echo "  ✅  Merged: $(basename $MERGED_BAM)"
     else
         echo "  ⏭️  Merged BAM already exists"
     fi
 
-    # ── Single pileup (all signals in one pass) ──────────────────
+    # ── Single pileup ────────────────────────────────────────────
     PILEUP_BG="$GROUP_DIR/${GROUP}.allpileup.bedgraph"
-
     if [ ! -f "$PILEUP_BG" ]; then
         echo "  Running pileup..."
         ft pileup --m6a --cpg --per-base \
             --out "$PILEUP_BG" "$MERGED_BAM" \
-            || { echo "  ❌ pileup failed"; continue; }
+            || { echo "  ❌ pileup failed — skipping group"; continue; }
+        echo "  ✅  Pileup done"
     else
         echo "  ⏭️  Pileup exists"
     fi
@@ -170,124 +166,80 @@ while read -r LINE; do
     echo "  Columns: $(head -1 $PILEUP_BG)"
 
     # ── Fractional bedgraphs + BigWigs ───────────────────────────
-    # col7=nuc, col8=msp, col9=m6a, col10=cpg — all divided by col4
     echo "  Making fractional tracks..."
+    make_fraction_tracks "$PILEUP_BG" "$GROUP_DIR/${GROUP}.nuc.frac.bedgraph" "$GROUP_DIR/${GROUP}.nuc.bw" 7
+    make_fraction_tracks "$PILEUP_BG" "$GROUP_DIR/${GROUP}.msp.frac.bedgraph" "$GROUP_DIR/${GROUP}.msp.bw" 8
+    make_fraction_tracks "$PILEUP_BG" "$GROUP_DIR/${GROUP}.m6a.frac.bedgraph" "$GROUP_DIR/${GROUP}.m6A.bw" 9
+    make_fraction_tracks "$PILEUP_BG" "$GROUP_DIR/${GROUP}.5mC.frac.bedgraph" "$GROUP_DIR/${GROUP}.5mC.bw" 10
 
-    make_fraction_tracks "$PILEUP_BG" \
-        "$GROUP_DIR/${GROUP}.nuc.frac.bedgraph" \
-        "$GROUP_DIR/${GROUP}.nuc.bw" 7
-
-    make_fraction_tracks "$PILEUP_BG" \
-        "$GROUP_DIR/${GROUP}.msp.frac.bedgraph" \
-        "$GROUP_DIR/${GROUP}.msp.bw" 8
-
-    make_fraction_tracks "$PILEUP_BG" \
-        "$GROUP_DIR/${GROUP}.m6a.frac.bedgraph" \
-        "$GROUP_DIR/${GROUP}.m6A.bw" 9
-
-    make_fraction_tracks "$PILEUP_BG" \
-        "$GROUP_DIR/${GROUP}.5mC.frac.bedgraph" \
-        "$GROUP_DIR/${GROUP}.5mC.bw" 10
-
-    # Sanity check — print a few non-zero fraction values
     echo "  Sample m6A fractions (first 3 non-zero):"
-    awk '$4 > 0' "$GROUP_DIR/${GROUP}.m6a.frac.bedgraph" | head -3 | sed 's/^/    /'
+    awk '$4 > 0' "$GROUP_DIR/${GROUP}.m6a.frac.bedgraph" 2>/dev/null | head -3 | sed 's/^/    /' || true
 
     PROCESSED_GROUPS="$PROCESSED_GROUPS $GROUP"
+    echo "  ✅  $GROUP complete"
 
 done < "$GROUPS_FILE"
 
-# =============================================================================
-# Per-group heatmaps from BigWig and bedgraph
-# =============================================================================
 echo ""
 echo "============================================================"
-echo " Generating per-group heatmaps"
+echo " All groups processed: $PROCESSED_GROUPS"
+echo " Generating heatmaps..."
 echo "============================================================"
 
+# =============================================================================
+# Per-group heatmaps
+# =============================================================================
 for GROUP in $PROCESSED_GROUPS; do
     GROUP_DIR="$OUT_DIR/${GROUP}"
-
     M6A_BW="$GROUP_DIR/${GROUP}.m6A.bw"
     MSP_BW="$GROUP_DIR/${GROUP}.msp.bw"
     NUC_BW="$GROUP_DIR/${GROUP}.nuc.bw"
     CPG_BW="$GROUP_DIR/${GROUP}.5mC.bw"
 
-    M6A_BG="$GROUP_DIR/${GROUP}.m6a.frac.bedgraph"
-    MSP_BG="$GROUP_DIR/${GROUP}.msp.frac.bedgraph"
-    NUC_BG="$GROUP_DIR/${GROUP}.nuc.frac.bedgraph"
-    CPG_BG="$GROUP_DIR/${GROUP}.5mC.frac.bedgraph"
-
-    [ -f "$M6A_BW" ] || { echo "  ⚠️  $GROUP BigWigs missing — skipping"; continue; }
+    [ -f "$M6A_BW" ] || { echo "  ⚠️  $GROUP BigWigs missing — skipping heatmaps"; continue; }
 
     echo ""
     echo "  ── $GROUP ──"
 
-    # BigWig matrix
-    MATRIX_BW="$GROUP_DIR/${GROUP}.bw.TSS.gz"
-    if [ ! -f "$MATRIX_BW" ]; then
+    MATRIX="$GROUP_DIR/${GROUP}.TSS.gz"
+    if [ ! -f "$MATRIX" ]; then
         computeMatrix reference-point \
             --referencePoint TSS \
             -b 2000 -a 2000 \
             -R "$TSS_BED" \
             -S "$M6A_BW" "$MSP_BW" "$NUC_BW" "$CPG_BW" \
-            -o "$MATRIX_BW" \
-            --outFileNameMatrix "$GROUP_DIR/${GROUP}.bw.TSS.tab" \
+            -o "$MATRIX" \
+            --outFileNameMatrix "$GROUP_DIR/${GROUP}.TSS.tab" \
             --missingDataAsZero \
             --samplesLabel "m6A" "MSP" "nucleosome" "5mC" \
             -p 12 \
-            && echo "    ✅  BW matrix" \
-            || echo "    ❌  BW computeMatrix failed"
+            && echo "    ✅  matrix" \
+            || { echo "    ❌  computeMatrix failed"; continue; }
     else
-        echo "    ⏭️  BW matrix exists"
+        echo "    ⏭️  matrix exists"
     fi
 
-    # Bedgraph matrix
-    MATRIX_BG="$GROUP_DIR/${GROUP}.bg.TSS.gz"
-    if [ ! -f "$MATRIX_BG" ] && [ -f "$M6A_BG" ]; then
-        computeMatrix reference-point \
-            --referencePoint TSS \
-            -b 2000 -a 2000 \
-            -R "$TSS_BED" \
-            -S "$M6A_BG" "$MSP_BG" "$NUC_BG" "$CPG_BG" \
-            -o "$MATRIX_BG" \
-            --outFileNameMatrix "$GROUP_DIR/${GROUP}.bg.TSS.tab" \
-            --missingDataAsZero \
-            --samplesLabel "m6A" "MSP" "nucleosome" "5mC" \
-            -p 12 \
-            && echo "    ✅  BG matrix" \
-            || echo "    ❌  BG computeMatrix failed"
-    else
-        echo "    ⏭️  BG matrix exists"
-    fi
+    plotHeatmap \
+        -m "$MATRIX" \
+        -out "$GROUP_DIR/${GROUP}.TSS_heatmap.png" \
+        --sortUsingSamples 1 \
+        --sortRegions descend \
+        --colorMap Greens Greens Reds Blues \
+        --whatToShow 'heatmap and colorbar' \
+        --plotTitle "$GROUP" \
+        --heatmapHeight 12 --heatmapWidth 3 \
+        --zMin 0 0 0 0 --zMax 1 1 1 1 \
+        && echo "    ✅  heatmap" || echo "    ❌  plotHeatmap failed"
 
-    for MATRIX in "$MATRIX_BW" "$MATRIX_BG"; do
-        [ -f "$MATRIX" ] || continue
-        TAG=$(echo "$MATRIX" | grep -o '\.[bw|bg]*\.TSS' | tr -d '.')
-
-        plotHeatmap \
-            -m "$MATRIX" \
-            -out "$GROUP_DIR/${GROUP}.${TAG}.heatmap.png" \
-            --sortUsingSamples 1 \
-            --sortRegions descend \
-            --colorMap Greens Greens Reds Blues \
-            --whatToShow 'heatmap and colorbar' \
-            --plotTitle "$GROUP ($TAG)" \
-            --heatmapHeight 12 --heatmapWidth 3 \
-            --zMin 0 0 0 0 \
-            && echo "    ✅  heatmap ($TAG)" \
-            || echo "    ❌  plotHeatmap failed"
-
-        plotProfile \
-            -m "$MATRIX" \
-            -out "$GROUP_DIR/${GROUP}.${TAG}.profile.png" \
-            --plotTitle "$GROUP ($TAG) — TSS signal" \
-            --samplesLabel "m6A" "MSP" "nucleosome" "5mC" \
-            --colors darkgreen green red blue \
-            --plotHeight 6 --plotWidth 8 \
-            && echo "    ✅  profile ($TAG)" \
-            || echo "    ❌  plotProfile failed"
-    done
+    plotProfile \
+        -m "$MATRIX" \
+        -out "$GROUP_DIR/${GROUP}.TSS_profile.png" \
+        --plotTitle "$GROUP — fraction signal around TSS" \
+        --samplesLabel "m6A" "MSP (accessible)" "nucleosome" "5mC" \
+        --colors darkgreen green red blue \
+        --yMin 0 --yMax 1 \
+        --plotHeight 6 --plotWidth 8 \
+        && echo "    ✅  profile" || echo "    ❌  plotProfile failed"
 
 done
 
@@ -302,70 +254,67 @@ echo "============================================================"
 COMPARE_GROUPS="WT_Eddie WT_Rochelle cac-1 cac-2 rtt109 rtt109FLAG"
 
 for SIGNAL in m6A msp nuc 5mC; do
-    for MODE in bw bg; do
 
-        BW_LIST=""
-        LABELS=""
-        for GROUP in $COMPARE_GROUPS; do
-            case "$MODE-$SIGNAL" in
-                bw-m6A) F="$OUT_DIR/${GROUP}/${GROUP}.m6A.bw" ;;
-                bw-msp) F="$OUT_DIR/${GROUP}/${GROUP}.msp.bw" ;;
-                bw-nuc) F="$OUT_DIR/${GROUP}/${GROUP}.nuc.bw" ;;
-                bw-5mC) F="$OUT_DIR/${GROUP}/${GROUP}.5mC.bw" ;;
-                bg-m6A) F="$OUT_DIR/${GROUP}/${GROUP}.m6a.frac.bedgraph" ;;
-                bg-msp) F="$OUT_DIR/${GROUP}/${GROUP}.msp.frac.bedgraph" ;;
-                bg-nuc) F="$OUT_DIR/${GROUP}/${GROUP}.nuc.frac.bedgraph" ;;
-                bg-5mC) F="$OUT_DIR/${GROUP}/${GROUP}.5mC.frac.bedgraph" ;;
-            esac
-            [ -f "$F" ] && BW_LIST="$BW_LIST $F" && LABELS="$LABELS $GROUP"
-        done
-
-        [ -z "$BW_LIST" ] && continue
-
-        echo ""
-        echo "  ── All strains: $SIGNAL ($MODE) ──"
-
-        MATRIX="$OUT_DIR/allgroups.${SIGNAL}.${MODE}.TSS.gz"
-        if [ ! -f "$MATRIX" ]; then
-            computeMatrix reference-point \
-                --referencePoint TSS \
-                -b 2000 -a 2000 \
-                -R "$TSS_BED" \
-                -S $BW_LIST \
-                -o "$MATRIX" \
-                --missingDataAsZero \
-                --samplesLabel $LABELS \
-                -p 12 \
-                && echo "    ✅  matrix" \
-                || { echo "    ❌  failed"; continue; }
-        else
-            echo "    ⏭️  matrix exists"
-        fi
-
+    BW_LIST=""
+    LABELS=""
+    for GROUP in $COMPARE_GROUPS; do
         case $SIGNAL in
-            m6A|msp) CMAP="Greens" ;;
-            nuc)     CMAP="Reds"   ;;
-            5mC)     CMAP="Blues"  ;;
+            m6A) F="$OUT_DIR/${GROUP}/${GROUP}.m6A.bw" ;;
+            msp) F="$OUT_DIR/${GROUP}/${GROUP}.msp.bw" ;;
+            nuc) F="$OUT_DIR/${GROUP}/${GROUP}.nuc.bw" ;;
+            5mC) F="$OUT_DIR/${GROUP}/${GROUP}.5mC.bw" ;;
         esac
-
-        plotProfile \
-            -m "$MATRIX" \
-            -out "$OUT_DIR/allgroups.${SIGNAL}.${MODE}.profile.png" \
-            --plotTitle "${SIGNAL} (${MODE}) around TSS — all strains" \
-            --plotHeight 6 --plotWidth 10 --perGroup \
-            && echo "    ✅  profile" || echo "    ❌  plotProfile failed"
-
-        plotHeatmap \
-            -m "$MATRIX" \
-            -out "$OUT_DIR/allgroups.${SIGNAL}.${MODE}.heatmap.png" \
-            --sortUsingSamples 1 --sortRegions descend \
-            --colorMap $CMAP \
-            --whatToShow 'heatmap and colorbar' \
-            --plotTitle "${SIGNAL} (${MODE}) — all strains" \
-            --heatmapHeight 12 --heatmapWidth 2 \
-            && echo "    ✅  heatmap" || echo "    ❌  plotHeatmap failed"
-
+        [ -f "$F" ] && BW_LIST="$BW_LIST $F" && LABELS="$LABELS $GROUP"
     done
+
+    [ -z "$BW_LIST" ] && { echo "  ⚠️  No BigWigs for $SIGNAL — skipping"; continue; }
+
+    echo ""
+    echo "  ── All strains: $SIGNAL ──"
+
+    MATRIX="$OUT_DIR/allgroups.${SIGNAL}.TSS.gz"
+    if [ ! -f "$MATRIX" ]; then
+        computeMatrix reference-point \
+            --referencePoint TSS \
+            -b 2000 -a 2000 \
+            -R "$TSS_BED" \
+            -S $BW_LIST \
+            -o "$MATRIX" \
+            --missingDataAsZero \
+            --samplesLabel $LABELS \
+            -p 12 \
+            && echo "    ✅  matrix" \
+            || { echo "    ❌  computeMatrix failed"; continue; }
+    else
+        echo "    ⏭️  matrix exists"
+    fi
+
+    case $SIGNAL in
+        m6A|msp) CMAP="Greens" ;;
+        nuc)     CMAP="Reds"   ;;
+        5mC)     CMAP="Blues"  ;;
+    esac
+
+    plotProfile \
+        -m "$MATRIX" \
+        -out "$OUT_DIR/allgroups.${SIGNAL}.profile.png" \
+        --plotTitle "${SIGNAL} fraction around TSS — all strains" \
+        --yMin 0 \
+        --plotHeight 6 --plotWidth 10 \
+        --perGroup \
+        && echo "    ✅  comparison profile" || echo "    ❌  plotProfile failed"
+
+    plotHeatmap \
+        -m "$MATRIX" \
+        -out "$OUT_DIR/allgroups.${SIGNAL}.heatmap.png" \
+        --sortUsingSamples 1 --sortRegions descend \
+        --colorMap $CMAP \
+        --whatToShow 'heatmap and colorbar' \
+        --plotTitle "${SIGNAL} fraction — all strains" \
+        --heatmapHeight 12 --heatmapWidth 2 \
+        --zMin 0 --zMax 1 \
+        && echo "    ✅  comparison heatmap" || echo "    ❌  plotHeatmap failed"
+
 done
 
 echo ""
