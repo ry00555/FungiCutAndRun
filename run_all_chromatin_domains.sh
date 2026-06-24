@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=120G
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 #SBATCH --output=chromatin_domains_%j.out
 #SBATCH --error=chromatin_domains_%j.err
 
