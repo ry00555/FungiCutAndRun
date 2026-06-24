@@ -31,15 +31,16 @@ BASE=/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek
 
 OUT=${BASE}/chromatin_domain_results
 
+cd ${BASE}
 
-mkdir -p \
-${OUT}/metadata \
-${OUT}/domains \
-${OUT}/domain_sequences \
-${OUT}/domain_hmms \
-${OUT}/domains_extracted \
-${OUT}/foldseek \
-${OUT}/tmp
+#mkdir -p \
+#${OUT}/metadata \
+#${OUT}/domains \
+#${OUT}/domain_sequences \
+#${OUT}/domain_hmms \
+#${OUT}/domains_extracted \
+#${OUT}/foldseek \
+#${OUT}/tmp
 
 
 
@@ -47,20 +48,20 @@ ${OUT}/tmp
 # PFAM
 ##################################################
 
-PFAM=${OUT}/Pfam-A.hmm
+#PFAM=${OUT}/Pfam-A.hmm
 
-if [ ! -f ${PFAM}.h3i ]
-then
+#if [ ! -f ${PFAM}.h3i ]
+#then
 
-    wget -q \
-        -O ${PFAM}.gz \
-        https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+#    wget -q \
+#        -O ${PFAM}.gz \
+#        https://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 
-    gunzip ${PFAM}.gz
+#    gunzip ${PFAM}.gz
 
-    hmmpress ${PFAM}
+#    hmmpress ${PFAM}
 
-fi
+#fi
 
 
 ##################################################
@@ -71,96 +72,96 @@ CHROM_PFAM=${OUT}/metadata/chromatin_Pfam.hmm
 
 DOMAIN_LIST=${OUT}/metadata/chromatin_pfams.txt
 
-if [ ! -f "${CHROM_PFAM}.h3i" ]
-then
-
-echo "Creating chromatin Pfam database"
-
-cat > "${DOMAIN_LIST}" << EOF
-BAH
-CBAH
-PHD
-PHD_2
-PHD_3
-PHD_4
-PHD_5
-PHD_like
-PHD_JHD1
-PHD_ash2p_like
-zf-PHD-like
-PWWP
-MUM1-like_PWWP
-Chromo
-Chromo_2
-Chromo_shadow
-Bromodomain
-MRG
-PHF12_MRG_bd
-MBT
-Tudor_2
-Tudor_3
-Tudor_4
-Tudor_5
-53-BP1_Tudor
-Crb2_Tudor
-SGF29_Tudor
-SMN_Tudor
-JmjC
-JmjC_2
-JmjN
-SET
-N-SET
-Pre-SET
-preSET_CXC
-SET_assoc
-SET7_N
-DOT1
-WD40
-EOF
-
-
-echo "Indexing Pfam"
-
-hmmfetch --index "${PFAM}"
-
-
-echo "Extracting chromatin Pfam models"
-
-hmmfetch \
-    -f \
-    "${PFAM}" \
-    "${DOMAIN_LIST}" \
-    > "${CHROM_PFAM}"
-
-
-echo "Pressing chromatin Pfam database"
-
-hmmpress "${CHROM_PFAM}"
-
-
-echo "Chromatin Pfam database created"
-
-fi
+# if [ ! -f "${CHROM_PFAM}.h3i" ]
+# then
+#
+# echo "Creating chromatin Pfam database"
+#
+# cat > "${DOMAIN_LIST}" << EOF
+# BAH
+# CBAH
+# PHD
+# PHD_2
+# PHD_3
+# PHD_4
+# PHD_5
+# PHD_like
+# PHD_JHD1
+# PHD_ash2p_like
+# zf-PHD-like
+# PWWP
+# MUM1-like_PWWP
+# Chromo
+# Chromo_2
+# Chromo_shadow
+# Bromodomain
+# MRG
+# PHF12_MRG_bd
+# MBT
+# Tudor_2
+# Tudor_3
+# Tudor_4
+# Tudor_5
+# 53-BP1_Tudor
+# Crb2_Tudor
+# SGF29_Tudor
+# SMN_Tudor
+# JmjC
+# JmjC_2
+# JmjN
+# SET
+# N-SET
+# Pre-SET
+# preSET_CXC
+# SET_assoc
+# SET7_N
+# DOT1
+# WD40
+# EOF
+#
+#
+# echo "Indexing Pfam"
+#
+# hmmfetch --index "${PFAM}"
+#
+#
+# echo "Extracting chromatin Pfam models"
+#
+# hmmfetch \
+#     -f \
+#     "${PFAM}" \
+#     "${DOMAIN_LIST}" \
+#     > "${CHROM_PFAM}"
+#
+#
+# echo "Pressing chromatin Pfam database"
+#
+# hmmpress "${CHROM_PFAM}"
+#
+#
+# echo "Chromatin Pfam database created"
+#
+# fi
 ##################################################
 # COMBINE PROTEOMES
 ##################################################
 
 ALL_FASTA=${OUT}/metadata/all_species.fasta
 
-> ${ALL_FASTA}
+#> ${ALL_FASTA}
 
 
-for f in ${BASE}/*_proteome.fasta
+#for f in ${BASE}/*_proteome.fasta
 
-do
+#do
 
-species=$(basename ${f} _proteome.fasta)
+#species=$(basename ${f} _proteome.fasta)
 
-echo "Adding ${species}"
+#echo "Adding ${species}"
 
-sed "s/^>/>${species}|/" ${f} >> ${ALL_FASTA}
+#sed "s/^>/>${species}|/" ${f} >> ${ALL_FASTA}
 
-done
+#done
 
 
 
@@ -168,13 +169,13 @@ done
 # PFAM SCAN
 ##################################################
 
-hmmscan \
---cpu ${SLURM_CPUS_PER_TASK} \
---domtblout ${OUT}/metadata/chromatin_hits.domtbl \
--E 1e-3 \
---domE 1e-3 \
-${CHROM_PFAM} \
-${ALL_FASTA}
+#hmmscan \
+#--cpu ${SLURM_CPUS_PER_TASK} \
+#--domtblout ${OUT}/metadata/chromatin_hits.domtbl \
+#-E 1e-3 \
+#--domE 1e-3 \
+#${CHROM_PFAM} \
+#${ALL_FASTA}
 
 
 
