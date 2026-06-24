@@ -264,6 +264,12 @@ mmseqs_fullprotein_identity = pd.read_csv(
 foldseek_master.columns = foldseek_master.columns.str.strip()
 mmseqs_fullprotein_identity.columns = mmseqs_fullprotein_identity.columns.str.strip()
 
+print("FoldSeek examples")
+print(foldseek_master[['query_id','target_id']].head())
+
+print("\nMMseqs examples")
+print(mmseqs_fullprotein_identity[['query_id','target_id']].head())
+
 
 foldseek_master = foldseek_master.merge(
     mmseqs_fullprotein_identity,
@@ -271,6 +277,13 @@ foldseek_master = foldseek_master.merge(
     how="left"
 )
 
+merged_ids = foldseek_master.merge(
+    mmseqs_fullprotein_identity[['query_id','target_id']],
+    on=["query_id","target_id"],
+    how="inner"
+)
+
+print("Matching rows:", len(merged_ids))
 
 foldseek_master.to_csv(
     "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded_with_seqid.csv",
