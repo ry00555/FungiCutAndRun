@@ -30,33 +30,33 @@ mkdir -p $OUT
 # 1. DOMAIN SEQUENCE IDENTITY
 ##################################################
 
-echo "Extracting domain FASTAs..."
+# echo "Extracting domain FASTAs..."
+#
+#
+#
+# for fasta in ${DOMAIN_FASTA}/*_fixed.fasta
+#
+# do
+#
+# domain=$(basename "$fasta" _fixed.fasta)
+#
+#
+# echo "Running domain: $domain"
+#
+#
+#
+# mmseqs easy-search \
+# $fasta \
+# $fasta \
+# ${OUT}/${domain}_identity.tsv \
+# tmp_${domain} \
+# -e 1e-3 \
+# -c 0.5 \
+# --cov-mode 0 \
+# --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
+#
 
-
-
-for fasta in ${DOMAIN_FASTA}/*_fixed.fasta
-
-do
-
-domain=$(basename "$fasta" _fixed.fasta)
-
-
-echo "Running domain: $domain"
-
-
-
-mmseqs easy-search \
-$fasta \
-$fasta \
-${OUT}/${domain}_identity.tsv \
-tmp_${domain} \
--e 1e-3 \
--c 0.5 \
---cov-mode 0 \
---format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
-
-
-done
+#done
 
 
 
@@ -66,95 +66,95 @@ done
 # Extract full-length proteins by domain
 #########################################
 
-echo "Extracting full-length proteins..."
-
-python3 <<'PY'
-
-from Bio import SeqIO
-import csv
-import os
-
-
-fasta = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
-
-domains = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
-
-outdir="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
-
-
-os.makedirs(outdir,exist_ok=True)
-
-
-# load proteins
-
-records={}
-
-for r in SeqIO.parse(fasta,"fasta"):
-
-    records[r.id]=r
-
-
-
-domain_proteins={}
-
-
-
-with open(domains) as f:
-
-    reader=csv.DictReader(f,delimiter="\t")
-
-    for row in reader:
-
-
-        accession=row["accession"]
-        domain=row["domain"]
-        gene=row["gene"]
-
-
-        for rid,rec in records.items():
-
-            if f"|{accession}|" in rid:
-
-
-                new=rec[:]
-
-                new.id=f"{gene}_{accession}"
-
-                new.description=""
-
-
-                domain_proteins.setdefault(
-                    domain,
-                    {}
-                )[accession]=new
-
-
-                break
-
-
-
-# write one fasta per domain
-
-for domain,proteins in domain_proteins.items():
-
-    outfile=f"{outdir}/{domain}_proteins.fasta"
-
-
-    SeqIO.write(
-        proteins.values(),
-        outfile,
-        "fasta"
-    )
-
-
-    print(domain,len(proteins))
-
-
-PY
-
-
-
-echo "Full-length protein FASTAs created"
+# echo "Extracting full-length proteins..."
+#
+# python3 <<'PY'
+#
+# from Bio import SeqIO
+# import csv
+# import os
+#
+#
+# fasta = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/all_species.fasta"
+#
+# domains = "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/metadata/domain_occurrences_extended.tsv"
+#
+# outdir="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
+#
+#
+# os.makedirs(outdir,exist_ok=True)
+#
+#
+# # load proteins
+#
+# records={}
+#
+# for r in SeqIO.parse(fasta,"fasta"):
+#
+#     records[r.id]=r
+#
+#
+#
+# domain_proteins={}
+#
+#
+#
+# with open(domains) as f:
+#
+#     reader=csv.DictReader(f,delimiter="\t")
+#
+#     for row in reader:
+#
+#
+#         accession=row["accession"]
+#         domain=row["domain"]
+#         gene=row["gene"]
+#
+#
+#         for rid,rec in records.items():
+#
+#             if f"|{accession}|" in rid:
+#
+#
+#                 new=rec[:]
+#
+#                 new.id=f"{gene}_{accession}"
+#
+#                 new.description=""
+#
+#
+#                 domain_proteins.setdefault(
+#                     domain,
+#                     {}
+#                 )[accession]=new
+#
+#
+#                 break
+#
+#
+#
+# # write one fasta per domain
+#
+# for domain,proteins in domain_proteins.items():
+#
+#     outfile=f"{outdir}/{domain}_proteins.fasta"
+#
+#
+#     SeqIO.write(
+#         proteins.values(),
+#         outfile,
+#         "fasta"
+#     )
+#
+#
+#     print(domain,len(proteins))
+#
+#
+# PY
+#
+#
+#
+# echo "Full-length protein FASTAs created"
 
 
 
@@ -162,46 +162,46 @@ echo "Full-length protein FASTAs created"
 # Whole protein identity by domain class
 #########################################
 
-echo "Running full protein MMseqs"
+# echo "Running full protein MMseqs"
+#
+#
+# PROTEIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
+#
+#
+# mkdir -p ${OUT}/protein_results
+#
+#
+#
+# for fasta in ${PROTEIN_DIR}/*_proteins.fasta
+#
+# do
+#
+#
+# domain=$(basename "$fasta" _proteins.fasta)
+#
+#
+# echo "Running full protein identity: $domain"
+#
+#
+#
+# # unique database per domain
+# mmseqs easy-search \
+# $fasta \
+# $fasta \
+# ${OUT}/protein_results/${domain}_protein_identity.tsv \
+# tmp_${domain}_protein \
+# -e 1e-5 \
+# -c 0.3 \
+# --cov-mode 0 \
+# --format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
+#
+#
+#
+# done
 
 
-PROTEIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/protein_sequences"
 
-
-mkdir -p ${OUT}/protein_results
-
-
-
-for fasta in ${PROTEIN_DIR}/*_proteins.fasta
-
-do
-
-
-domain=$(basename "$fasta" _proteins.fasta)
-
-
-echo "Running full protein identity: $domain"
-
-
-
-# unique database per domain
-mmseqs easy-search \
-$fasta \
-$fasta \
-${OUT}/protein_results/${domain}_protein_identity.tsv \
-tmp_${domain}_protein \
--e 1e-5 \
--c 0.3 \
---cov-mode 0 \
---format-output "query,target,pident,alnlen,qcov,tcov,evalue,bits"
-
-
-
-done
-
-
-
-echo "Full protein MMseqs complete"
+#echo "Full protein MMseqs complete"
 
 
 
@@ -251,7 +251,7 @@ python3 <<'PY'
 import pandas as pd
 
 foldseek_master = pd.read_csv(
-    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/annotated_hits_expanded.csv"
+    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded.csv"
 )
 
 mmseqs_fullprotein_identity = pd.read_csv(
@@ -266,6 +266,6 @@ foldseek_master = foldseek_master.merge(
 )
 
 foldseek_master.to_csv(
-    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/chromatin_domain_results/annotated_hits_expanded_with_seqid.csv",
+    "/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/annotated_hits_expanded_with_seqid.csv",
     index=False
 )
