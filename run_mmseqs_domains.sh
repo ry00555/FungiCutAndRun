@@ -14,7 +14,7 @@ ml MMseqs2/18-8cc5c-gompi-2025a
 
 DOMAIN_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/domain_sequences"
 
-FULL_FASTA="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/all_species.fasta"
+FULL_FASTA="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/metadata/all_species.fasta"
 
 OUT="/scratch/ry00555/RNASeqPaper2026/Proteome/StructuralSimilarity/FoldSeek/mmseqs_identity"
 
@@ -28,7 +28,7 @@ mkdir -p $OUT
 echo "Running domain MMseqs"
 
 
-for fasta in $DOMAIN_DIR/*/*.fasta
+for fasta in $DOMAIN_DIR/*.fasta
 
 do
 
