@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=merge_normalize_bw
+#SBATCH --job-name=BWCompare
 #SBATCH --partition=batch
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=12
-#SBATCH --mem=32G
-#SBATCH --time=12:00:00
-#SBATCH --output=%x_%j.out
-#SBATCH --error=%x_%j.err
-#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=500gb
+#SBATCH --time=48:00:00
+#SBATCH --output=../BWDeep.%j.out
+#SBATCH --error=../BWDeep.%j.err
 
 
 set -euo pipefail
