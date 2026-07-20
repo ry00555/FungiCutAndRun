@@ -15,7 +15,6 @@ set -euo pipefail
 
 # ---- Environment ----
 module load deepTools
-module load Python
 
 THREADS=12
 
