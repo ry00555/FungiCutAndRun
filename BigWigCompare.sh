@@ -15,10 +15,9 @@ set -euo pipefail
 
 # ---- Environment ----
 module load deepTools
-module load Python/3.9-anaconda
-conda activate deeptools_env
+module load Python
 
-THREADS=${SLURM_CPUS_PER_TASK:-12}
+THREADS=12
 
 # ---- Paths ----
 BASEDIR="/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/RemappedBW"
