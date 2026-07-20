@@ -18,9 +18,10 @@ module load deepTools
 
 THREADS=12
 
+
 # ---- Paths ----
 BASEDIR="/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/RemappedBW"
-META_CSV="${BASEDIR}/BW_Meta_all_samples.csv"
+META_CSV="${BASEDIR}/BW_Meta_deduplicated.csv"
 AVG_DIR="${BASEDIR}/AveragedBW"
 NORM_DIR="${BASEDIR}/Log2InputNormBW"
 
@@ -51,6 +52,18 @@ elif "bigwig_path" in df.columns:
 else:
     raise SystemExit("Meta CSV needs either a 'bigwig_filename' or 'bigwig_path' column")
 
+# Sanity check: this script assumes BW_Meta_deduplicated.csv, which already has
+# one row per physical replicate+mark+condition+factor (no repeats from a
+# sample being listed in multiple source metadata sheets, no conflicting
+# labels). If that's not true of whatever CSV got pointed at here, stop rather
+# than silently double-counting or merging on a contradiction.
+dup_check = df.groupby(["RunID", "mark", "Condition", "Factor"]).size()
+if (dup_check > 1).any():
+    raise SystemExit(
+        "META_CSV is not deduplicated (found repeated RunID+mark+Condition+Factor rows) -- "
+        "point this script at BW_Meta_deduplicated.csv, or dedupe first."
+    )
+
 
 def get_dominant_input_condition(chip_condition, ds_df):
     """Resolve a ChIP condition's Input group via bamControl -- handles
@@ -79,12 +92,17 @@ def run(cmd):
     return result.returncode == 0
 
 
-input_merge_cache = {}  # (dataset, mark, input_condition) -> merged Input path, so shared Inputs are only merged once
+# Tracks are keyed by (mark, condition) only -- NOT by source dataset. Every
+# physical replicate is already deduplicated in the meta sheet, so a strain
+# shared across multiple original projects (e.g. tetRGFP, tetRGFPsuz12) still
+# produces exactly one merged/normalized track, not one redundant copy per
+# project it happened to be referenced from.
+input_merge_cache = {}  # (mark, input_condition) -> merged Input path, so shared Inputs are only merged once
 n_done = 0
 n_skipped = 0
 n_failed = 0
 
-for (dataset, mark), ds_df in df.groupby(["dataset", "mark"]):
+for mark, ds_df in df.groupby("mark"):
     conditions = ds_df.loc[ds_df["Factor"] != "Input", "Condition"].unique()
 
     for condition in conditions:
@@ -94,20 +112,20 @@ for (dataset, mark), ds_df in df.groupby(["dataset", "mark"]):
 
         input_condition = get_dominant_input_condition(condition, ds_df)
         if input_condition is None:
-            print(f"SKIP [{dataset}/{mark}] {condition}: could not resolve Input via bamControl", flush=True)
+            print(f"SKIP [{mark}] {condition}: could not resolve Input via bamControl", flush=True)
             n_skipped += 1
             continue
 
         input_rows = ds_df[(ds_df["Condition"] == input_condition) & (ds_df["Factor"] == "Input")]
         if input_rows.empty:
-            print(f"SKIP [{dataset}/{mark}] {condition}: resolved Input condition '{input_condition}' has no bigwigs", flush=True)
+            print(f"SKIP [{mark}] {condition}: resolved Input condition '{input_condition}' has no bigwigs", flush=True)
             n_skipped += 1
             continue
 
-        print(f"\n[{dataset}/{mark}] {condition}  (Input: {input_condition})", flush=True)
+        print(f"\n[{mark}] {condition}  (Input: {input_condition})", flush=True)
 
         chip_bws = chip_rows["bigwig_path"].tolist()
-        chip_tag = f"{dataset}_{mark}_{condition}_ChIP".replace(" ", "_")
+        chip_tag = f"{mark}_{condition}_ChIP".replace(" ", "_")
         chip_merged = f"{avg_dir}/{chip_tag}.bw"
         chip_bw_args = " ".join(f'"{p}"' for p in chip_bws)
 
@@ -117,15 +135,15 @@ for (dataset, mark), ds_df in df.groupby(["dataset", "mark"]):
             n_failed += 1
             continue
 
-        # Reuse an already-merged Input bigwig for this dataset/mark/input_condition
+        # Reuse an already-merged Input bigwig for this mark/input_condition
         # rather than rebuilding it once per ChIP condition that shares it.
-        input_key = (dataset, mark, input_condition)
+        input_key = (mark, input_condition)
         if input_key in input_merge_cache:
             input_merged = input_merge_cache[input_key]
             print(f"  [reusing merged Input] {input_key}", flush=True)
         else:
             input_bws = input_rows["bigwig_path"].tolist()
-            input_tag = f"{dataset}_{mark}_{input_condition}_Input".replace(" ", "_")
+            input_tag = f"{mark}_{input_condition}_Input".replace(" ", "_")
             input_merged = f"{avg_dir}/{input_tag}.bw"
             input_bw_args = " ".join(f'"{p}"' for p in input_bws)
 
@@ -136,7 +154,7 @@ for (dataset, mark), ds_df in df.groupby(["dataset", "mark"]):
                 continue
             input_merge_cache[input_key] = input_merged
 
-        final_tag = f"{dataset}_{mark}_{condition}_InputNorm".replace(" ", "_")
+        final_tag = f"{mark}_{condition}_InputNorm".replace(" ", "_")
         final_path = f"{norm_dir}/{final_tag}.bw"
 
         print(f"  [log2 compare] -> {final_tag}.bw", flush=True)
@@ -157,3 +175,4 @@ PYEOF
 echo "== Done =="
 echo "Averaged (per-condition merged) bigwigs: ${AVG_DIR}"
 echo "Log2 input-normalized bigwigs:            ${NORM_DIR}"
+ 
