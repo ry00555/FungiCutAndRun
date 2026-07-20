@@ -19,13 +19,15 @@ module load deepTools
 THREADS=12
 
 
+
 # ---- Paths ----
 BASEDIR="/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/RemappedBW"
 META_CSV="${BASEDIR}/BW_Meta_deduplicated.csv"
 AVG_DIR="${BASEDIR}/AveragedBW"
 NORM_DIR="${BASEDIR}/Log2InputNormBW"
+RATIO_DIR="${BASEDIR}/InputNormRatioBW"
 
-mkdir -p "$AVG_DIR" "$NORM_DIR"
+mkdir -p "$AVG_DIR" "$NORM_DIR" "$RATIO_DIR"
 
 echo "== Checking deepTools is available =="
 which bigwigAverage
@@ -33,12 +35,12 @@ which bigwigCompare
 
 echo "== Reading ${META_CSV} and running merge + input-normalize directly =="
 
-python3 - "$BASEDIR" "$META_CSV" "$AVG_DIR" "$NORM_DIR" "$THREADS" <<'PYEOF'
+python3 - "$BASEDIR" "$META_CSV" "$AVG_DIR" "$NORM_DIR" "$RATIO_DIR" "$THREADS" <<'PYEOF'
 import sys
 import subprocess
 import pandas as pd
 
-basedir, meta_csv, avg_dir, norm_dir, threads = sys.argv[1:6]
+basedir, meta_csv, avg_dir, norm_dir, ratio_dir, threads = sys.argv[1:7]
 
 df = pd.read_csv(meta_csv)
 
@@ -177,6 +179,15 @@ for factor in chip_factors:
            n_failed += 1
            continue
 
+       ratio_tag = f"{factor}_{condition}_InputNormRatio".replace(" ", "_")
+       ratio_path = f"{ratio_dir}/{ratio_tag}.bw"
+
+       print(f"  [ratio compare] -> {ratio_tag}.bw", flush=True)
+       ok = run(f'bigwigCompare -b1 "{chip_merged}" -b2 "{input_merged}" --operation ratio -o "{ratio_path}" -p {threads}')
+       if not ok:
+           n_failed += 1
+           continue
+
        n_done += 1
 
 print(f"\n== Summary ==")
@@ -189,3 +200,4 @@ PYEOF
 echo "== Done =="
 echo "Averaged (per-condition merged) bigwigs: ${AVG_DIR}"
 echo "Log2 input-normalized bigwigs:            ${NORM_DIR}"
+echo "Ratio input-normalized bigwigs:           ${RATIO_DIR}"
