@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/Run156"
+OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
@@ -29,8 +29,8 @@ OUTDIR="/lustre2/scratch/ry00555/Run156"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-#module load Trim_Galore
-#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+module load Trim_Galore
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
 
@@ -46,13 +46,13 @@ do
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%__S[1-990]*_L003_R1_001_val_1.fq.gz/}
+name=${file/%__S[1-990]*_L002_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
-read2=$(echo "$f" | sed 's/_L003_R1_001_val_1\.fq\.gz/_L003_R2_001_val_2\.fq\.gz/g')
+read2=$(echo "$f" | sed 's/_L002_R1_001_val_1\.fq\.gz/_L002_R2_001_val_2\.fq\.gz/g')
 
 #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file

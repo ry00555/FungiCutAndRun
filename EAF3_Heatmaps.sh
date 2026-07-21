@@ -16,7 +16,57 @@ BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools
 
-computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_EctopicGenes_V1.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.tab
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/ASH1_nonH3K27me3_marked_forEAF3paper.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K36me3.tab
+
+plotHeatmap -m ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K36me3.gz -o ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K36me3.png \
+--heatmapHeight 5 \
+--heatmapWidth 3 \
+    --startLabel "5'" \
+    --sortRegions descend --sortUsingSamples 2 \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'YlOrBr' --zMax 8  \
+      --samplesLabel "WT H3K36me3" "eaf3" "cdp6" "mrg15"
+
+      computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/ASH1_nonH3K27me3_marked_forEAF3paper.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 1000 -a 2000 --sortRegions descend -o ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K27me3.gz --outFileNameMatrix ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K27me3.tab
+
+      plotHeatmap -m ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K27me3.gz -o ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K27me3.png   \
+          --heatmapHeight 5 \
+          --heatmapWidth 3 \
+          --outFileSortedRegions ../Heatmaps/eaf3_ASH1_nonH3K27me3_marked_V1_H3K27me3.bed \
+          --startLabel "5'" \
+          --endLabel "3'" \
+          --boxAroundHeatmaps no \
+          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 45 45 45 45  \
+            --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+            computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/nonK27nonASH1genes.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K36me3.tab
+
+            plotHeatmap -m ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K36me3.gz -o ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K36me3.png \
+            --heatmapHeight 5 \
+            --heatmapWidth 3 \
+                --startLabel "5'" \
+                --sortRegions descend --sortUsingSamples 2 \
+                --endLabel "3'" \
+                --boxAroundHeatmaps no \
+                --colorMap 'YlOrBr' --zMax 8  \
+                  --samplesLabel "WT H3K36me3" "eaf3" "cdp6" "mrg15"
+
+            computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/nonK27nonASH1genes.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 1000 -a 2000 --sortRegions descend -o ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K27me3.gz --outFileNameMatrix ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K27me3.tab
+
+            plotHeatmap -m ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K27me3.gz -o ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K27me3.png   \
+                --heatmapHeight 5 \
+                --heatmapWidth 3 \
+                --kmeans 2 \
+                --outFileSortedRegions ../Heatmaps/eaf3_nonASH1_nonH3K27me3_marked_V1_H3K27me3.bed \
+                --startLabel "5'" \
+                --endLabel "3'" \
+                --boxAroundHeatmaps no \
+                --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 40 40 40 40  \
+                  --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+
+computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_EctopicGenes_V1_sorted.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.tab
 
 plotHeatmap -m ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz -o ../Heatmaps/eaf3_EctopicGenes_V3_H3K36me3.png \
 --heatmapHeight 5 \
@@ -27,6 +77,17 @@ plotHeatmap -m ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz -o ../Heatmaps/eaf3_
     --colorMap 'YlOrBr' --zMax 30  \
       --samplesLabel "WT H3K36me3" "eaf3" "cdp6" "mrg15"
 
+      computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/eaf3_H3K27me3_WTgenesonly_V4_FINAL_wNCU.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_K27Genes_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_K27Genes_V1_H3K36me3.tab
+
+      plotHeatmap -m ../Heatmaps/eaf3_K27Genes_V1_H3K36me3.gz -o ../Heatmaps/eaf3_K27Genes_V2sortedeaf3_H3K36me3.png \
+      --heatmapHeight 5 \
+      --heatmapWidth 3 \
+          --startLabel "5'" \
+          --sortRegions descend --sortUsingSamples 2 \
+          --endLabel "3'" \
+          --boxAroundHeatmaps no \
+          --colorMap 'YlOrBr' --zMax 8  \
+            --samplesLabel "WT H3K36me3" "eaf3" "cdp6" "mrg15"
 
 
 
