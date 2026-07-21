@@ -16,6 +16,12 @@ BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools
 
+computeMatrix scale-regions -p 12 -R "../Heatmaps/WT_H3K27me3_domains_V3_eaf3.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 500 -a 500 --sortRegions descend -o ../Heatmaps/eaf3_K27domains_V3.gz --outFileNameMatrix ../Heatmaps/eaf3_K27domains_V3.tab
+
+
+plotHeatmap -m ../Heatmaps/eaf3_K27domains_V3.gz -o ../Heatmaps/eaf3_K27domains_V4.png --sortRegions descend --sortUsingSamples 2 --heatmapHeight 5  --heatmapWidth 3  --outFileSortedRegions ../Heatmaps/WT_H3K27me3_domains_V3_eaf3_sorted.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'Greens' --zMax 8 --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/neurospora.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 --sortRegions descend -o ../Heatmaps/eaf3_AllGenes_V1.gz --outFileNameMatrix ../Heatmaps/eaf3_AllGenes_V1.tab
 
 plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
@@ -31,20 +37,56 @@ plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
     --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 20 20 20 20  \
       --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
 
-      computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_H3K27me3genes_V3.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 --sortRegions descend -o ../Heatmaps/eaf3_H3K27me3genes_V2.gz --outFileNameMatrix ../Heatmaps/eaf3_H3K27me3genes_V2.tab
+      computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_H3K27me3_WTgenesonly_V4.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 1000 -a 2000 --sortRegions descend -o ../Heatmaps/eaf3_H3K27me3genes_V8.gz --outFileNameMatrix ../Heatmaps/eaf3_H3K27me3genes_V8.tab
 
-      plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V2.gz \
-          -o ../Heatmaps/eaf3_H3K27me3genes_V2.png \
+      plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V8.gz \
+          -o ../Heatmaps/eaf3_H3K27me3genes_V10.png \
           --sortRegions descend \
-          --sortUsingSamples 1 2 \
+          --sortUsingSamples 3 \
           --heatmapHeight 5 \
           --heatmapWidth 3 \
-          --outFileSortedRegions ../Heatmaps/eaf3_H3K27me3genes_V3.bed \
+          --outFileSortedRegions ../Heatmaps/eaf3_H3K27me3_WTgenesonly_V4_cdp6sorted.bed \
           --startLabel "5'" \
           --endLabel "3'" \
           --boxAroundHeatmaps no \
-          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 20 20 20 20  \
+          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 30 30 30 30  \
             --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+            plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V4.gz \
+                -o ../Heatmaps/eaf3_H3K27me3genes_V5.png \
+                --sortRegions descend \
+                --sortUsingSamples 1 \
+                --heatmapHeight 5 \
+                --heatmapWidth 3 \
+                --outFileSortedRegions ../Heatmaps/eaf3_H3K27me3_top729list_WTsorted.bed \
+                --startLabel "5'" \
+                --endLabel "3'" \
+                --boxAroundHeatmaps no \
+                --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 40 40 40 40  \
+                  --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+REPLICATES=("134-28_ChIP_WT_H3K27me3_Rep2_peaks.xls"
+"147-3_WT_H3K27me3_rep9_peaks.xls"
+"145-30_ChIP_peaks.xls")
+OUT_DIR="BedToolsMergedPeaks"
+INTERMEDIATE_BEDS=()
+for file in "${REPLICATES[@]}"; do
+    base_name="${file%.xls}"
+    output_path="$OUT_DIR/${base_name}_WT_.bed"
+    awk 'BEGIN{OFS="\t"}
+         /^[^#]/ && $1!="" && $1!="chr" {
+             print $1, $2-1, $3, $4
+         }' "$file" > "$output_path"
+        INTERMEDIATE_BEDS+=("$output_path")
+    echo "Converted $file -> $output_path"
+done
+MERGED_FILE="$OUT_DIR/merged_peaks_master.bed"
+
+echo "Merging overlapping peaks across all replicates..."
+cat "${INTERMEDIATE_BEDS[@]}" | \
+    bedtools sort -i stdin | \
+    bedtools merge -i stdin > "$MERGED_FILE"
+
 
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" --skipZeros -b 2000 -a 1000 --sortRegions descend -o ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.gz --outFileNameMatrix ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.tab
 
