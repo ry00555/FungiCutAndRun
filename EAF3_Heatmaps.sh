@@ -16,6 +16,35 @@ BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools
 
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/neurospora.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 --sortRegions descend -o ../Heatmaps/eaf3_AllGenes_V1.gz --outFileNameMatrix ../Heatmaps/eaf3_AllGenes_V1.tab
+
+plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
+    -o ../Heatmaps/eaf3_AllGenes_V1.png \
+    --sortRegions descend \
+    --sortUsingSamples 1 \
+    --heatmapHeight 5 \
+    --heatmapWidth 3 \
+    --outFileSortedRegions ../Heatmaps/eaf3_AllGenes_V1.bed \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 20 20 20 20  \
+      --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+      computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_H3K27me3genes_V3.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 --sortRegions descend -o ../Heatmaps/eaf3_H3K27me3genes_V2.gz --outFileNameMatrix ../Heatmaps/eaf3_H3K27me3genes_V2.tab
+
+      plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V2.gz \
+          -o ../Heatmaps/eaf3_H3K27me3genes_V2.png \
+          --sortRegions descend \
+          --sortUsingSamples 1 2 \
+          --heatmapHeight 5 \
+          --heatmapWidth 3 \
+          --outFileSortedRegions ../Heatmaps/eaf3_H3K27me3genes_V3.bed \
+          --startLabel "5'" \
+          --endLabel "3'" \
+          --boxAroundHeatmaps no \
+          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 20 20 20 20  \
+            --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
 
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/K27genes_NCU_n573.bed" -S "/scratch/ry00555/Run153/BigWigs/153-26_ChIP_WT_H3K27me3_Rep1_S26_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-107_ChIP_WT_H3K36me3__S100_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-38_ChIP_set7_H3K27me3__S38_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" "/scratch/ry00555/Run153/BigWigs/153-40_ChIP_set7_H3K36me3__S40_L002_R1_001_val_1.bin_25.smooth_50Bulk.bw" --skipZeros -b 2000 -a 1000 --sortRegions descend -o ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.gz --outFileNameMatrix ASH1_SET7_K27me3_H3K36me3_H3K27me3genes_V1.tab
 
