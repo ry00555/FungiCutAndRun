@@ -47,12 +47,17 @@ df = pd.read_csv(meta_csv)
 if "bigwig_found" in df.columns:
    df = df[df["bigwig_found"] == True].copy()
 
-if "bigwig_filename" in df.columns:
-   df["bigwig_path"] = df["bigwig_filename"].apply(lambda f: f"{basedir}/{f}")
-elif "bigwig_path" in df.columns:
+if "bigwig_path" in df.columns:
    pass  # already has usable paths
+elif "bigwig_filename" in df.columns:
+   df["bigwig_path"] = df["bigwig_filename"].apply(lambda f: f"{basedir}/{f}")
+elif "BigWig" in df.columns:
+   df["bigwig_path"] = df["BigWig"].apply(lambda f: f"{basedir}/{f}")
 else:
-   raise SystemExit("Meta CSV needs either a 'bigwig_filename' or 'bigwig_path' column")
+   raise SystemExit(
+       "Meta CSV needs a 'bigwig_path', 'bigwig_filename', or 'BigWig' column "
+       f"(found columns: {list(df.columns)})"
+   )
 
 # Safety net: collapse any literal leftover duplicate rows (same RunID +
 # Condition + Factor) rather than erroring or double-counting them. This is
