@@ -16,6 +16,39 @@ BWDIR="$OUTDIR/BigWigs"
 
 ml deepTools
 
+computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_EctopicGenes_V1.bed" -S "H3K36me3_WT_ChIP.bw" "H3K36me3_eaf3_ChIP.bw"  "H3K36me3_cdp6_ChIP.bw" "H3K36me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 -o  ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz --outFileNameMatrix ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.tab
+
+plotHeatmap -m ../Heatmaps/eaf3_EctopicGenes_V1_H3K36me3.gz -o ../Heatmaps/eaf3_EctopicGenes_V3_H3K36me3.png \
+--heatmapHeight 5 \
+--heatmapWidth 3 \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'YlOrBr' --zMax 30  \
+      --samplesLabel "WT H3K36me3" "eaf3" "cdp6" "mrg15"
+
+
+
+
+computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/EctopicH3K27me3GenesGained_Final_wNCU.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 1000 -a 2000 --sortRegions descend -o ../Heatmaps/eaf3_EctopicGenes_V1.gz --outFileNameMatrix ../Heatmaps/eaf3_EctopicGenes_V1.tab
+
+plotHeatmap -m ../Heatmaps/eaf3_EctopicGenes_V1.gz -o ../Heatmaps/eaf3_EctopicGenes_V2.png   \
+    --heatmapHeight 5 \
+    --heatmapWidth 3 \
+    --outFileSortedRegions ../Heatmaps/eaf3_EctopicGenes_V1_sorted.bed \
+    --startLabel "5'" \
+    --endLabel "3'" \
+    --boxAroundHeatmaps no \
+    --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 40 40 40 40  \
+      --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+      computeMatrix scale-regions -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/EctopicH3K27me3Domains.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 500 -a 500 --sortRegions descend -o ../Heatmaps/Ectopic_eaf3_K27domains_V1.gz --outFileNameMatrix ../Heatmaps/Ectopic_eaf3_K27domains_V1.tab
+
+
+      plotHeatmap -m ../Heatmaps/Ectopic_eaf3_K27domains_V1.gz -o ../Heatmaps/Ectopic_eaf3_K27domains_V1.png --sortRegions descend --sortUsingSamples 4 --heatmapHeight 1  --heatmapWidth 3  --outFileSortedRegions ../Heatmaps/Ectopic_eaf3_K27domains_V1.bed  --startLabel "5'"  --endLabel "3'" --boxAroundHeatmaps no  --colorMap 'Greens' --zMax 6 --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
+
+
+
 computeMatrix scale-regions -p 12 -R "../Heatmaps/WT_H3K27me3_domains_V3_eaf3.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 500 -a 500 --sortRegions descend -o ../Heatmaps/eaf3_K27domains_V3.gz --outFileNameMatrix ../Heatmaps/eaf3_K27domains_V3.tab
 
 
@@ -24,10 +57,7 @@ plotHeatmap -m ../Heatmaps/eaf3_K27domains_V3.gz -o ../Heatmaps/eaf3_K27domains_
 
 computeMatrix reference-point -p 12 -R "/home/ry00555/Research/Genomes/HeatmapGeneFiles/neurospora.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 2000 -a 1000 --sortRegions descend -o ../Heatmaps/eaf3_AllGenes_V1.gz --outFileNameMatrix ../Heatmaps/eaf3_AllGenes_V1.tab
 
-plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
-    -o ../Heatmaps/eaf3_AllGenes_V1.png \
-    --sortRegions descend \
-    --sortUsingSamples 1 \
+plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz -o ../Heatmaps/eaf3_AllGenes_V1.png   --sortRegions descend --sortUsingSamples 1 \
     --heatmapHeight 5 \
     --heatmapWidth 3 \
     --outFileSortedRegions ../Heatmaps/eaf3_AllGenes_V1.bed \
@@ -40,7 +70,7 @@ plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
       computeMatrix reference-point -p 12 -R "../Heatmaps/eaf3_H3K27me3_WTgenesonly_V4.bed" -S "H3K27me3_WT_ChIP.bw" "H3K27me3_eaf3_ChIP.bw"  "H3K27me3_cdp6_ChIP.bw" "H3K27me3_mrg15_ChIP.bw"  --skipZeros -b 1000 -a 2000 --sortRegions descend -o ../Heatmaps/eaf3_H3K27me3genes_V8.gz --outFileNameMatrix ../Heatmaps/eaf3_H3K27me3genes_V8.tab
 
       plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V8.gz \
-          -o ../Heatmaps/eaf3_H3K27me3genes_V10.png \
+          -o ../Heatmaps/eaf3_H3K27me3genes_V11.png \
           --sortRegions descend \
           --sortUsingSamples 3 \
           --heatmapHeight 5 \
@@ -49,7 +79,7 @@ plotHeatmap -m ../Heatmaps/eaf3_AllGenes_V1.gz \
           --startLabel "5'" \
           --endLabel "3'" \
           --boxAroundHeatmaps no \
-          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 30 30 30 30  \
+          --colorMap 'Greens' 'Greens' 'Greens' 'Greens'  --zMax 40 40 40 40  \
             --samplesLabel "WT H3K27me3" "eaf3" "cdp6" "mrg15"
 
             plotHeatmap -m ../Heatmaps/eaf3_H3K27me3genes_V4.gz \
