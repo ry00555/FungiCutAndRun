@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/"
+OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
