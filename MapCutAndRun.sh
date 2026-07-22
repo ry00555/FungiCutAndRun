@@ -29,8 +29,8 @@ OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-module load Trim_Galore
-trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+#module load Trim_Galore
+#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
 FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
 
