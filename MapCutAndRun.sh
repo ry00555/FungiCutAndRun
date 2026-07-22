@@ -87,7 +87,7 @@ ml MACS3
 # command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
-for infile in $BAMDIR/*.bam
+for infile in $BAMDIR/153-107*.bam
 do
   base=$(basename ${infile} .bam)
 #    Input=$BAMDIR/ ${infile} Input_Q30.bam
