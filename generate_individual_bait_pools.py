@@ -154,11 +154,33 @@ def generate_pools(bait_name, bait_seq, proteome, max_aa, max_candidates, seeds,
     os.makedirs(outdir, exist_ok=True)
 
     # Sort candidates by aa length ascending so smaller proteins pack better
-    candidates_all = [
+    candidates_sorted = [
         (pid, seq) for pid, seq in sorted(proteome.items(),
                                            key=lambda x: len(x[1]))
         if pid not in exclude_ids and len(seq) >= 20
     ]
+
+    # ── Drop candidates that can NEVER fit in a pool with this bait ───
+    # (their own length alone exceeds the per-pool candidate budget, so
+    # bait + candidate together would already exceed max_aa). Leaving
+    # these in the packing list causes the packer to stall forever on
+    # them (it can never find a home for them), so they must be
+    # filtered out up front and reported separately.
+    candidates_all  = [(pid, seq) for pid, seq in candidates_sorted if len(seq) <= budget]
+    oversized       = [(pid, seq) for pid, seq in candidates_sorted if len(seq) > budget]
+
+    if oversized:
+        print(f"  {bait_name}: {len(oversized)} candidate(s) exceed the "
+              f"per-pool budget ({budget} aa) and cannot be paired with "
+              f"this bait under max_aa={max_aa}. Skipping: "
+              f"{', '.join(pid for pid, _ in oversized)}", file=sys.stderr)
+        oversized_path = os.path.join(outdir, f"{bait_name}_oversized_excluded.csv")
+        with open(oversized_path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["protein_id", "length_aa", "budget_aa", "max_aa"])
+            for pid, seq in oversized:
+                writer.writerow([pid, len(seq), budget, max_aa])
+        print(f"  Oversized-excluded list written: {oversized_path}")
 
     pool_rows = []
     pool_num  = 0
@@ -193,7 +215,17 @@ def generate_pools(bait_name, bait_seq, proteome, max_aa, max_candidates, seeds,
                     break  # nothing fits, close pool
 
         if not current_candidates:
-            i = j
+            # Safety net: should be unreachable now that oversized
+            # candidates are pre-filtered (every remaining candidate is
+            # individually <= budget, so a fresh/empty pool can always
+            # accept candidates_all[j]). Guard against any future stall
+            # by always forcing forward progress instead of looping.
+            stuck_pid = candidates_all[j][0] if j < len(candidates_all) else "n/a"
+            print(f"  WARNING: {bait_name} pool at index {i} could not "
+                  f"place any candidate ({stuck_pid}); skipping it to "
+                  f"avoid a stall.", file=sys.stderr)
+            i = max(j, i + 1)
+            pool_num -= 1  # this iteration didn't actually produce a pool
             continue
 
         # Write JSON
