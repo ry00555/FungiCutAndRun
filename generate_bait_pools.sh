@@ -76,8 +76,8 @@ python3 "${SCRIPTS}/generate_individual_bait_pools.py" \
     --bait_fasta     "${BAIT_FASTA}" \
     --baits          SET7 SUZ12 EED EAF3 \
     --outdir         "${SCRATCH}" \
-    --max_aa         5000 \
-    --max_candidates 6 \
+    --max_aa         5120 \
+    --max_candidates 20 \
     --seeds          42 137
 
 echo ""
