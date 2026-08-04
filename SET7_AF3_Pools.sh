@@ -36,7 +36,7 @@ cd $SLURM_SUBMIT_DIR
 # ══════════════════════════════════════════════════════════════════════
 
 TOTAL=1624
-MSA_THROTTLE=50
+MSA_THROTTLE=100
 INF_THROTTLE=2
 INF_BATCH=4
 MSA_SCRIPT="SET7_AF3_MSA_Pool.sh"

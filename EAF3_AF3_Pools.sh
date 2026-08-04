@@ -36,9 +36,9 @@ cd $SLURM_SUBMIT_DIR
 # ══════════════════════════════════════════════════════════════════════
 
 TOTAL=1182
-MSA_THROTTLE=50
-INF_THROTTLE=2
-INF_BATCH=4
+MSA_THROTTLE=100
+INF_THROTTLE=3
+INF_BATCH=6
 MSA_SCRIPT="EAF3_AF3_MSA_Pool.sh"
 INF_SCRIPT="EAF3_AF3_INF_Pool.sh"
 INPUT_DIR="/scratch/ry00555/RNASeqPaper2026/Proteome/SingleBaitPools/EAF3/EAF3_PooledPPI_InputJSONs"
