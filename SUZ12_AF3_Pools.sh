@@ -77,9 +77,18 @@ if [ "$MODE" == "inf_scan" ]; then
         pool=$(basename "$json_file" .json | tr '[:upper:]' '[:lower:]')
         msa_json="${OUTPUT_DIR}/${pool}/${pool}_data.json"
         inf_done="${OUTPUT_DIR}/${pool}/seed-1_sample-0/summary_confidences.json"
+        submitted_marker="${OUTPUT_DIR}/${pool}/.inf_submitted"
 
         [ ! -f "$msa_json" ] && continue
         [ -f "$inf_done" ] && continue
+
+        # Skip pools already submitted for INF within the last 20 hours
+        # (covers 4h INF walltime + queue wait) so an earlier scan's
+        # still-pending jobs don't get resubmitted as duplicates by a
+        # later scan.
+        if [ -f "$submitted_marker" ] && [ -n "$(find "$submitted_marker" -mmin -1200 2>/dev/null)" ]; then
+            continue
+        fi
 
         ready+=($line_num)
     done < <(ls $INPUT_DIR/*.json)
@@ -98,30 +107,51 @@ if [ "$MODE" == "inf_scan" ]; then
         exit 0
     fi
 
-    prev_job=""
+    submitted_any=false
     for ((start=0; start<${#ready[@]}; start+=INF_BATCH)); do
         chunk=("${ready[@]:$start:$INF_BATCH}")
         indices="${chunk[0]}"
         for idx in "${chunk[@]:1}"; do indices="${indices},${idx}"; done
 
-        if [ -z "$prev_job" ]; then
-            job=$(sbatch --parsable --array=${indices}%${INF_THROTTLE} $INF_SCRIPT)
-        else
-            job=$(sbatch --parsable --dependency=afterany:${prev_job} --array=${indices}%${INF_THROTTLE} $INF_SCRIPT)
-        fi
+        # No inter-chunk dependency: these chunks cover independent pools
+        # with no real dependency on each other. Chaining them with
+        # --dependency=afterany forced every later chunk to wait for the
+        # entire earlier chunk to finish before it could even START
+        # running (not just before it was submitted) -- serializing work
+        # that should run concurrently up to the account's 8-running cap.
+        # Slurm's own QOS enforcement (8 running / 20 submitted, shared
+        # across all 4 baits) is what should gate concurrency here, and
+        # the QOS-limit catch below already handles submission-time
+        # rejection when the 20-submitted cap is full.
+        job=$(sbatch --parsable --array=${indices}%${INF_THROTTLE} $INF_SCRIPT)
 
         if [ -n "$job" ]; then
             echo "INF submitted: $job ($indices)"
-            prev_job=$job
+            submitted_any=true
+            # Mark each pool in this chunk as submitted so a later scan
+            # (which may run before this job finishes) doesn't resubmit it.
+            for idx in "${chunk[@]}"; do
+                json_file=$(ls $INPUT_DIR/*.json | sed -n "${idx}p")
+                pool=$(basename "$json_file" .json | tr '[:upper:]' '[:lower:]')
+                mkdir -p "${OUTPUT_DIR}/${pool}"
+                touch "${OUTPUT_DIR}/${pool}/.inf_submitted"
+            done
         else
             echo "FAILED (QOS limit): $indices — stopping here, will retry on next scan"
             break
         fi
     done
 
-    if [ -n "$prev_job" ]; then
-        sbatch --dependency=afterany:${prev_job} $0 inf_scan
-        echo "Next inf_scan scheduled after job $prev_job"
+    # Reschedule the next scan on a timer instead of chaining it to the
+    # last INF job. Chaining meant no NEW pool could even be submitted
+    # until the entire previous batch finished, stalling the pipeline
+    # for hours at a time. A periodic scan re-checks progress regularly
+    # without needing to wait on any specific job.
+    sbatch --begin=now+30minutes $0 inf_scan
+    if [ "$submitted_any" = true ]; then
+        echo "Next inf_scan scheduled in 30 minutes"
+    else
+        echo "No chunks submitted this round (QOS limit reached); next inf_scan scheduled in 30 minutes anyway"
     fi
     exit 0
 fi
