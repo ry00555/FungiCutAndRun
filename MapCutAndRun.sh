@@ -15,7 +15,7 @@ cd $SLURM_SUBMIT_DIR
 #read in variables from the config file ($threads, $FASTQ, $OUTDIR, )
 
 source config.txt
-OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq"
+OUTDIR="/lustre2/scratch/ry00555/Run157"
 
 # if output directory doesn't exist, create it
   mkdir -p $OUTDIR
@@ -29,10 +29,10 @@ OUTDIR="/lustre2/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq"
  BAMDIR="${OUTDIR}/SortedBamFiles"
  BEDDIR="${OUTDIR}/Beds"
 #   process reads using trimGalore
-#module load Trim_Galore
-#trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
+module load Trim_Galore
+trim_galore --paired --length 20 --fastqc --gzip -o ${OUTDIR}/TrimmedReads ${FASTQ}/*fastq\.gz
 
-FILES="${OUTDIR}/TrimmedReads/*_L002_R1_001_val_1\.fq\.gz"
+FILES="${OUTDIR}/TrimmedReads/*_L004_R1_001_val_1\.fq\.gz"
 
 #FILES="${OUTDIR}/TrimmedReads/*_L003_R1_001_val_1\.fq\.gz"
 #  Iterate over the files
@@ -46,13 +46,13 @@ do
 #
 file=${f##*/}
 #  	remove ending from file name to create shorter names for bam files and other downstream output
-name=${file/%__S[1-990]*_L002_R1_001_val_1.fq.gz/}
+name=${file/%__S[1-990]*_L004_R1_001_val_1.fq.gz/}
 #name=${file/%_S[1-990]*R1_001_val_1.fq.gz/}
 #
 #
 #  	 File Vars
 #  	use sed to get the name of the second read matching the input file
-read2=$(echo "$f" | sed 's/_L002_R1_001_val_1\.fq\.gz/_L002_R2_001_val_2\.fq\.gz/g')
+read2=$(echo "$f" | sed 's/_L004_R1_001_val_1\.fq\.gz/_L004_R2_001_val_2\.fq\.gz/g')
 
 #read2=$(echo "$f" | sed 's/R1_001_val_1\.fq\.gz/R2_001_val_2\.fq\.gz/g')
 #  	variable for naming bam file
@@ -87,7 +87,7 @@ ml MACS3
 # command line
 #macs3 callpeak -t 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli.sorted.bam -f BAMPE -n 137-11_CUTANDRUN_rtt109_H3K36me3_Rep1_S11_Ecoli -c 137-9_CUTANDRUN_rtt109_IgG_Rep1_S9_Ecoli.sorted.bam --broad -g 41037538 --broad-cutoff 0.1 --outdir /scratch/ry00555/OutputRun137/CutandRun/MACSPeaks --min-length 800 --max-gap 500
 
-for infile in $BAMDIR/153-107*.bam
+for infile in $BAMDIR/*.bam
 do
   base=$(basename ${infile} .bam)
 #    Input=$BAMDIR/ ${infile} Input_Q30.bam
