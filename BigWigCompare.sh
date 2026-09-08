@@ -21,8 +21,8 @@ THREADS=12
 
 
 # ---- Paths ----
-BASEDIR="/scratch/ry00555/EpigeneticMemoryPaper2026/ChIPSeq/RemappedBW"
-META_CSV="${BASEDIR}/H3K36me3_ISW_BWfill.csv"
+BASEDIR="/scratch/ry00555/Run157/BigWigs"
+META_CSV="/scratch/ry00555/Run157/eaf3_run157_meta.csv"
 AVG_DIR="${BASEDIR}/AveragedBW"
 NORM_DIR="${BASEDIR}/Log2InputNormBW"
 RATIO_DIR="${BASEDIR}/InputNormRatioBW"
