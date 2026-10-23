@@ -1,0 +1,34 @@
+#number of CPUs
+THREADS=12
+
+#to download all files to local machine  scp -r ry00555@xfer.gacrc.uga.edu:/scratch/zlewis/Run133/2023_Run133_FASTQ/ /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133
+#then seperate my files into a new folder for Run133 on my local machine it is /Users/ry00555/Desktop/RochelleLabDesktopData/IlluminaResults/Run133/RYSamples/ZippedFastQ
+#transfer to the scratch folder scp -r *fastq.gz ry00555@xfer.gacrc.uga.edu:/scratch/ry00555/OutputRun133/FastQ
+
+#test
+
+#FASTQ should be the path to a folder containing all your zipped fastq files; filename endings should be fastq.gz
+
+#fastqPath="/scratch/ry00555/RTT109PaperFigures/2024_Run142_FASTQ"
+FASTQ="/scratch/ry00555/Afum/CEA10/FastQ"
+
+#Edit Code to add Q score option
+
+#Name of Output directory. This will be created one directory above the folder you run the MapCutAndRun.sh script from.
+
+OutputFolderName="/scratch/ry00555/Afum/CEA10"
+
+
+#GENOME should be the path to a bwa-indexed genome file; include the entire root file name; you can uncomment formatted genome you want to use or add a path to a different genome
+
+GENOME="/home/zlewis/Genomes/AfumagatisGenome/Af_CEA10/Afum_A1163_edit6.fasta"
+#GENOME="/home/zlewis/Genomes/AfumagatisGenome/AspergillusFumagatis_GCF_000002655.1/Afumagatis_GCF_000002655.1"  #Aspergillus fumigatus AF293
+#GENOME="/home/zlewis/Genomes/Anidulans/A_nidulans_FGSC_A4_current_chromosomes.fasta"  #Aspergillus nidulans A4
+
+
+#SET Deeptools paramenters
+#binsize for windows
+BIN="25"
+
+#smoothlength setting, for smoothing the enrichment curve
+SMOOTH="75"
