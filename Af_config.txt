@@ -32,3 +32,7 @@ BIN="25"
 
 #smoothlength setting, for smoothing the enrichment curve
 SMOOTH="75"
+
+# Q score cutoffs
+TRIMQ=20   # Trim Galore: trim bases below this Phred score
+MAPQ=20    # bamCoverage: ignore reads mapped below this MAPQ

@@ -40,7 +40,7 @@ bigwig="${bwDir}/${accession}"
 ################### trimming ###################
 # remove adaptors, trim low-quality bases (Phred $TRIMQ), keep reads >= 25 bp
 module load Trim_Galore/0.6.10-GCCcore-12.3.0
-trim_galore --illumina --fastqc --paired --length 25 --quality $TRIMQ --cores 2 \
+trim_galore --illumina --fastqc --paired --length 25 --quality $TRIMQ \
   --basename "${accession}" --gzip -o "$trimmed" "$read1" "$read2"
 
 ################### mapping ###################
@@ -69,5 +69,5 @@ bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality $
 ################### peaks ###################
 module load MACS3/3.0.1-gfbf-2023a
 # --nolambda: call peaks without a control
-macs3 callpeak -t "$bam" -f BAMPE -n "${accession}" --broad -g $GSIZE \
+macs3 callpeak -t "$bam" -f BAMPE -n "${accession}" --broad -g 29322347 \
   --broad-cutoff 0.1 --outdir "$PeakDir" --min-length 800 --max-gap 500 --nolambda
