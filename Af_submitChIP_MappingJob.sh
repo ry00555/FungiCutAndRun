@@ -32,7 +32,7 @@ while read -r line || [[ -n "$line" ]]; do
     --output="${outdir}/logs/%x.out" \
     --error="${outdir}/logs/%x.err" \
     --export=ALL,accession="${line}",fastqPath="${fastqPath}",outdir="${outdir}" \
-    MapData.sh
+    MapAfData.sh
   echo "$line mapping job submitted"
   sleep 1
 done < "$1"

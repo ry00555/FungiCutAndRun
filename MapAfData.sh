@@ -3,7 +3,7 @@
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-user=ry00555@uga.edu
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=12
 #SBATCH --mem=100gb
 #SBATCH --time=8:00:00
 
