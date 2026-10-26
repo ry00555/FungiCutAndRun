@@ -15,8 +15,8 @@ fi
 fastqPath="/scratch/ry00555/Afum/CEA10/FastQ"   # renamed <SampleID>_R1/_R2.fastq.gz files
 outdir="/scratch/ry00555/Afum/CEA10"            # TrimmedFastQs, bamFiles, bigWig, Peaks, logs go here
 
-mkdir -p "${outdir}/logs" "${outdir}/TrimmedFastQs" "${outdir}/bamFiles" \
-         "${outdir}/bigWig" "${outdir}/Peaks"
+mkdir -p "${outdir}/logs" "${outdir}/TrimmedFastQs" "${outdir}/SortedBamFiles" \
+         "${outdir}/BigWigs" "${outdir}/MACSPeaks"
 
 while read -r line || [[ -n "$line" ]]; do
   line="${line//$'\r'/}"            # strip Windows/Excel line endings

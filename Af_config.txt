@@ -36,3 +36,22 @@ SMOOTH="75"
 # Q score cutoffs
 TRIMQ=20   # Trim Galore: trim bases below this Phred score
 MAPQ=20    # bamCoverage: ignore reads mapped below this MAPQ
+
+
+############ CUT&RUN only (MapCutRun.sh) ############
+# Bowtie2 index prefixes (built once from the command line)
+BT2_GENOME="/home/ry00555/Research/Genomes/Afum_CEA10/Afum_A1163_edit6"
+BT2_ECOLI="/home/ry00555/Research/Genomes/Ecoli/ecoli"
+
+# E. coli spike-in scaling: scale factor = SPIKE_CONSTANT / E. coli fragments
+SPIKE_CONSTANT=10000
+
+# Remove PCR duplicates in CUT&RUN (true/false)
+REMOVE_DUPS=true
+
+# Genome size for MACS3, calculated from the genome so it always matches what you mapped to.
+if [[ -s "${GENOME}.fai" ]]; then
+  GSIZE=$(awk '{s+=$2} END {print s}' "${GENOME}.fai")
+else   # no .fai (e.g. no write access to the genome folder): count bases in the FASTA
+  GSIZE=$(grep -v '^>' "$GENOME" | tr -d '\n\r' | wc -c)
+fi

@@ -8,7 +8,7 @@
 #SBATCH --time=8:00:00
 
 cd $SLURM_SUBMIT_DIR
-source config.txt
+source Af_config.txt
 
 # Variables passed in from submitMappingJob.sh:
 #   accession = SampleID (e.g. CEA10_H3K4me2_ChIP_1_5glucose_Rep1)
@@ -29,13 +29,13 @@ done
 ################### output folders ###################
 trimmed="${outdir}/TrimmedFastQs/${accession}"
 tmp="${outdir}/tempFile/${accession}"
-bamdir="${outdir}/bamFiles"
-bwDir="${outdir}/bigWig"
-PeakDir="${outdir}/Peaks/${accession}"
-mkdir -p "$trimmed" "$tmp" "$bamdir" "$bwDir" "$PeakDir"
+BAMDIR="${outdir}/SortedBamFiles"
+BWDIR="${outdir}/BigWigs"
+PEAKDIR="${outdir}/MACSPeaks/${accession}"
+mkdir -p "$trimmed" "$tmp" "$BAMDIR" "$BWDIR" "$PEAKDIR"
 
-bam="${bamdir}/${accession}.bam"
-bigwig="${bwDir}/${accession}"
+bam="${BAMDIR}/${accession}.bam"
+bigwig="${BWDIR}/${accession}"
 
 ################### trimming ###################
 # remove adaptors, trim low-quality bases (Phred $TRIMQ), keep reads >= 25 bp
@@ -57,17 +57,15 @@ rm -r "$tmp"
 ################### bigWigs ###################
 module load deepTools/3.5.5-gfbf-2023a
 # all reads
-bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality $MAPQ \
+bamCoverage -p $THREADS -bs $BIN --normalizeUsing BPM --minMappingQuality 20 \
   --smoothLength $SMOOTH -of bigwig -b "$bam" \
   -o "${bigwig}.bin_${BIN}.smooth_${SMOOTH}Bulk.bw"
 
 # mononucleosome-sized fragments (bin 1, smooth 25 -> named to match)
-bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality $MAPQ \
-  --smoothLength 25 -of bigwig -b "$bam" \
-  -o "${bigwig}.bin_1.smooth_25_MNase.bw"
+#bamCoverage -p $THREADS --MNase -bs 1 --normalizeUsing BPM --minMappingQuality $MAPQ  --smoothLength 25 -of bigwig -b "$bam"  -o "${bigwig}.bin_1.smooth_25_MNase.bw"
 
 ################### peaks ###################
 module load MACS3/3.0.1-gfbf-2023a
 # --nolambda: call peaks without a control
 macs3 callpeak -t "$bam" -f BAMPE -n "${accession}" --broad -g 29322347 \
-  --broad-cutoff 0.1 --outdir "$PeakDir" --min-length 800 --max-gap 500 --nolambda
+  --broad-cutoff 0.1 --outdir "$PEAKDIR" --min-length 800 --max-gap 500 --nolambda
