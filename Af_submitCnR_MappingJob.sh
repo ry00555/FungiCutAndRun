@@ -1,19 +1,19 @@
 #!/bin/bash
 # Submits one CUT&RUN mapping job (MapCutRun.sh) per sample in the list.
-# Usage (from the folder with MapCutRun.sh and config.txt):
-#   bash submitCutRunJob.sh sampleList_CutRun.txt
+# Usage (from the folder with MapCutRun.sh and Af_config.txt):
+#   bash Af_submitCnR_MappingJob.sh sampleList_CutRun.txt
 
 if [[ -z "$1" ]]; then
   echo "
   ################
   ERROR: You must include the path to your sample list.
-  eg. bash submitCutRunJob.sh sampleList_CutRun.txt
+  eg. bash Af_submitCnR_MappingJob.sh sampleList_CutRun.txt
   ################
   "
   exit 1
 fi
 
-[[ -f MapCutRun.sh && -f config.txt ]] || { echo "ERROR: run this from the folder containing Map_AfCutnRun.sh and config.txt"; exit 1; }
+[[ -f Map_AfCutnRun.sh && -f Af_config.txt ]] || { echo "ERROR: run this from the folder containing Map_AfCutnRun.sh and config.txt"; exit 1; }
 
 fastqPath="/scratch/ry00555/Afum/CEA10/FastQ"   # <name>_R1.fastq.gz or <name>_R1_001.fastq.gz
 outdir="/scratch/ry00555/Afum/CEA10"            # results go to $outdir/CutRun
