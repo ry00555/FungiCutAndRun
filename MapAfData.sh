@@ -31,7 +31,7 @@ trimmed="${outdir}/TrimmedFastQs/${accession}"
 tmp="${outdir}/tempFile/${accession}"
 BAMDIR="${outdir}/SortedBamFiles"
 BWDIR="${outdir}/BigWigs"
-PEAKDIR="${outdir}/MACSPeaks/${accession}"
+PEAKDIR="${outdir}/MACSPeaks"
 mkdir -p "$trimmed" "$tmp" "$BAMDIR" "$BWDIR" "$PEAKDIR"
 
 bam="${BAMDIR}/${accession}.bam"
