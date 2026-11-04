@@ -25,8 +25,8 @@ set -euo pipefail
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-MERGED_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedBams"
-OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
+MERGED_DIR="/scratch/ry00555/ONTRun13_14Combined/MergedBams"
+OUT_DIR="/scratch/ry00555/ONTRun13_14Combined/fibertools_results"
 THREADS=8
 
 mkdir -p "$OUT_DIR"
@@ -37,7 +37,7 @@ echo " Input : $MERGED_DIR"
 echo " Output: $OUT_DIR"
 echo "============================================================"
 
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
 
     RUN_IN="$MERGED_DIR/$RUN"
     RUN_OUT="$OUT_DIR/$RUN"
@@ -161,7 +161,7 @@ echo " All done. QC summary:"
 echo "============================================================"
 echo ""
 
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
     echo "  $RUN:"
     find "$OUT_DIR/$RUN" -name "*.qc.txt" | sort | while read -r QC; do
         SAMPLE=$(basename "$QC" .qc.txt)
