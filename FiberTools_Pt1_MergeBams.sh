@@ -38,12 +38,12 @@ set -euo pipefail
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-BASE_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/InputBams"
-OUT_DIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/MergedBams"
+BASE_DIR="/lustre2/scratch/ry00555/ONTRun13_14combined/InputBams"
+OUT_DIR="/lustre2/scratch/ry00555/ONTRun13_14combined/MergedBams"
 SORTED_TMP="${OUT_DIR}/sorted_q10_tmp"
 
-mkdir -p "$OUT_DIR/ONTRun9"
-mkdir -p "$OUT_DIR/ONTRun10"
+mkdir -p "$OUT_DIR/ONTRun13"
+mkdir -p "$OUT_DIR/ONTRun14"
 mkdir -p "$SORTED_TMP"
 
 # =============================================================================
@@ -51,36 +51,33 @@ mkdir -p "$SORTED_TMP"
 # Barcodes 23 & 24 are empty in metadata — skipped.
 # =============================================================================
 declare -A SAMPLE_MAP=(
-    [barcode01]="WT_Eddie_barcode01"
-    [barcode02]="WT_Eddie_barcode02"
-    [barcode03]="cac-1_Eddie_barcode03"
-    [barcode04]="cac-1_Eddie_barcode04"
-    [barcode05]="cac-2_Eddie_barcode05"
-    [barcode06]="cac-2_Eddie_barcode06"
-    [barcode07]="WT_Rochelle_barcode07"
-    [barcode08]="WT_Rochelle_barcode08"
-    [barcode09]="rtt109_Rochelle_barcode09"
-    [barcode10]="rtt109_Rochelle_barcode10"
-    [barcode11]="rtt109FLAG_Rochelle_barcode11"
-    [barcode12]="rtt109FLAG_Rochelle_barcode12"
-    [barcode13]="WT_Eddie_barcode13"
-    [barcode14]="cac-1_Eddie_barcode14"
-    [barcode15]="cac-2_Eddie_barcode15"
-    [barcode16]="gDNA_Hia5_ctrl_Eddie_barcode16"
-    [barcode17]="WizardgDNA_HMW_Eddie_barcode17"
-    [barcode18]="WT_Rochelle_barcode18"
-    [barcode19]="rtt109_Rochelle_barcode19"
-    [barcode20]="rtt109FLAG_Rochelle_barcode20"
-    [barcode21]="gDNA_Hia5_ctrl_Rochelle_barcode21"
-    [barcode22]="WizardgDNA_HMW_Rochelle_barcode22"
-)
+    [barcode01]="WT_Nc_Rep1_3"
+    [barcode02]="WT_Nc_Rep2_2"
+    [barcode03]="isw_Rep1_3"
+    [barcode04]="isw_Rep2_2"
+    [barcode05]="K214R_Rep1_1"
+    [barcode06]="K214R_Rep2_2"
+    [barcode07]="CEA10_Af_C_rep1"
+    [barcode08]="CEA10_Af_C_rep2"
+    [barcode09]="CEA10_Af_C_rep3"
+    [barcode10]="WT_Nc_Rep1_2"
+    [barcode11]="WT_Nc_Rep1_3"
+    [barcode12]="WT_Nc_Rep2_2"
+    [barcode13]="isw_Rep1_2"
+    [barcode14]="isw_Rep1_3"
+    [barcode15]="isw_Rep2_2"
+    [barcode16]="K214R_Rep2_1"
+    [barcode17]="K214R_Rep1_1"
+    [barcode18]="K214R_Rep2_2"
+    [barcode19]="K214R_Rep2_1"
+    )
 
 echo "============================================================"
 echo " FiberTools Pt1: Merge split BAMs (runs kept separate)"
 echo " Output dir: $OUT_DIR"
 echo "============================================================"
 
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
 
     echo ""
     echo "╔══════════════════════════════════════════════════════╗"
@@ -154,7 +151,7 @@ echo ""
 echo "============================================================"
 echo " All done. Merged BAMs:"
 echo "============================================================"
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
     echo ""
     echo "  $RUN:"
     find "$OUT_DIR/$RUN" -name "*_merged.bam" | sort | while read -r BAM; do
@@ -165,4 +162,4 @@ done
 
 echo ""
 echo "Next: update IN_DIR in FiberTools_Pt2_CallNucs.sh to:"
-echo "  $OUT_DIR/ONTRun9   and/or   $OUT_DIR/ONTRun10"
+echo "  $OUT_DIR/ONTRun13   and/or   $OUT_DIR/ONTRun14"

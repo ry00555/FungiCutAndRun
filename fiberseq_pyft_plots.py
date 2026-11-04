@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
-Fiber-seq visualization using pyft — Neurospora crassa
-=======================================================
+Fiber-seq visualization using pyft — any genome
+================================================
+Works for Neurospora or Aspergillus samples: pass the TSS BED that matches
+the genome the sample was aligned to (see <RUN>_samples.tsv from Pt1).
 Covers all major plot types available through pyft plus
 custom plots for nucleosome spacing heterogeneity analysis.
 
@@ -14,6 +16,13 @@ Usage:
         --tss  /path/to/neurospora.bed \
         --out  /path/to/output_dir \
         --sample WT_Eddie
+
+    # Aspergillus sample: same command, Aspergillus TSS BED
+    python fiberseq_pyft_plots.py \
+        --bam  /path/to/ONTRun13_CEA10_Af_Justina_barcode07_merged.nucs.bam \
+        --tss  /path/to/Afum_CEA10_TSS.bed \
+        --out  /path/to/output_dir \
+        --sample CEA10_Af_rep1
 
     # Compare two samples (WT vs mutant):
     python fiberseq_pyft_plots.py \
@@ -56,6 +65,10 @@ COLORS = {
     "cac-2":          "#F4A582",
     "rtt109":         "#762A83",
     "rtt109FLAG":     "#9970AB",
+    "WT_Nc":          "#2166AC",
+    "isw":            "#E08214",
+    "K214R":          "#B2182B",
+    "CEA10":          "#1B7837",
     "default_wt":     "#2166AC",
     "default_mut":    "#D6604D",
 }
@@ -535,7 +548,7 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--bam",     required=True, help="*.nucs.bam for sample 1 (or WT)")
     parser.add_argument("--bam2",    default=None,  help="*.nucs.bam for sample 2 (mutant) — optional")
-    parser.add_argument("--tss",     required=True, help="TSS BED file (neurospora.bed)")
+    parser.add_argument("--tss",     required=True, help="TSS BED file for the sample's genome")
     parser.add_argument("--out",     required=True, help="Output directory")
     parser.add_argument("--sample",  default="sample1", help="Name for sample 1")
     parser.add_argument("--sample2", default="sample2", help="Name for sample 2")
