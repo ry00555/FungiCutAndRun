@@ -31,7 +31,7 @@ set -euo pipefail
 module load Miniforge3/24.11.3-0 ucsc/443
 source activate /home/ry00555/fibertools
 
-WORKDIR="/lustre2/scratch/ry00555/ONTRun9_10Combined/fibertools_results"
+WORKDIR="/lustre2/scratch/ry00555/ONTRun13_14combined/fibertools_results"
 GENOME="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
 
 echo "============================================================"
@@ -82,7 +82,7 @@ make_bigwig() {
 }
 
 # ── Main loop ────────────────────────────────────────────────────
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
 
     RUN_DIR="$WORKDIR/$RUN"
     if [ ! -d "$RUN_DIR" ]; then
@@ -145,7 +145,7 @@ echo ""
 echo "============================================================"
 echo " Part 3 complete."
 echo "============================================================"
-for RUN in ONTRun9 ONTRun10; do
+for RUN in ONTRun13 ONTRun14; do
     echo ""
     echo "  $RUN BigWigs:"
     find "$WORKDIR/$RUN" -name "*.bw" | sort | while read -r BW; do
