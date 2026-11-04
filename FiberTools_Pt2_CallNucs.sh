@@ -25,8 +25,8 @@ set -euo pipefail
 module load Miniforge3/24.11.3-0
 source activate /home/ry00555/fibertools
 
-MERGED_DIR="/scratch/ry00555/ONTRun13_14Combined/MergedBams"
-OUT_DIR="/scratch/ry00555/ONTRun13_14Combined/fibertools_results"
+MERGED_DIR="/scratch/ry00555/ONTRun13_14combined/MergedBams"
+OUT_DIR="/scratch/ry00555/ONTRun13_14combined/fibertools_results"
 THREADS=8
 
 mkdir -p "$OUT_DIR"
