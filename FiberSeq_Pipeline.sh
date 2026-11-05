@@ -14,8 +14,9 @@
 #  Run with bash (NOT sbatch) from the folder holding this script and
 #  fiber_nuc_spacing.py:
 #
-#     bash FiberSeq_pipeline.sh                # submit everything
-#     RUN_LIST="ONTRun14" bash FiberSeq_pipeline.sh     # a different run, no editing
+#     bash FiberSeq_pipeline.sh                          # submit everything
+#     RUN_LIST="ONTRun14" bash FiberSeq_pipeline.sh      # a different run, no editing
+#     POOL_RUNS=true bash FiberSeq_pipeline.sh           # pool the same DNA sequenced in several runs
 #
 #  It reads each run's metadata CSV, then submits
 #    1. one job PER SAMPLE (all in parallel), each doing:
@@ -44,7 +45,7 @@ RUN_LIST="${RUN_LIST:-ONTRun13 ONTRun14}"
 
 # Where each run's MinKNOW BAMs and metadata live ({RUN} is replaced by the run name)
 BAM_PASS_PATTERN="/scratch/ry00555/{RUN}/bam_pass"          # contains barcode01/, barcode02/ ...
-META_PATTERN="/scratch/ry00555/{RUN}/{RUN}_meta.csv"        # columns: Index, Strain, Notes, Owner ...
+META_PATTERN="/scratch/ry00555/{RUN}/{RUN}_meta.csv"        # columns: run,barcode,sample_name,genome,genotype,condition,bio_rep,tech_rep,include,...
 
 # ── GENOME: un-comment ONE block, comment out the others ─────────────────────
 # GENOME_SIZES and TSS_BED are optional ("" = make sizes from the FASTA / skip TSS plots).
@@ -53,16 +54,21 @@ META_PATTERN="/scratch/ry00555/{RUN}/{RUN}_meta.csv"        # columns: Index, St
 GENOME_NAME="Ncrassa"
 GENOME_FASTA="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
 GENOME_SIZES="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
-TSS_BED=""
+TSS_BED="/home/ry00555/Research/Genomes/neurospora_TSS_stranded.bed"
 
 #GENOME_NAME="Afum_CEA10"
 #GENOME_FASTA="/home/ry00555/Research/Genomes/Afum_CEA10/Afum_A1163_edit6.fasta"
-#GENOME_SIZES=""
-#TSS_BED=""
+#GENOME_SIZES="/home/ry00555/Research/Genomes/Afum_CEA10/Afum_A1163_edit6.chrom.sizes.txt"
+#TSS_BED="/home/ry00555/Research/Genomes/Afum_CEA10_TSS.bed"
 
-# All output goes here: one folder per set of runs + genome
+# Pool re-sequenced DNA: true = rows with the same sample_name in different runs are merged
+# and analysed as ONE sample (more fibers). false = every run/barcode analysed separately.
+# Pooled and unpooled results go to different folders, so you can run both and compare.
+POOL_RUNS="${POOL_RUNS:-false}"
+
+# All output goes here: one folder per set of runs + genome (+ "_pooled")
 PROJECT="${PROJECT:-$(echo "$RUN_LIST" | tr ' ' '_')}"
-OUT="/scratch/ry00555/FiberSeq/${PROJECT}_${GENOME_NAME}"
+OUT="/scratch/ry00555/FiberSeq/${PROJECT}_${GENOME_NAME}$([[ "$POOL_RUNS" == true ]] && echo _pooled)"
 
 # Analysis settings
 MIN_MAPQ=10        # alignment quality filter when merging
@@ -143,29 +149,57 @@ setup () {
     META="${META_PATTERN//\{RUN\}/$RUN}"; BP="${BAM_PASS_PATTERN//\{RUN\}/$RUN}"
     [[ -s "$META" ]] || { echo "ERROR: metadata not found: $META"; exit 1; }
     [[ -d "$BP" ]]   || { echo "ERROR: bam_pass not found: $BP"; exit 1; }
-    tr -d '\r' < "$META" | awk -F',' '
-      NR == 1 { for (i = 1; i <= NF; i++) c[$i] = i; next }
-      { s = $c["Strain"]; r = $c["Notes"]; gsub(/[^A-Za-z0-9_.-]/, "_", s); gsub(/[^A-Za-z0-9_.-]/, "_", r)
-        if (s != "") print $c["Index"] "\t" s "\t" r }' \
-    | while IFS=$'\t' read -r BC STRAIN REP; do
-        local S="${RUN}_${STRAIN}${REP:+_$REP}"
-        # keep names unique (add barcode if Strain+Notes repeats)
-        if cut -f3 "$SAMPLE_TABLE" | grep -qx "$S"; then S="${S}_${BC}"; fi
-        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$RUN" "$BC" "$S" "$STRAIN" "$REP" "$GENOME_NAME" \
+    # Metadata columns used: barcode, sample_name, genome, genotype, condition, bio_rep, tech_rep, include
+    # Only rows with include=yes AND genome = the active GENOME_NAME are processed.
+    tr -d '\r' < "$META" | awk -F',' -v G="$GENOME_NAME" '
+      NR == 1 { for (i = 1; i <= NF; i++) c[$i] = i
+                if (!("sample_name" in c) || !("genome" in c)) {
+                  print "ERROR: metadata needs columns barcode,sample_name,genome,genotype,condition,bio_rep,tech_rep,include" > "/dev/stderr"; exit 1 }
+                next }
+      { inc = tolower($c["include"]); if (inc != "yes") next
+        if ($c["genome"] != G) { skipped++; next }
+        grp = $c["genotype"]; if ($c["condition"] != "") grp = grp "_" $c["condition"]
+        rep = "rep" $c["bio_rep"] "_tech" $c["tech_rep"]
+        gsub(/[^A-Za-z0-9_.-]/, "_", grp)
+        print $c["barcode"] "\t" $c["sample_name"] "\t" grp "\t" rep }
+      END { if (skipped) printf "  (%d sample(s) in this run use another genome — skipped)\n", skipped > "/dev/stderr" }' \
+    | while IFS=$'\t' read -r BC NAME GROUP REP; do
+        local S="${RUN}_${NAME}"
+        if cut -f3 "$SAMPLE_TABLE" | grep -qx "$S"; then
+          echo "ERROR: sample_name '$NAME' appears twice in $META — names must be unique"; exit 1
+        fi
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n" "$RUN" "$BC" "$S" "$GROUP" "$REP" "$GENOME_NAME" \
           "$GENOME_FASTA" "$SZ" "$BP/$BC" >> "$SAMPLE_TABLE"
       done
   done
 
+  # pool rows with the same sample_name across runs into one sample
+  if [[ "$POOL_RUNS" == true ]]; then
+    awk -F'\t' -v OFS='\t' '
+      NR == 1 { print; next }
+      { name = substr($3, length($1) + 2)                       # sample_name without the run prefix
+        if (!(name in seen)) { seen[name] = 1; order[++n] = name; grp[name] = $4; rep[name] = $5
+                               gen[name] = $6; fa[name] = $7; sz[name] = $8 }
+        runs[name] = runs[name] (runs[name] ? "+" : "") $1
+        bcs[name]  = bcs[name]  (bcs[name]  ? "+" : "") $1 ":" $2
+        dirs[name] = dirs[name] (dirs[name] ? "," : "") $9 }
+      END { for (i = 1; i <= n; i++) { k = order[i]
+              print runs[k], bcs[k], k, grp[k], rep[k], gen[k], fa[k], sz[k], dirs[k] } }' \
+      "$SAMPLE_TABLE" > "$SAMPLE_TABLE.pooled" && mv "$SAMPLE_TABLE.pooled" "$SAMPLE_TABLE"
+  fi
+
   local N; N=$(($(wc -l < "$SAMPLE_TABLE") - 1))
   echo "============================================================"
-  echo " FiberSeq pipeline — $PROJECT ($N samples, genome: $GENOME_NAME)"
+  echo " FiberSeq pipeline — $PROJECT ($N samples, genome: $GENOME_NAME, pooled runs: $POOL_RUNS)"
   echo " Output: $OUT"
   echo "============================================================"
-  awk -F'\t' 'NR>1{ n=0; cmd="ls " $9 "/*.bam 2>/dev/null | wc -l"; cmd | getline n; close(cmd)
-                    printf "  %-45s %-10s %s split BAMs\n", $3, $2, n }' "$SAMPLE_TABLE"
-  (( N > 0 )) || { echo "ERROR: no samples with a Strain in the metadata"; exit 1; }
+  awk -F'\t' 'NR>1{ t = 0; k = split($9, d, ",")
+                    for (j = 1; j <= k; j++) { n = 0; cmd = "ls " d[j] "/*.bam 2>/dev/null | wc -l"
+                                               cmd | getline n; close(cmd); t += n }
+                    printf "  %-40s %-30s %s split BAMs\n", $3, $2, t }' "$SAMPLE_TABLE"
+  (( N > 0 )) || { echo "ERROR: no samples with include=yes and genome=$GENOME_NAME in the metadata"; exit 1; }
 
-  export RUN_LIST PROJECT
+  export RUN_LIST PROJECT POOL_RUNS
   local J1 J2
   J1=$(sbatch --parsable --array=1-"$N" --job-name="FS_${PROJECT}" \
          --output="$D_LOG/sample_%a_%A.out" --error="$D_LOG/sample_%a_%A.err" \
@@ -201,22 +235,36 @@ run_sample () {
   # ── 1. merge split BAMs (+ re-align if needed) ──────────────────────────────
   echo ""; echo "[1/11] merge split BAMs"
   if [[ ! -s "$FIRE" && ! -s "$MERGED" ]]; then
-    local BAMS=( "$SRC"/*.bam )
-    [[ -f "${BAMS[0]}" ]] || { echo "❌ no BAMs in $SRC"; exit 1; }
-    echo "     ${#BAMS[@]} split BAMs"
-    if diff -q <(samtools view -H "${BAMS[0]}" | awk '$1=="@SQ"{sub(/^SN:/,"",$2); print $2}' | sort) \
-               <(cut -f1 "$SIZES" | sort) > /dev/null; then
-      echo "     already aligned to $G → MAPQ≥$MIN_MAPQ filter + sort"
-      samtools cat "${BAMS[@]}" | samtools view -u -q "$MIN_MAPQ" - \
-        | samtools sort -@ "$T" -T "$TMP/s" -o "$MERGED" -
+    # SRC is one barcode folder, or several (comma-separated) when POOL_RUNS=true
+    local DIRS PARTS=() i=0 dir part
+    IFS=',' read -ra DIRS <<< "$SRC"
+    for dir in "${DIRS[@]}"; do
+      local BAMS=( "$dir"/*.bam )
+      [[ -f "${BAMS[0]}" ]] || { echo "❌ no BAMs in $dir"; exit 1; }
+      part="$TMP/part$i.bam"; i=$((i + 1))
+      echo "     $dir: ${#BAMS[@]} split BAMs"
+      if diff -q <(samtools view -H "${BAMS[0]}" | awk '$1=="@SQ"{sub(/^SN:/,"",$2); print $2}' | sort) \
+                 <(cut -f1 "$SIZES" | sort) > /dev/null; then
+        echo "       already aligned to $G → MAPQ≥$MIN_MAPQ filter + sort"
+        samtools cat "${BAMS[@]}" | samtools view -u -q "$MIN_MAPQ" - \
+          | samtools sort -@ "$T" -T "$TMP/s$i" -o "$part" -
+      else
+        echo "       not aligned to $G → re-aligning with minimap2 (keeping MM/ML/MN tags)"
+        module load "$MINIMAP2_MODULE"
+        [[ -s "$FASTA" ]] || { echo "❌ FASTA not found: $FASTA"; exit 1; }
+        samtools cat "${BAMS[@]}" | samtools fastq -F 0x900 -T MM,ML,MN - \
+          | minimap2 -ax map-ont -y -t "$T" "$FASTA" - \
+          | samtools view -u -q "$MIN_MAPQ" - \
+          | samtools sort -@ "$T" -T "$TMP/s$i" -o "$part" -
+      fi
+      PARTS+=("$part")
+    done
+    if (( ${#PARTS[@]} == 1 )); then
+      mv "${PARTS[0]}" "$MERGED"
     else
-      echo "     not aligned to $G → re-aligning with minimap2 (keeping MM/ML/MN tags)"
-      module load "$MINIMAP2_MODULE"
-      [[ -s "$FASTA" ]] || { echo "❌ FASTA not found: $FASTA"; exit 1; }
-      samtools cat "${BAMS[@]}" | samtools fastq -F 0x900 -T MM,ML,MN - \
-        | minimap2 -ax map-ont -y -t "$T" "$FASTA" - \
-        | samtools view -u -q "$MIN_MAPQ" - \
-        | samtools sort -@ "$T" -T "$TMP/s" -o "$MERGED" -
+      echo "     pooling ${#PARTS[@]} runs"
+      samtools merge -@ "$T" -o "$MERGED" "${PARTS[@]}"
+      rm -f "${PARTS[@]}"
     fi
     samtools index "$MERGED"
     echo "     ✅ $(samtools view -c "$MERGED") reads"
@@ -412,7 +460,7 @@ run_summary () {
   module load "$DEEPTOOLS_MODULE"
   local T="${SLURM_CPUS_PER_TASK:-8}" G STRAIN TR
 
-  echo "== Strain-averaged BigWigs (replicates and runs combined)"
+  echo "== Group-averaged BigWigs (genotype + condition; replicates and runs combined)"
   mkdir -p "$D_SUM/strain_bigwigs"
   for STRAIN in $(tail -n +2 "$SAMPLE_TABLE" | cut -f4 | sort -u); do
     for TR in nuc_occupancy nuc_dyads dinuc_fraction NDR_fraction accessibility FIRE_fraction m6A_fraction; do
