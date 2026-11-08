@@ -41,25 +41,25 @@
 
 # Runs to process together (space-separated). Override without editing:
 #   RUN_LIST="ONTRun14" bash FiberSeq_pipeline.sh
-RUN_LIST="${RUN_LIST:-ONTRun13 ONTRun14}"
+RUN_LIST="${RUN_LIST:-ONTRun13_CEA10Align}"
 
 # Where each run's MinKNOW BAMs and metadata live ({RUN} is replaced by the run name)
-BAM_PASS_PATTERN="/scratch/ry00555/{RUN}/bam_pass"          # contains barcode01/, barcode02/ ...
+BAM_PASS_PATTERN="/scratch/ry00555/Afum/{RUN}/bam_pass"          # contains barcode01/, barcode02/ ...
 META_PATTERN="/scratch/ry00555/{RUN}/{RUN}_meta.csv"        # columns: run,barcode,sample_name,genome,genotype,condition,bio_rep,tech_rep,include,...
 
 # ── GENOME: un-comment ONE block, comment out the others ─────────────────────
 # GENOME_SIZES and TSS_BED are optional ("" = make sizes from the FASTA / skip TSS plots).
 # All samples are aligned to this genome (re-aligned if MinKNOW used a different one).
 
-GENOME_NAME="Ncrassa"
-GENOME_FASTA="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
-GENOME_SIZES="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
-TSS_BED="/home/ry00555/Research/Genomes/neurospora_TSS_stranded.bed"
+#GENOME_NAME="Ncrassa"
+#GENOME_FASTA="/home/zlewis/Genomes/Neurospora/Nc12_RefSeq/GCA_000182925.2_NC12_genomic.fna"
+#GENOME_SIZES="/home/ry00555/Research/Genomes/GenBankNcrassachromsizes.txt"
+#TSS_BED="/home/ry00555/Research/Genomes/neurospora_TSS_stranded.bed"
 
-#GENOME_NAME="Afum_CEA10"
-#GENOME_FASTA="/home/ry00555/Research/Genomes/Afum_CEA10/Afum_A1163_edit6.fasta"
-#GENOME_SIZES="/home/ry00555/Research/Genomes/Afum_CEA10/Afum_A1163_edit6.chrom.sizes.txt"
-#TSS_BED="/home/ry00555/Research/Genomes/Afum_CEA10_TSS.bed"
+GENOME_NAME="Afum_CEA10"
+GENOME_FASTA="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1_ASM5122562v1_genomic.fna"
+GENOME_SIZES="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1.chrom.sizes.txt"
+TSS_BED="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1_TSS_CEA10.bed"
 
 # Pool re-sequenced DNA: true = rows with the same sample_name in different runs are merged
 # and analysed as ONE sample (more fibers). false = every run/barcode analysed separately.
