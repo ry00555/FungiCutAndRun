@@ -17,6 +17,7 @@
 #     bash FiberSeq_pipeline.sh                          # submit everything
 #     RUN_LIST="ONTRun14" bash FiberSeq_pipeline.sh      # a different run, no editing
 #     POOL_RUNS=true bash FiberSeq_pipeline.sh           # pool the same DNA sequenced in several runs
+#     MODE=resummary bash FiberSeq_pipeline.sh           # re-submit ONLY the summary job (TSS plots etc.)
 #
 #  It reads each run's metadata CSV, then submits
 #    1. one job PER SAMPLE (all in parallel), each doing:
@@ -28,7 +29,7 @@
 #         -> single-fiber tables for PLOT_REGIONS (for FiberSeq_figures.Rmd)
 #    2. one SUMMARY job after all samples finish:
 #         combined QC + spacing tables, comparison plots, strain-averaged BigWigs,
-#         TSS occupancy / phasing profiles
+#         TSS profiles + heatmaps (nucleosome occupancy and 6mA)
 #
 #  Every step skips work that already exists, so re-running after a failure
 #  only redoes what is missing.
@@ -479,7 +480,7 @@ run_summary () {
   G="$GENOME_NAME"; local BED="$TSS_BED"
   if [[ -n "$BED" && -s "$BED" ]]; then
     local STRAINS; STRAINS=$(tail -n +2 "$SAMPLE_TABLE" | cut -f4 | sort -u)
-    for TR in nuc_occupancy nuc_dyads NDR_fraction accessibility FIRE_fraction; do
+    for TR in nuc_occupancy m6A_fraction nuc_dyads NDR_fraction accessibility FIRE_fraction; do
       local BWS=() LAB=()
       for STRAIN in $STRAINS; do
         [[ -s "$D_SUM/strain_bigwigs/$STRAIN.$TR.bw" ]] && { BWS+=("$D_SUM/strain_bigwigs/$STRAIN.$TR.bw"); LAB+=("$STRAIN"); }
@@ -491,7 +492,15 @@ run_summary () {
         -p "$T" -o "$M" || continue
       plotProfile -m "$M" --perGroup --plotTitle "$G: $TR around TSS" -out "$D_SUM/TSS_${G}.${TR}.png"
       plotProfile -m "$M" --perGroup --plotTitle "$G: $TR around TSS" -out "$D_SUM/TSS_${G}.${TR}.pdf"
-      [[ "$TR" == nuc_occupancy ]] && plotHeatmap -m "$M" --colorMap Blues -out "$D_SUM/TSS_${G}.${TR}.heatmap.png"
+      # heatmaps: nucleosome occupancy (blue) and m6A / 6mA accessibility (purple)
+      case "$TR" in
+        nuc_occupancy) plotHeatmap -m "$M" --colorMap Blues   --heatmapHeight 15 \
+                         --zMin 0 --yAxisLabel "nucleosome occupancy" \
+                         -out "$D_SUM/TSS_${G}.${TR}.heatmap.png" ;;
+        m6A_fraction)  plotHeatmap -m "$M" --colorMap Purples --heatmapHeight 15 \
+                         --zMin 0 --yAxisLabel "6mA (m6A) fraction" \
+                         -out "$D_SUM/TSS_${G}.${TR}.heatmap.png" ;;
+      esac
       echo "   TSS_${G}.${TR}"
     done
   else
@@ -505,5 +514,10 @@ case "${MODE:-setup}" in
   setup)   setup ;;
   sample)  run_sample ;;
   summary) set +e; run_summary ;;
+  resummary)                                  # submit just the summary job (samples already done)
+    mkdir -p "$D_LOG"; export RUN_LIST PROJECT POOL_RUNS
+    sbatch --job-name="FS_${PROJECT}_summary" --cpus-per-task=8 --mem=32G --time=8:00:00 \
+      --mail-type=END,FAIL --output="$D_LOG/summary_%j.out" --error="$D_LOG/summary_%j.err" \
+      --export=ALL,MODE=summary "$0" ;;
   *) echo "Unknown MODE=$MODE"; exit 1 ;;
 esac
