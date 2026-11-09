@@ -15,8 +15,8 @@
 
 cd $SLURM_SUBMIT_DIR
 # Directories
-INPUT_DIR="/scratch/ry00555/AlphaFold/AF3/input"
-OUTPUT_DIR="/scratch/ry00555/AlphaFold/AF3/output"
+INPUT_DIR="/scratch/ry00555/AlphaFold/input/AF3"
+OUTPUT_DIR="/scratch/ry00555/AlphaFold/output/AF3"
 MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"        # where your AlphaFold3 parameters live
 PUBLIC_DB="/db/AlphaFold3/20241114"                # Sapelo2 path for public database
 
