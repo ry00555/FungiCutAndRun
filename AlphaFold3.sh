@@ -7,16 +7,16 @@
 #SBATCH --constraint=Milan|SapphireRapids	#…this is the easiest way to specify either one without accidentally using a P100 or L4, which lack sufficient device memory
 #SBATCH --mem=60gb
 #SBATCH --time=10:00:00
-#SBATCH --output=../alphafold3_rtt109_isw.%j.out
-#SBATCH --error=../alphafold3_rtt109_isw.%j.err
+#SBATCH --output=../alphafold3_macrod1.%j.out
+#SBATCH --error=../alphafold3_macrod1.%j.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ry00555@uga.edu
 
 
 cd $SLURM_SUBMIT_DIR
 # Directories
-INPUT_DIR="/scratch/ry00555/AlphaFold/input"
-OUTPUT_DIR="/scratch/ry00555/AlphaFold/output"
+INPUT_DIR="/scratch/ry00555/AlphaFold/AF3/input"
+OUTPUT_DIR="/scratch/ry00555/AlphaFold/AF3/output"
 MODEL_DIR="/home/ry00555/Research/FungiCutAndRun/AlphaFold3"        # where your AlphaFold3 parameters live
 PUBLIC_DB="/db/AlphaFold3/20241114"                # Sapelo2 path for public database
 
@@ -28,7 +28,7 @@ singularity exec \
      --bind ${PUBLIC_DB}:/root/public_databases \
      /apps/singularity-images/alphafold-3.0.0.sif \
      python /app/alphafold/run_alphafold.py \
-     --json_path=/root/af_input/ASH1_EAF3Transcoder.json \
+     --json_path=/root/af_input/MACROD1.json \
      --model_dir=/root/models \
      --db_dir=/root/public_databases \
      --output_dir=/root/af_output
