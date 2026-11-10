@@ -42,7 +42,7 @@
 
 # Runs to process together (space-separated). Override without editing:
 #   RUN_LIST="ONTRun14" bash FiberSeq_pipeline.sh
-RUN_LIST="${RUN_LIST:-ONTRun13_CEA10Align}"
+RUN_LIST="${RUN_LIST:-ONT13_CEA10align_megabam}"
 
 # Where each run's MinKNOW BAMs and metadata live ({RUN} is replaced by the run name)
 BAM_PASS_PATTERN="/scratch/ry00555/Afum/{RUN}/bam_pass"          # contains barcode01/, barcode02/ ...
@@ -67,6 +67,20 @@ TSS_BED="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1_TSS_CEA10.bed
 #grep -Ff my_gene_list.txt reference.gtf > extracted_genes.gtf
 #awk '$3=="gene" {print $1 "\t" $4-1 "\t" $5 "\t" $9}' extracted_genes.gtf > extracted_genes.bed
 
+
+#module load SAMtools
+
+#cd /scratch/ry00555/ONTRun13/bam_pass          # change to your run
+
+# list every barcode's split BAMs (unclassified is left out)
+# ls barcode0[7-9]/*.bam > all_bams.txt
+# wc -l < all_bams.txt                            # how many files will be merged
+#
+# # concatenate, sort by position, index
+# samtools cat -b all_bams.txt -o - \
+#   | samtools sort -@ 8 -m 2G -o ONTRun13_all_barcodes.bam -
+# samtools index ONTRun13_all_barcodes.bam
+# samtools flagstat ONTRun13_all_barcodes.bam
 
 # Pool re-sequenced DNA: true = rows with the same sample_name in different runs are merged
 # and analysed as ONE sample (more fibers). false = every run/barcode analysed separately.
