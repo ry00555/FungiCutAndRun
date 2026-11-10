@@ -62,6 +62,12 @@ GENOME_FASTA="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1_ASM51225
 GENOME_SIZES="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1.chrom.sizes.txt"
 TSS_BED="/home/ry00555/Research/Genomes/Afum_CEA10/GCA_051225625.1_TSS_CEA10.bed"
 
+
+#make a new .bed file from a list of genes in .txt
+#grep -Ff my_gene_list.txt reference.gtf > extracted_genes.gtf
+#awk '$3=="gene" {print $1 "\t" $4-1 "\t" $5 "\t" $9}' extracted_genes.gtf > extracted_genes.bed
+
+
 # Pool re-sequenced DNA: true = rows with the same sample_name in different runs are merged
 # and analysed as ONE sample (more fibers). false = every run/barcode analysed separately.
 # Pooled and unpooled results go to different folders, so you can run both and compare.
